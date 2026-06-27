@@ -398,14 +398,6 @@ function renderWeeklySchedule() {
         return s.releaseDay === selectedDay;
     });
     
-    // Sort schedule shows chronologically (Day of week index, then release time)
-    scheduledShows.sort((a, b) => {
-        const dayA = DAYS_MAP[a.releaseDay];
-        const dayB = DAYS_MAP[b.releaseDay];
-        if (dayA !== dayB) return dayA - dayB;
-        return a.releaseTime.localeCompare(b.releaseTime);
-    });
-    
     if (scheduledShows.length === 0) {
         listEl.innerHTML = `
             <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem 0;">
@@ -416,22 +408,54 @@ function renderWeeklySchedule() {
     }
     
     const todayName = DAYS_ARRAY[new Date().getDay()];
+    const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const daysToRender = selectedDay === 'all' ? daysOrder : [selectedDay];
     
-    listEl.innerHTML = scheduledShows.map(show => {
-        const isToday = show.releaseDay === todayName;
-        return `
-            <div class="schedule-item" style="${isToday ? 'border-color: rgba(157, 78, 221, 0.4); background: rgba(157,78,221,0.03)' : ''}">
-                <div class="schedule-item-name">
-                    ${isToday ? '<i class="fa-solid fa-circle-play" style="color: var(--accent-purple); font-size: 0.75rem; animation: pulse 1.5s infinite"></i>' : ''}
-                    <span>${show.title}</span>
+    let html = '';
+    daysToRender.forEach(day => {
+        const dayShows = scheduledShows.filter(s => s.releaseDay === day);
+        if (dayShows.length === 0) return; // Skip days with no releases
+        
+        // Sort shows chronologically for this specific day
+        dayShows.sort((a, b) => a.releaseTime.localeCompare(b.releaseTime));
+        
+        const isToday = day === todayName;
+        
+        html += `
+            <div class="day-schedule-group" style="margin-bottom: 1.2rem;">
+                <div class="day-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding: 0 0.2rem;">
+                    <span style="font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700; color: ${isToday ? 'var(--accent-purple)' : 'var(--text-secondary)'}; display: flex; align-items: center; gap: 0.4rem;">
+                        ${isToday ? '<i class="fa-solid fa-circle" style="font-size: 0.5rem; color: var(--accent-purple);"></i>' : ''}
+                        ${day} ${isToday ? '(Today)' : ''}
+                    </span>
+                    <span style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 10px; color: var(--text-muted);">
+                        ${dayShows.length} show${dayShows.length === 1 ? '' : 's'}
+                    </span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem">
-                    ${selectedDay === 'all' ? `<span class="schedule-item-day">${show.releaseDay.slice(0, 3)}</span>` : ''}
-                    <span class="schedule-item-time"><i class="fa-regular fa-clock"></i> ${show.releaseTime}</span>
+                <div class="day-schedule-list" style="display: flex; flex-direction: column; gap: 0.4rem;">
+        `;
+        
+        html += dayShows.map(show => {
+            return `
+                <div class="schedule-item" style="${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''}">
+                    <div class="schedule-item-name">
+                        ${isToday ? '<i class="fa-solid fa-circle-play" style="color: var(--accent-purple); font-size: 0.75rem; animation: pulse 1.5s infinite"></i>' : ''}
+                        <span>${show.title}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem">
+                        <span class="schedule-item-time" style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="color: var(--accent-purple); margin-right: 0.2rem;"></i> ${show.releaseTime}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        html += `
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    
+    listEl.innerHTML = html;
 }
 
 /**

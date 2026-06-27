@@ -529,7 +529,7 @@ input, textarea {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    max-height: 250px;
+    max-height: 360px;
     overflow-y: auto;
     padding-right: 0.4rem;
 }
