@@ -1044,9 +1044,10 @@ input, textarea {
     backdrop-filter: blur(8px);
     z-index: 100;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 1rem;
+    padding: 2rem 1rem;
+    overflow-y: auto;
 }
 
 .modal-content {
