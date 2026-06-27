@@ -504,7 +504,11 @@ function renderHeroBanner() {
     }
     
     const bannerGradient = getPosterGradient(show.title);
-    bannerEl.style.background = `linear-gradient(135deg, rgba(20, 26, 38, 0.9), rgba(10, 12, 20, 0.98)), ${bannerGradient}`;
+    if (show.poster) {
+        bannerEl.style.background = `linear-gradient(135deg, rgba(10, 12, 20, 0.75), rgba(5, 6, 10, 0.95)), url(${show.poster}) center/cover no-repeat`;
+    } else {
+        bannerEl.style.background = `linear-gradient(135deg, rgba(20, 26, 38, 0.9), rgba(10, 12, 20, 0.98)), ${bannerGradient}`;
+    }
     
     bannerEl.innerHTML = `
         <div class="banner-details">
@@ -521,6 +525,66 @@ function renderHeroBanner() {
         </div>
         ${countdownHtml}
     `;
+}
+
+/**
+ * Asynchronously fetches a show's page HTML via Native Java bridge,
+ * parses out the OpenGraph banner image (og:image), and caches it.
+ */
+function fetchShowBanner(showId, countdownUrl) {
+    if (!window.AndroidApp || !window.AndroidApp.fetchUrl) return;
+    if (!countdownUrl || !countdownUrl.startsWith('http')) return;
+    
+    // Generate unique callback
+    const callbackName = "cb_banner_" + showId.replace(/[^a-zA-Z0-9]/g, '') + "_" + Math.floor(Math.random() * 1000000);
+    window[callbackName] = function(html) {
+        delete window[callbackName];
+        if (!html) return;
+        
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Try og:image first
+            const ogImage = doc.querySelector('meta[property="og:image"]');
+            let imageUrl = ogImage ? ogImage.getAttribute('content') : null;
+            
+            // If not found, try twitter:image
+            if (!imageUrl) {
+                const twImage = doc.querySelector('meta[name="twitter:image"]');
+                imageUrl = twImage ? twImage.getAttribute('content') : null;
+            }
+            
+            // Fallback: check other standard image fields
+            if (!imageUrl) {
+                const itemImg = doc.querySelector('img[src*="posters/"], img[src*="fanart/"], .poster-img');
+                imageUrl = itemImg ? itemImg.src : null;
+            }
+            
+            if (imageUrl) {
+                // Ensure image uses HTTPS
+                if (imageUrl.startsWith('//')) {
+                    imageUrl = 'https:' + imageUrl;
+                }
+                
+                const idx = shows.findIndex(s => s.id === showId);
+                if (idx !== -1 && shows[idx].poster !== imageUrl) {
+                    shows[idx].poster = imageUrl;
+                    localStorage.setItem('donghua_shows', JSON.stringify(shows));
+                    
+                    // Re-render display
+                    updateStats();
+                    renderWeeklySchedule();
+                    renderHeroBanner();
+                    renderShowsGrid();
+                }
+            }
+        } catch (e) {
+            console.error("Failed to parse banner HTML for ID: " + showId, e);
+        }
+    };
+    
+    window.AndroidApp.fetchUrl(countdownUrl, callbackName);
 }
 
 /**
@@ -940,6 +1004,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clock/Timer Loop
     setInterval(updateTimers, 1000);
     
+    // Auto-fetch missing posters from saved countdown links
+    setTimeout(() => {
+        shows.forEach(show => {
+            if (show.countdownUrl && !show.poster) {
+                fetchShowBanner(show.id, show.countdownUrl);
+            }
+        });
+    }, 1500);
+    
     // Modal Close buttons
     document.getElementById('btn-close-modal').addEventListener('click', closeModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
@@ -983,6 +1056,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         saveState();
         closeModal();
+        
+        if (newShowData.countdownUrl) {
+            // Trigger fetch banner asynchronously
+            setTimeout(() => fetchShowBanner(newShowData.id, newShowData.countdownUrl), 200);
+        }
     });
     
     // Search box listener

@@ -53,11 +53,52 @@ public class MainActivity extends AppCompatActivity {
         webView.setOnLongClickListener(v -> true);
         webView.setLongClickable(false);
 
-        // Add JavascriptInterface to allow web pages to trigger native exit
+        // Add JavascriptInterface to allow web pages to trigger native actions
         webView.addJavascriptInterface(new Object() {
             @android.webkit.JavascriptInterface
             public void exitApp() {
                 runOnUiThread(() -> finish());
+            }
+
+            @android.webkit.JavascriptInterface
+            public void fetchUrl(final String url, final String callbackName) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            java.net.URL urlObj = new java.net.URL(url);
+                            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) urlObj.openConnection();
+                            conn.setRequestMethod("GET");
+                            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                            conn.setConnectTimeout(10000);
+                            conn.setReadTimeout(10000);
+                            
+                            java.io.InputStream inStream = conn.getInputStream();
+                            java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(inStream, "UTF-8"));
+                            StringBuilder response = new StringBuilder();
+                            String inputLine;
+                            while ((inputLine = in.readLine()) != null) {
+                                response.append(inputLine).append("\n");
+                            }
+                            in.close();
+                            
+                            final String html = response.toString();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    webView.evaluateJavascript(callbackName + "(" + org.json.JSONObject.quote(html) + ");", null);
+                                }
+                            });
+                        } catch (final Exception e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    webView.evaluateJavascript(callbackName + "(null);", null);
+                                }
+                            });
+                        }
+                    }
+                }).start();
             }
         }, "AndroidApp");
 
