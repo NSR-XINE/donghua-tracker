@@ -791,9 +791,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clock/Timer Loop
     setInterval(updateTimers, 1000);
     
-    // Modal Open Buttons
-    document.getElementById('btn-add-show').addEventListener('click', () => openModal());
-    
     // Modal Close buttons
     document.getElementById('btn-close-modal').addEventListener('click', closeModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
