@@ -1083,25 +1083,58 @@ function openWatchScreen(url) {
 function exportData() {
     const json = localStorage.getItem('donghua_shows');
     if (!json) { alert('No data to export.'); return; }
+    
+    // File download trigger (creates a local .json file download)
+    try {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'donghua_backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error("Blob download failed", e);
+    }
+
     if (window.AndroidApp && window.AndroidApp.shareText) {
         window.AndroidApp.shareText(json);
     } else {
-        navigator.clipboard.writeText(json).then(() => alert('Data copied to clipboard.'));
+        navigator.clipboard.writeText(json).then(() => {
+            alert('Backup JSON copied to clipboard.');
+        }).catch(err => {
+            console.error("Clipboard write failed", err);
+        });
     }
 }
 
-function importData() {
-    const json = prompt('Paste your backup JSON here:');
-    if (!json) return;
+function importData(jsonString) {
+    let json = jsonString;
+    if (!json) {
+        json = prompt('Paste your backup JSON here:');
+    }
+    if (!json) return false;
     try {
         const parsed = JSON.parse(json);
-        if (!Array.isArray(parsed)) throw new Error('Invalid format');
+        if (!Array.isArray(parsed)) throw new Error('Invalid format: root must be a JSON array');
+        
+        // Simple schema verification
+        for (const item of parsed) {
+            if (!item.title || !item.id) {
+                throw new Error("Missing 'title' or 'id' fields in backup item");
+            }
+        }
+        
         shows = parsed;
         localStorage.setItem('donghua_shows', JSON.stringify(shows));
         saveState();
         alert('Import successful! ' + shows.length + ' shows loaded.');
+        return true;
     } catch(e) {
-        alert('Invalid backup data. Make sure you pasted the full JSON.');
+        alert('Failed to import backup: ' + e.message);
+        return false;
     }
 }
 
