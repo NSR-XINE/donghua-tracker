@@ -415,8 +415,15 @@ function renderHeroBanner() {
     const ongoingShows = shows.filter(s => s.status === 'ongoing');
     const bannerEl = document.getElementById('next-up-banner');
     
+    // Check mobile viewport and active tab
+    const isMobile = window.innerWidth <= 1024;
+    if (isMobile && activeTab !== 'home') {
+        if (bannerEl) bannerEl.style.setProperty('display', 'none', 'important');
+        return;
+    }
+    
     if (ongoingShows.length === 0) {
-        bannerEl.style.display = 'none';
+        if (bannerEl) bannerEl.style.display = 'none';
         return;
     }
     
@@ -1090,8 +1097,9 @@ function switchTab(tabName) {
     const filtersPanel = document.querySelector('.panel-filters');
     const devPanel = document.querySelector('.panel-dev-info');
     const scheduleContainer = document.querySelector('.schedule-container');
-    const heroBanner = document.getElementById('hero-banner-container');
+    const heroBanner = document.getElementById('next-up-banner');
     const sectionsContainer = document.getElementById('shows-sections-container');
+    const statsPanel = document.querySelector('.stats-panel');
     
     // Mobile Viewport Check (corresponds to CSS max-width: 1024px)
     const isMobile = window.innerWidth <= 1024;
@@ -1103,11 +1111,16 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
+        if (statsPanel) statsPanel.style.setProperty('display', 'none', 'important');
         
         // Show only the selected tab
         if (tabName === 'home') {
-            if (heroBanner) heroBanner.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+            if (statsPanel) statsPanel.style.setProperty('display', 'grid', 'important');
+            if (heroBanner) {
+                heroBanner.style.display = ''; // Clear important override
+                renderHeroBanner();
+            }
         } else if (tabName === 'schedule') {
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'filters') {
@@ -1124,6 +1137,7 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.display = '';
         if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';
+        if (statsPanel) statsPanel.style.display = '';
     }
 }
 
