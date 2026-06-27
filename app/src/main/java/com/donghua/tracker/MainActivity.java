@@ -1,7 +1,11 @@
 package com.donghua.tracker;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
@@ -9,11 +13,16 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import java.lang.ref.WeakReference;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private DatabaseHelper dbHelper;
+    private String pendingShowId = null;
 
     private void setImmersiveFullScreen() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -35,6 +44,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.hasExtra(NotificationReceiver.EXTRA_SHOW_ID)) {
+            String showId = intent.getStringExtra(NotificationReceiver.EXTRA_SHOW_ID);
+            if (showId != null && !showId.isEmpty()) {
+                pendingShowId = showId;
+                if (webView != null) {
+                    webView.evaluateJavascript("window.showNotificationDetail && window.showNotificationDetail(\"" + showId + "\");", null);
+                    pendingShowId = null;
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +73,39 @@ public class MainActivity extends AppCompatActivity {
         // Enable immersive full-screen sticky mode (called after contentView inflation to ensure system UI controller is ready)
         setImmersiveFullScreen();
 
+        // Initialize Database Helper
+        dbHelper = new DatabaseHelper(this);
+
         webView = findViewById(R.id.webview);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // If we were launched with a deep-link from a notification tap, dispatch it now
+                if (pendingShowId != null) {
+                    webView.evaluateJavascript("window.showNotificationDetail && window.showNotificationDetail(\"" + pendingShowId + "\");", null);
+                    pendingShowId = null;
+                }
+            }
+            
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // Block unknown external URL loads inside the WebView to prevent hijacking
+                if (url.startsWith("file://") || url.startsWith("https://animecountdown.com/") || url.startsWith("https://cdn.")) {
+                    return false;
+                }
+                // Open external watch/streaming links in system browser
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
+                    startActivity(browserIntent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+        });
+
+        webView.setWebChromeClient(new android.webkit.WebChromeClient());
 
         // Mask WebView initialization latency with dark theme color to prevent white flashes
         webView.setBackgroundColor(android.graphics.Color.parseColor("#05060a"));
@@ -144,10 +204,160 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            // SQLite Database Bridge Methods
+            @JavascriptInterface
+            public String getAllShows() {
+                return dbHelper.getAllShowsJson();
+            }
+
+            @JavascriptInterface
+            public boolean insertShow(String jsonStr) {
+                try {
+                    JSONObject obj = new JSONObject(jsonStr);
+                    return dbHelper.insertShow(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @JavascriptInterface
+            public boolean updateShow(String jsonStr) {
+                try {
+                    JSONObject obj = new JSONObject(jsonStr);
+                    return dbHelper.updateShow(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @JavascriptInterface
+            public boolean deleteShow(String id) {
+                return dbHelper.deleteShow(id);
+            }
+
+            @JavascriptInterface
+            public String getSetting(String key, String defaultVal) {
+                return dbHelper.getSetting(key, defaultVal);
+            }
+
+            @JavascriptInterface
+            public boolean saveSetting(String key, String value) {
+                return dbHelper.saveSetting(key, value);
+            }
+
+            @JavascriptInterface
+            public void addHistoryRecord(String showId, int episodeNum) {
+                dbHelper.addHistoryRecord(showId, episodeNum);
+            }
+
+            @JavascriptInterface
+            public String getHistory() {
+                return dbHelper.getHistoryJson();
+            }
+
+            @JavascriptInterface
+            public void clearDatabase() {
+                dbHelper.clearDatabase();
+            }
+
+            // Notification Reminders scheduler
+            @JavascriptInterface
+            public boolean checkNotificationPermission() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    return ContextCompat.checkSelfPermission(
+                            MainActivity.this,
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED;
+                }
+                return true;
+            }
+
+            @JavascriptInterface
+            public void requestNotificationPermission() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.requestPermissions(
+                            MainActivity.this,
+                            new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                            101
+                    );
+                }
+            }
+
+            @JavascriptInterface
+            public void scheduleReminder(String id, String title, long releaseTimeMs, int reminderOffsetMinutes) {
+                try {
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    if (alarmManager == null) return;
+
+                    Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
+                    intent.putExtra(NotificationReceiver.EXTRA_SHOW_ID, id);
+                    intent.putExtra(NotificationReceiver.EXTRA_SHOW_TITLE, title);
+
+                    int requestCode = id.hashCode() + reminderOffsetMinutes;
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                            MainActivity.this,
+                            requestCode,
+                            intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                    );
+
+                    long triggerTimeMs = releaseTimeMs - ((long) reminderOffsetMinutes * 60 * 1000);
+                    if (triggerTimeMs < System.currentTimeMillis()) {
+                        return; // Release time passed
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        if (alarmManager.canScheduleExactAlarms()) {
+                            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent);
+                        } else {
+                            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent);
+                        }
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent);
+                    } else {
+                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @JavascriptInterface
+            public void cancelReminder(String id, int reminderOffsetMinutes) {
+                try {
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    if (alarmManager == null) return;
+
+                    Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
+                    int requestCode = id.hashCode() + reminderOffsetMinutes;
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                            MainActivity.this,
+                            requestCode,
+                            intent,
+                            PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE
+                    );
+                    if (pendingIntent != null) {
+                        alarmManager.cancel(pendingIntent);
+                        pendingIntent.cancel();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }, "AndroidApp");
 
         // Load our index.html from assets
-        webView.loadUrl("file:///android_asset/index.html");
+        if (savedInstanceState == null) {
+            webView.loadUrl("file:///android_asset/index.html");
+        } else {
+            webView.restoreState(savedInstanceState);
+        }
+
+        // Handle deep link notification intent on startup
+        handleNotificationIntent(getIntent());
     }
 
     @Override
@@ -164,6 +374,22 @@ public class MainActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             setImmersiveFullScreen();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (webView != null) {
+            webView.saveState(outState);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (webView != null) {
+            webView.restoreState(savedInstanceState);
         }
     }
 

@@ -1493,3 +1493,55 @@ body.modal-open {
     0% { opacity: 0.5; }
     100% { opacity: 1; }
 }
+
+/* AMOLED Dark Theme Override */
+body.amoled {
+    --bg-darker: #000000;
+    --bg-dark: #000000;
+    background-color: #000000 !important;
+}
+body.amoled .glass-card {
+    background: rgba(0, 0, 0, 0.85);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+body.amoled .show-card {
+    background: #080808;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom switch sliders */
+.switch-container input:checked + .slider {
+    background-color: var(--accent-cyan) !important;
+}
+.switch-container .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+.switch-container input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+/* Accent Color Variations */
+body.theme-accent-purple {
+    --accent-cyan: #b12fc3;
+    --accent-cyan-rgb: 177, 47, 195;
+}
+body.theme-accent-rose {
+    --accent-cyan: #ff0844;
+    --accent-cyan-rgb: 255, 8, 68;
+}
+body.theme-accent-emerald {
+    --accent-cyan: #11998e;
+    --accent-cyan-rgb: 17, 153, 142;
+}
+body.theme-accent-gold {
+    --accent-cyan: #fee140;
+    --accent-cyan-rgb: 254, 225, 64;
+}

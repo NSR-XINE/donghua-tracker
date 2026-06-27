@@ -80,25 +80,37 @@
                 </div>
 
                 <div class="glass-card panel-filters">
-                    <h3><i class="fa-solid fa-filter"></i> Filters</h3>
+                    <h3><i class="fa-solid fa-filter"></i> Filters & Sort</h3>
                     
                     <div class="filter-group">
-                        <label>Status</label>
-                        <div class="filter-options" id="filter-status">
-                            <button class="filter-chip active" data-value="all">All</button>
-                            <button class="filter-chip" data-value="ongoing">Ongoing</button>
-                            <button class="filter-chip" data-value="upcoming">Upcoming</button>
+                        <label>Status Filters</label>
+                        <div class="filter-options" id="filter-status" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                            <button class="filter-chip active" data-value="all">All Statuses</button>
+                            <button class="filter-chip" data-value="ongoing">Watching</button>
                             <button class="filter-chip" data-value="completed">Completed</button>
+                            <button class="filter-chip" data-value="planned">Planned</button>
+                            <button class="filter-chip" data-value="onhold">On Hold</button>
+                            <button class="filter-chip" data-value="dropped">Dropped</button>
                         </div>
                     </div>
 
-                    <div class="filter-group">
+                    <div class="filter-group" style="margin-top: 0.8rem;">
+                        <label>Special Filters</label>
+                        <div class="filter-options" id="filter-special" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                            <button class="filter-chip" data-value="favorites"><i class="fa-solid fa-star" style="color: #ffd700;"></i> Favorites</button>
+                            <button class="filter-chip" data-value="airing-today">Airing Today</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-group" style="margin-top: 0.8rem;">
                         <label>Sort By</label>
-                        <select class="form-select" id="sort-select">
-                            <option value="countdown">Next Release</option>
-                            <option value="alphabetical">Title (A-Z)</option>
-                            <option value="progress">Completion %</option>
-                            <option value="last-updated">Last Updated</option>
+                        <select class="form-select" id="sort-select" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 0.4rem; font-size: 0.82rem; outline: none; width: 100%; border-color: rgba(255,255,255,0.1);">
+                            <option value="countdown">Next Release Time</option>
+                            <option value="alphabetical">Alphabetical (A-Z)</option>
+                            <option value="last-updated">Last Watched / Updated</option>
+                            <option value="date-added">Date Added</option>
+                            <option value="progress">Completion Progress %</option>
+                            <option value="rating">User Rating</option>
                         </select>
                     </div>
                 </div>
@@ -164,6 +176,91 @@
                                 <i class="fa-solid fa-file-import"></i> Import JSON
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="glass-card panel-detailed-stats" style="margin-top: 1rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-chart-simple" style="color: var(--accent-cyan);"></i> Watch Analytics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; font-size: 0.82rem;">
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;">Total Hours</div>
+                            <div id="stat-hours-watched" style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-top: 2px;">0.0h</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;">Airing Today</div>
+                            <div id="stat-airing-today" style="font-size: 1.1rem; font-weight: 700; color: var(--accent-purple); margin-top: 2px;">0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;">Planned</div>
+                            <div id="stat-planned-count" style="font-size: 1.1rem; font-weight: 700; color: var(--text-secondary); margin-top: 2px;">0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;">Dropped/On-Hold</div>
+                            <div id="stat-dropped-count" style="font-size: 1.1rem; font-weight: 700; color: var(--accent-rose); margin-top: 2px;">0</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem; font-size: 0.82rem;">
+                        <div style="color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; margin-bottom: 0.4rem;">Watch Activity</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.4rem;">
+                            <span>Last 7 Days</span>
+                            <strong id="stat-week-eps" style="color: var(--accent-cyan);">0 eps</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.4rem 0.6rem; border-radius: 6px;">
+                            <span>Last 30 Days</span>
+                            <strong id="stat-month-eps" style="color: var(--accent-purple);">0 eps</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card panel-settings" style="margin-top: 1rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-gear" style="color: var(--accent-cyan);"></i> App Settings</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.82rem;">
+                        
+                        <!-- AMOLED Toggle -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 6px;">
+                            <span>AMOLED Black Mode</span>
+                            <label class="switch-container" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                                <input type="checkbox" id="setting-amoled" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px;"></span>
+                            </label>
+                        </div>
+
+                        <!-- Accent Color Selector -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 6px;">
+                            <span>Accent Theme</span>
+                            <select id="setting-accent" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 0.2rem 0.4rem; font-size: 0.8rem; outline: none; border-color: rgba(255,255,255,0.1);">
+                                <option value="cyan">Default Cyan</option>
+                                <option value="purple">Magic Purple</option>
+                                <option value="rose">Rose Sparkle</option>
+                                <option value="emerald">Jade Emerald</option>
+                                <option value="gold">Golden Sands</option>
+                            </select>
+                        </div>
+
+                        <!-- Notification Reminder Offset -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 6px;">
+                            <span>Release Reminder Offset</span>
+                            <select id="setting-reminder" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 0.2rem 0.4rem; font-size: 0.8rem; outline: none; border-color: rgba(255,255,255,0.1);">
+                                <option value="10">10 Minutes Before</option>
+                                <option value="30">30 Minutes Before</option>
+                                <option value="60">1 Hour Before</option>
+                                <option value="1440">24 Hours Before</option>
+                            </select>
+                        </div>
+
+                        <!-- Countdown Format -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 6px;">
+                            <span>Countdown Display</span>
+                            <select id="setting-countdown-format" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 0.2rem 0.4rem; font-size: 0.8rem; outline: none; border-color: rgba(255,255,255,0.1);">
+                                <option value="standard">Standard (Days/Hrs/Min)</option>
+                                <option value="compact">Compact Hours Only</option>
+                            </select>
+                        </div>
+
+                        <!-- Clear Database -->
+                        <button id="btn-clear-db" class="btn" style="width: 100%; padding: 0.5rem; background: rgba(255, 87, 87, 0.1); border: 1px solid rgba(255, 87, 87, 0.2); color: #ff5757; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center; margin-top: 0.4rem; font-size: 0.8rem;">
+                            <i class="fa-solid fa-trash-can"></i> Wipe Database Reset
+                        </button>
                     </div>
                 </div>
             </section>
@@ -369,7 +466,19 @@
         </button>
     </nav>
 
-    <!-- Custom Script -->
-    <script src="app.js"></script>
+    <!-- Modular Script Loader -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/countdown.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/filter.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
