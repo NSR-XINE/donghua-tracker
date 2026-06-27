@@ -195,73 +195,75 @@
             </div>
             
             <form id="donghua-form" autocomplete="off">
-                <input type="hidden" id="show-id">
-                
-                <div class="form-row">
-                    <div class="form-group col-8">
-                        <label for="show-title">Title (English / Romaji) *</label>
-                        <input type="text" id="show-title" required placeholder="e.g., Battle Through the Heavens S5">
+                <div class="modal-body">
+                    <input type="hidden" id="show-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group col-8">
+                            <label for="show-title">Title (English / Romaji) *</label>
+                            <input type="text" id="show-title" required placeholder="e.g., Battle Through the Heavens S5">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="show-title-zh">Chinese Title (Optional)</label>
+                            <input type="text" id="show-title-zh" placeholder="e.g., 斗破苍穹">
+                        </div>
                     </div>
-                    <div class="form-group col-4">
-                        <label for="show-title-zh">Chinese Title (Optional)</label>
-                        <input type="text" id="show-title-zh" placeholder="e.g., 斗破苍穹">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group col-6">
-                        <label for="show-status">Status *</label>
-                        <select id="show-status" required>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="completed">Completed</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="show-status">Status *</label>
+                            <select id="show-status" required>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="show-watch-url">Streaming Link (Optional)</label>
+                            <input type="url" id="show-watch-url" placeholder="e.g., https://weibo.com/...">
+                        </div>
                     </div>
-                    <div class="form-group col-6">
-                        <label for="show-watch-url">Streaming Link (Optional)</label>
-                        <input type="url" id="show-watch-url" placeholder="e.g., https://weibo.com/...">
-                    </div>
-                </div>
 
-                <div class="form-row schedule-inputs">
-                    <div class="form-group col-6">
-                        <label for="show-release-day">Release Day *</label>
-                        <select id="show-release-day" required>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
+                    <div class="form-row schedule-inputs">
+                        <div class="form-group col-6">
+                            <label for="show-release-day">Release Day *</label>
+                            <select id="show-release-day" required>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="show-release-time">Release Time (Local Time) *</label>
+                            <input type="time" id="show-release-time" required value="10:00">
+                        </div>
                     </div>
-                    <div class="form-group col-6">
-                        <label for="show-release-time">Release Time (Local Time) *</label>
-                        <input type="time" id="show-release-time" required value="10:00">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group col-6">
-                        <label for="show-current-ep">Current Watched Episode *</label>
-                        <input type="number" id="show-current-ep" min="0" required value="0">
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="show-current-ep">Current Watched Episode *</label>
+                            <input type="number" id="show-current-ep" min="0" required value="0">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="show-total-ep">Total Episodes (0 for unknown) *</label>
+                            <input type="number" id="show-total-ep" min="0" required value="12">
+                        </div>
                     </div>
-                    <div class="form-group col-6">
-                        <label for="show-total-ep">Total Episodes (0 for unknown) *</label>
-                        <input type="number" id="show-total-ep" min="0" required value="12">
+
+                    <div class="form-group">
+                        <label for="show-poster">Poster Image URL (Optional)</label>
+                        <input type="url" id="show-poster" placeholder="https://domain.com/poster.jpg">
+                        <small class="form-help">Leave empty to auto-generate a beautiful custom gradient banner.</small>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="show-poster">Poster Image URL (Optional)</label>
-                    <input type="url" id="show-poster" placeholder="https://domain.com/poster.jpg">
-                    <small class="form-help">Leave empty to auto-generate a beautiful custom gradient banner.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="show-notes">Synopsis & Personal Notes (Optional)</label>
-                    <textarea id="show-notes" rows="3" placeholder="Add details, season info, characters, or viewing notes..."></textarea>
+                    <div class="form-group">
+                        <label for="show-notes">Synopsis & Personal Notes (Optional)</label>
+                        <textarea id="show-notes" rows="3" placeholder="Add details, season info, characters, or viewing notes..."></textarea>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
