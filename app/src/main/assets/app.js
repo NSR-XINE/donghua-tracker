@@ -438,7 +438,7 @@ function renderWeeklySchedule() {
  * Renders the main grid of shows based on searches, filters, and sorting.
  */
 function renderShowsGrid() {
-    const gridEl = document.getElementById('shows-grid');
+    const containerEl = document.getElementById('shows-sections-container');
     const emptyStateEl = document.getElementById('empty-state');
     
     // Apply search and status filters
@@ -486,162 +486,202 @@ function renderShowsGrid() {
         }
     });
     
-    // Update Grid count
-    document.getElementById('grid-count').innerText = `${filteredShows.length} show${filteredShows.length === 1 ? '' : 's'}`;
-    
     if (filteredShows.length === 0) {
-        gridEl.innerHTML = '';
+        containerEl.innerHTML = '';
         emptyStateEl.style.display = 'flex';
         return;
     }
     
     emptyStateEl.style.display = 'none';
     
+    // Group into sections
+    const groups = [
+        {
+            id: 'ongoing',
+            title: '📺 Ongoing / Watching',
+            shows: filteredShows.filter(s => s.status === 'ongoing')
+        },
+        {
+            id: 'upcoming',
+            title: '🚀 Upcoming Releases',
+            shows: filteredShows.filter(s => s.status === 'upcoming')
+        },
+        {
+            id: 'completed',
+            title: '✅ Completed Series',
+            shows: filteredShows.filter(s => s.status === 'completed')
+        }
+    ];
+    
     const todayName = DAYS_ARRAY[new Date().getDay()];
     
-    gridEl.innerHTML = filteredShows.map(show => {
-        const progressPct = show.totalEp > 0 ? Math.min(100, Math.round((show.currentEp / show.totalEp) * 100)) : 0;
-        const progressDisplay = show.totalEp > 0 ? `${show.currentEp}/${show.totalEp}` : `${show.currentEp}/?`;
+    let html = '';
+    groups.forEach(group => {
+        if (group.shows.length === 0) return;
         
-        const isReleasingToday = show.status === 'ongoing' && show.releaseDay === todayName;
-        
-        // Poster Image or Gradient Placeholder
-        let posterHtml = '';
-        if (show.poster) {
-            posterHtml = `<img class="card-poster" src="${show.poster}" alt="${show.title} Poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`;
-        }
-        
-        // Text watermark for gradient poster
-        const initials = show.title.split(' ').map(w => w[0]).slice(0, 3).join('').toUpperCase();
-        const firstChineseChar = show.titleZh ? show.titleZh.slice(0, 2) : '';
-        const gradientBg = getPosterGradient(show.title);
-        
-        const placeholderHtml = `
-            <div class="poster-placeholder" style="background: ${gradientBg}">
-                <div class="placeholder-symbol"><i class="fa-solid fa-dragon"></i></div>
-                <div class="placeholder-text">${initials}</div>
-                ${firstChineseChar ? `<div class="placeholder-zh">${firstChineseChar}</div>` : ''}
-            </div>
+        // Render section title and count badge
+        html += `
+            <div class="shows-section" id="section-${group.id}" style="margin-bottom: 2.5rem;">
+                <div class="section-title-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+                    <h2 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">${group.title}</h2>
+                    <span class="count-tag" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 20px; color: var(--text-secondary);">${group.shows.length} show${group.shows.length === 1 ? '' : 's'}</span>
+                </div>
+                <div class="shows-grid">
         `;
         
-        // Countdown Clock Section HTML
-        let clockHtml = '';
-        if (show.status === 'completed') {
-            clockHtml = `
-                <div class="card-countdown completed-state">
-                    <i class="fa-solid fa-circle-check"></i> Series Completed
+        // Render each card inside the section grid
+        html += group.shows.map(show => {
+            const progressPct = show.totalEp > 0 ? Math.min(100, Math.round((show.currentEp / show.totalEp) * 100)) : 0;
+            const progressDisplay = show.totalEp > 0 ? `${show.currentEp}/${show.totalEp}` : `${show.currentEp}/?`;
+            
+            const isReleasingToday = show.status === 'ongoing' && show.releaseDay === todayName;
+            
+            // Poster Image or Gradient Placeholder
+            let posterHtml = '';
+            if (show.poster) {
+                posterHtml = `<img class="card-poster" src="${show.poster}" alt="${show.title} Poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`;
+            }
+            
+            // Text watermark for gradient poster
+            const initials = show.title.split(' ').map(w => w[0]).slice(0, 3).join('').toUpperCase();
+            const firstChineseChar = show.titleZh ? show.titleZh.slice(0, 2) : '';
+            const gradientBg = getPosterGradient(show.title);
+            
+            const placeholderHtml = `
+                <div class="poster-placeholder" style="background: ${gradientBg}">
+                    <div class="placeholder-symbol"><i class="fa-solid fa-dragon"></i></div>
+                    <div class="placeholder-text">${initials}</div>
+                    ${firstChineseChar ? `<div class="placeholder-zh">${firstChineseChar}</div>` : ''}
                 </div>
             `;
-        } else if (show.status === 'upcoming') {
-            clockHtml = `
-                <div class="card-countdown upcoming-state">
-                    <i class="fa-solid fa-calendar-days"></i> Upcoming Release
-                </div>
-            `;
-        } else {
-            // Ongoing
-            const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
-            if (schedule.airingNow) {
+            
+            // Countdown Clock Section HTML
+            let clockHtml = '';
+            if (show.status === 'completed') {
                 clockHtml = `
-                    <div class="card-countdown" style="background: rgba(0, 242, 254, 0.1); border-color: rgba(0, 242, 254, 0.3)">
-                        <div class="c-item" style="width: 100%">
-                            <div class="c-val" style="font-size: 0.95rem; animation: pulse 1s infinite">AIRING NOW / RELEASED</div>
-                        </div>
+                    <div class="card-countdown completed-state">
+                        <i class="fa-solid fa-circle-check"></i> Series Completed
+                    </div>
+                `;
+            } else if (show.status === 'upcoming') {
+                clockHtml = `
+                    <div class="card-countdown upcoming-state">
+                        <i class="fa-solid fa-calendar-days"></i> Upcoming Release
                     </div>
                 `;
             } else {
-                const time = calculateTimeRemaining(schedule.targetDate);
-                clockHtml = `
-                    <div class="card-countdown">
-                        <div class="c-item">
-                            <div class="c-val">${String(time.days).padStart(2, '0')}</div>
-                            <div class="c-lbl">D</div>
-                        </div>
-                        <div class="c-item">
-                            <div class="c-val">${String(time.hours).padStart(2, '0')}</div>
-                            <div class="c-lbl">H</div>
-                        </div>
-                        <div class="c-item">
-                            <div class="c-val">${String(time.minutes).padStart(2, '0')}</div>
-                            <div class="c-lbl">M</div>
-                        </div>
-                        <div class="c-item">
-                            <div class="c-val">${String(time.seconds).padStart(2, '0')}</div>
-                            <div class="c-lbl">S</div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-        
-        return `
-            <article class="show-card ${isReleasingToday ? 'releasing-today' : ''}" data-id="${show.id}">
-                <!-- Poster -->
-                <div class="card-header">
-                    <div class="card-badges">
-                        <span class="status-badge ${show.status}">${show.status}</span>
-                        ${isReleasingToday ? '<span class="status-badge" style="background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.4)">Airs Today</span>' : ''}
-                    </div>
-                    ${posterHtml}
-                    ${placeholderHtml}
-                    <div class="card-overlay"></div>
-                </div>
-                
-                <!-- Body -->
-                <div class="card-body">
-                    <div class="card-title-block">
-                        <h3 class="card-title" title="${show.title}">${show.title}</h3>
-                        ${show.titleZh ? `<div class="card-title-zh">${show.titleZh}</div>` : ''}
-                    </div>
-                    
-                    <!-- Countdown Clock -->
-                    ${clockHtml}
-                    
-                    <!-- Schedule Info -->
-                    <div class="card-schedule-info">
-                        <i class="fa-regular fa-calendar"></i>
-                        <span>${show.releaseDay} at ${show.releaseTime}</span>
-                    </div>
-                    
-                    <!-- Progress Section -->
-                    <div class="card-progress-section">
-                        <div class="progress-header">
-                            <div class="ep-counter">Watched: <span>${progressDisplay}</span></div>
-                            <div class="ep-buttons">
-                                <button class="ep-btn btn-minus" title="Decrease episode"><i class="fa-solid fa-minus"></i></button>
-                                <button class="ep-btn btn-plus" title="Increase episode"><i class="fa-solid fa-plus"></i></button>
+                // Ongoing
+                const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
+                if (schedule.airingNow) {
+                    clockHtml = `
+                        <div class="card-countdown" style="background: rgba(0, 242, 254, 0.1); border-color: rgba(0, 242, 254, 0.3)">
+                            <div class="c-item" style="width: 100%">
+                                <div class="c-val" style="font-size: 0.95rem; animation: pulse 1s infinite">AIRING NOW / RELEASED</div>
                             </div>
                         </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
+                    `;
+                } else {
+                    const time = calculateTimeRemaining(schedule.targetDate);
+                    clockHtml = `
+                        <div class="card-countdown">
+                            <div class="c-item">
+                                <div class="c-val">${String(time.days).padStart(2, '0')}</div>
+                                <div class="c-lbl">D</div>
+                            </div>
+                            <div class="c-item">
+                                <div class="c-val">${String(time.hours).padStart(2, '0')}</div>
+                                <div class="c-lbl">H</div>
+                            </div>
+                            <div class="c-item">
+                                <div class="c-val">${String(time.minutes).padStart(2, '0')}</div>
+                                <div class="c-lbl">M</div>
+                            </div>
+                            <div class="c-item">
+                                <div class="c-val">${String(time.seconds).padStart(2, '0')}</div>
+                                <div class="c-lbl">S</div>
+                            </div>
                         </div>
+                    `;
+                }
+            }
+            
+            return `
+                <article class="show-card ${isReleasingToday ? 'releasing-today' : ''}" data-id="${show.id}">
+                    <!-- Poster -->
+                    <div class="card-header">
+                        <div class="card-badges">
+                            <span class="status-badge ${show.status}">${show.status}</span>
+                            ${isReleasingToday ? '<span class="status-badge" style="background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.4)">Airs Today</span>' : ''}
+                        </div>
+                        ${posterHtml}
+                        ${placeholderHtml}
+                        <div class="card-overlay"></div>
                     </div>
                     
-                    <!-- Notes / Synopsis -->
-                    <p class="card-notes" title="${show.notes || ''}">
-                        ${show.notes ? show.notes : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
-                    </p>
-                    
-                    <!-- Card Footer Actions -->
-                    <div class="card-actions">
-                        ${show.watchUrl ? `
-                            <a class="watch-link" href="${show.watchUrl}" target="_blank" rel="noopener noreferrer">
-                                <i class="fa-solid fa-circle-play"></i> Watch Now
-                            </a>
-                        ` : `
-                            <span class="watch-link" style="opacity: 0.3; cursor: not-allowed;">
-                                <i class="fa-solid fa-circle-play"></i> No Stream Link
-                            </span>
-                        `}
-                        <div class="card-ctrls">
-                            <button class="ctrl-btn edit-btn" title="Edit show"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="ctrl-btn delete-btn" title="Delete show"><i class="fa-solid fa-trash"></i></button>
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div class="card-title-block">
+                            <h3 class="card-title" title="${show.title}">${show.title}</h3>
+                            ${show.titleZh ? `<div class="card-title-zh">${show.titleZh}</div>` : ''}
+                        </div>
+                        
+                        <!-- Countdown Clock -->
+                        ${clockHtml}
+                        
+                        <!-- Schedule Info -->
+                        <div class="card-schedule-info">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span>${show.releaseDay} at ${show.releaseTime}</span>
+                        </div>
+                        
+                        <!-- Progress Section -->
+                        <div class="card-progress-section">
+                            <div class="progress-header">
+                                <div class="ep-counter">Watched: <span>${progressDisplay}</span></div>
+                                <div class="ep-buttons">
+                                    <button class="ep-btn btn-minus" title="Decrease episode"><i class="fa-solid fa-minus"></i></button>
+                                    <button class="ep-btn btn-plus" title="Increase episode"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes / Synopsis -->
+                        <p class="card-notes" title="${show.notes || ''}">
+                            ${show.notes ? show.notes : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
+                        </p>
+                        
+                        <!-- Card Footer Actions -->
+                        <div class="card-actions">
+                            ${show.watchUrl ? `
+                                <a class="watch-link" href="${show.watchUrl}" target="_blank" rel="noopener noreferrer">
+                                    <i class="fa-solid fa-circle-play"></i> Watch Now
+                                </a>
+                            ` : `
+                                <span class="watch-link" style="opacity: 0.3; cursor: not-allowed;">
+                                    <i class="fa-solid fa-circle-play"></i> No Stream Link
+                                </span>
+                            `}
+                            <div class="card-ctrls">
+                                <button class="ctrl-btn edit-btn" title="Edit show"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="ctrl-btn delete-btn" title="Delete show"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
                     </div>
+                </article>
+            `;
+        }).join('');
+        
+        // Close grid and section tags
+        html += `
                 </div>
-            </article>
+            </div>
         `;
-    }).join('');
+    });
+    
+    containerEl.innerHTML = html;
 }
 
 /**
@@ -823,7 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Grid Card Action Delegations (increment, decrement, edit, delete)
-    document.getElementById('shows-grid').addEventListener('click', (e) => {
+    document.getElementById('shows-sections-container').addEventListener('click', (e) => {
         const card = e.target.closest('.show-card');
         if (!card) return;
         
