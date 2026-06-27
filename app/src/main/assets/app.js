@@ -1116,7 +1116,7 @@ function switchTab(tabName) {
         // Show only the selected tab
         if (tabName === 'home') {
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
-            if (statsPanel) statsPanel.style.setProperty('display', 'grid', 'important');
+            if (statsPanel) statsPanel.style.setProperty('display', 'flex', 'important');
             if (heroBanner) {
                 heroBanner.style.display = ''; // Clear important override
                 renderHeroBanner();
