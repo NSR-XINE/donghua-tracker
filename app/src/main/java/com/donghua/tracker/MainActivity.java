@@ -27,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setAllowContentAccess(true);
         webSettings.setDatabaseEnabled(true);
 
+        // Lock zoom levels and disable user scaling to make it feel native
+        webSettings.setSupportZoom(false);
+        webSettings.setBuiltInZoomControls(false);
+        webSettings.setDisplayZoomControls(false);
+
+        // Disable WebView long click to prevent text selection and context menu popups
+        webView.setOnLongClickListener(v -> true);
+        webView.setLongClickable(false);
+
         // Load our index.html from assets
         webView.loadUrl("file:///android_asset/index.html");
     }

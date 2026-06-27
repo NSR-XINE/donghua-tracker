@@ -877,4 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Disable context menu for a fully native app feel
+    document.addEventListener('contextmenu', e => e.preventDefault());
 });

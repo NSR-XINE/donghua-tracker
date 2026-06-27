@@ -38,6 +38,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    overscroll-behavior-y: contain;
 }
 
 body {
@@ -48,6 +53,13 @@ body {
     overflow-x: hidden;
     position: relative;
     line-height: 1.5;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 /* Background Stars effect */
