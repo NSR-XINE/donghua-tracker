@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+    private long backPressedTime;
+    private android.widget.Toast backToast;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -52,7 +54,17 @@ public class MainActivity extends AppCompatActivity {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            super.onBackPressed();
+            if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                if (backToast != null) {
+                    backToast.cancel();
+                }
+                super.onBackPressed();
+                return;
+            } else {
+                backToast = android.widget.Toast.makeText(getBaseContext(), "Press back again to exit", android.widget.Toast.LENGTH_SHORT);
+                backToast.show();
+            }
+            backPressedTime = System.currentTimeMillis();
         }
     }
 }
