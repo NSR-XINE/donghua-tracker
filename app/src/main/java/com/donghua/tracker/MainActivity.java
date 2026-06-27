@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    private long backPressedTime;
-    private android.widget.Toast backToast;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -54,17 +52,24 @@ public class MainActivity extends AppCompatActivity {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                if (backToast != null) {
-                    backToast.cancel();
-                }
-                super.onBackPressed();
-                return;
-            } else {
-                backToast = android.widget.Toast.makeText(getBaseContext(), "Press back again to exit", android.widget.Toast.LENGTH_SHORT);
-                backToast.show();
-            }
-            backPressedTime = System.currentTimeMillis();
+            showExitConfirmationDialog();
         }
+    }
+
+    private void showExitConfirmationDialog() {
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Exit Application")
+            .setMessage("Do you want to close Donghua Tracker?")
+            .setPositiveButton("Exit", (dialogInterface, i) -> finish())
+            .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
+            .create();
+
+        dialog.show();
+
+        // Style dialog action button text colors to match our dark neon theme
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            .setTextColor(android.graphics.Color.parseColor("#00f2fe")); // Cyan accent
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+            .setTextColor(android.graphics.Color.parseColor("#a0aec0")); // Muted silver
     }
 }
