@@ -598,7 +598,7 @@ input, textarea {
 
 .shows-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
@@ -912,12 +912,7 @@ input, textarea {
     font-size: 0.8rem;
     color: var(--text-secondary);
     line-height: 1.4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    min-height: 2.2em;
+    word-wrap: break-word;
 }
 
 /* Card Actions Footer */
