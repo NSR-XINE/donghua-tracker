@@ -2,7 +2,7 @@
 
 A sleek, high-aesthetic dark-themed native Android application designed for Chinese anime (Donghua) fans to track watched episodes, view release schedules, and follow live countdown clocks.
 
-This repository contains the native Android wrapper project and the compiled APK package.
+This repository contains the source code for the native Android wrapper project.
 
 ---
 
@@ -23,19 +23,7 @@ This repository contains the native Android wrapper project and the compiled APK
 * **`app/`**: Android application module source code.
   * `src/main/java/com/donghua/tracker/MainActivity.java` - Android controller enabling DOM LocalStorage and managing navigation stack.
   * `src/main/assets/` - Bundled web assets (HTML, CSS, JS) that run inside the app wrapper.
-* **`donghua-tracker.apk`**: Pre-compiled, installable Android package.
-
----
-
-## 📲 How to Install the App
-
-The repository includes a pre-compiled, lightweight APK (`donghua-tracker.apk`) in the root folder for direct installation.
-
-1. Download **`donghua-tracker.apk`** to your phone.
-2. Open your device's **Files** or **Downloads** app.
-3. Tap on the APK.
-4. If prompted to allow installing unknown apps, tap **Settings**, enable **Allow from this source**, and press back.
-5. Tap **Install** and launch it!
+* **`build.gradle`, `settings.gradle`, `gradlew`**: Gradle build configurations.
 
 ---
 
