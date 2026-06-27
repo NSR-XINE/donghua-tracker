@@ -1076,6 +1076,9 @@ input, textarea {
     overflow-y: auto;
     padding: 1.5rem;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
 }
 
 body.modal-open {
@@ -1119,7 +1122,9 @@ body.modal-open {
 #donghua-form {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .form-row {
