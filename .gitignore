@@ -1,0 +1,20 @@
+# Gradle files
+.gradle/
+**/build/
+gradlew.bat
+local.properties
+
+# Android Studio / IntelliJ files
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# System / OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Keep the compiled release APK for direct downloads
+# (we do not ignore the root donghua-tracker.apk)

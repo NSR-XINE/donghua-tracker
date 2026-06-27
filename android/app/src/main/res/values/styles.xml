@@ -1,0 +1,20 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.DonghuaTracker" parent="Theme.MaterialComponents.DayNight">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#9d4edd</item>
+        <item name="colorPrimaryVariant">#7f00ff</item>
+        <item name="colorOnPrimary">#ffffff</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#00f2fe</item>
+        <item name="colorSecondaryVariant">#4facfe</item>
+        <item name="colorOnSecondary">#000000</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#0a0c14</item>
+    </style>
+
+    <style name="Theme.DonghuaTracker.NoActionBar" parent="Theme.DonghuaTracker">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
