@@ -947,6 +947,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize mobile navigation tab state
     switchTab('home');
+
+    // Dismiss App Loading Splash Overlay after initializing systems
+    setTimeout(() => {
+        const loader = document.getElementById('app-loading-screen');
+        if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.remove(), 600);
+        }
+    }, 1600);
 });
 
 // Mobile Navigation View Controller

@@ -20,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         webView.setWebViewClient(new WebViewClient());
 
+        // Mask WebView initialization latency with dark theme color to prevent white flashes
+        webView.setBackgroundColor(android.graphics.Color.parseColor("#05060a"));
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true); // Required for LocalStorage
