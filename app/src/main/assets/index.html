@@ -150,14 +150,6 @@
                             </div>
                         </div>
                     </div>
-                    <div style="margin-top:1.2rem; display:flex; flex-direction:column; gap:0.6rem;">
-                        <button onclick="exportData()" class="btn btn-secondary" style="width:100%;">
-                            <i class="fa-solid fa-file-export"></i> Export Backup
-                        </button>
-                        <button onclick="importData()" class="btn btn-secondary" style="width:100%;">
-                            <i class="fa-solid fa-file-import"></i> Import Backup
-                        </button>
-                    </div>
                 </div>
 
                 <div class="glass-card panel-backup-info" style="margin-top: 1rem;">
@@ -177,6 +169,21 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Details & Episodes Modal -->
+            <div class="modal-wrapper" id="details-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 6, 10, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 1.5rem;">
+                <div class="glass-card" style="width: 100%; max-width: 480px; display: flex; flex-direction: column; max-height: 90vh; min-height: 0; padding: 1.5rem;">
+                    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.2rem;">
+                        <h2 style="font-family: var(--font-heading); font-size: 1.2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="details-modal-title">
+                            Donghua Details
+                        </h2>
+                        <button id="btn-close-details" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 0.3rem;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1.2rem; min-height: 0; padding-bottom: 1rem;" id="details-modal-content">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
 
             <!-- Import Backup Modal -->
             <div class="modal-wrapper" id="import-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 6, 10, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 1.5rem;">

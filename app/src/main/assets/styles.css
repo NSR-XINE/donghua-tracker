@@ -1628,3 +1628,20 @@ body.theme-accent-gold {
     --accent-cyan: #fee140;
     --accent-cyan-rgb: 254, 225, 64;
 }
+
+/* Episode grid button styling in Details modal */
+.ep-pill-btn {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
+    outline: none;
+}
+.ep-pill-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);
+    filter: brightness(1.1);
+}
+.ep-pill-btn:active {
+    transform: translateY(0);
+}
+.ep-pill-btn::-webkit-scrollbar {
+    width: 4px;
+}

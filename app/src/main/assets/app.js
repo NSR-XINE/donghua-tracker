@@ -2,298 +2,17 @@
    STATE MANAGEMENT & DEFAULT DATA
    ========================================================================== */
 
-/// Default mock data to populate local storage on first load
-const DEFAULT_DONGHUA = [
-    {
-        id: "dh-1",
-        title: "Swallowed Star",
-        titleZh: "吞噬星空",
-        status: "ongoing",
-        releaseDay: "Wednesday",
-        releaseTime: "10:00",
-        currentEp: 227,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/swallowed-star/",
-        countdownUrl: "https://animecountdown.com/1815156/swallowed-star-2",
-        notes: "Luo Feng strives to protect Earth and reach the peak of cosmic cultivation in a post-apocalyptic future.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-2",
-        title: "Perfect World",
-        titleZh: "完美世界",
-        status: "ongoing",
-        releaseDay: "Friday",
-        releaseTime: "10:00",
-        currentEp: 275,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/perfect-world/",
-        countdownUrl: "https://animecountdown.com/1816738/perfect-world-episode-275",
-        notes: "Shi Hao, a cultivation genius born in a desolate wilderness, trains to become the savior of the universe.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-3",
-        title: "Throne of Seal",
-        titleZh: "神印王座",
-        status: "completed",
-        releaseDay: "Thursday",
-        releaseTime: "10:00",
-        currentEp: 104,
-        totalEp: 104,
-        poster: "",
-        watchUrl: "https://donghuastream.org/throne-of-seal/",
-        countdownUrl: "https://animecountdown.com/1815190/throne-of-seal",
-        notes: "Long Haochen rises through the ranks of the Temple Alliance to defeat the Demon Emperor and save humanity.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-4",
-        title: "Soul Land 2",
-        titleZh: "斗罗大陆II绝世唐门",
-        status: "ongoing",
-        releaseDay: "Saturday",
-        releaseTime: "10:00",
-        currentEp: 159,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/soul-land-2/",
-        countdownUrl: "https://animecountdown.com/1815191/soul-land-2",
-        notes: "Huo Yuhao and a new generation of Shrek Academy students revive the legendary Tang Sect.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-5",
-        title: "A Mortal's Journey to Immortality",
-        titleZh: "凡人修仙传",
-        status: "ongoing",
-        releaseDay: "Sunday",
-        releaseTime: "11:00",
-        currentEp: 176,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/a-mortals-journey-to-immortality/",
-        countdownUrl: "https://animecountdown.com/1816560/a-mortals-journey-to-immortality-remake",
-        notes: "A poor village boy rises in the cultivation world despite having ordinary spiritual roots.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-6",
-        title: "Battle through the heavens",
-        titleZh: "斗破苍穹",
-        status: "ongoing",
-        releaseDay: "Sunday",
-        releaseTime: "10:00",
-        currentEp: 203,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/battle-through-the-heavens/",
-        countdownUrl: "https://animecountdown.com/1815250/battle-through-the-heavens",
-        notes: "Xiao Yan masters flame techniques to reclaim his family honor and climb to the top of the Dou Qi world.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-7",
-        title: "Renegade immortal",
-        titleZh: "仙逆",
-        status: "ongoing",
-        releaseDay: "Monday",
-        releaseTime: "10:00",
-        currentEp: 146,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/renegade-immortal/",
-        countdownUrl: "https://animecountdown.com/1815480/renegade-immortal",
-        notes: "Wang Lin overcomes mortal challenges to seek the supreme path of ruthlessness and immortality.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-8",
-        title: "Jade dynasty",
-        titleZh: "诛仙",
-        status: "completed",
-        releaseDay: "Saturday",
-        releaseTime: "10:00",
-        currentEp: 26,
-        totalEp: 26,
-        poster: "",
-        watchUrl: "https://donghuastream.org/jade-dynasty/",
-        countdownUrl: "https://animecountdown.com/1815198/jade-dynasty",
-        notes: "Zhang Xiaofan gets caught in the conflict between righteous cultivation sects and demonic paths. Completed.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-9",
-        title: "Lingwu continent",
-        titleZh: "灵武大陆",
-        status: "ongoing",
-        releaseDay: "Tuesday",
-        releaseTime: "10:00",
-        currentEp: 1,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/lingwu-continent/",
-        countdownUrl: "https://animecountdown.com/1815340/lingwu-continent",
-        notes: "A young martial artist unlocks dormant ancestral spirits to conquer the spiritual martial universe.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-10",
-        title: "Apotheosis",
-        titleZh: "百炼成神",
-        status: "ongoing",
-        releaseDay: "Friday",
-        releaseTime: "10:00",
-        currentEp: 78,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/apotheosis/",
-        countdownUrl: "https://animecountdown.com/1815192/apotheosis",
-        notes: "Luo Zheng refines his body into a weapon to save his sister and discover cosmic truths. Season 3 Episode 26 stopped.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-11",
-        title: "A moment but forever",
-        titleZh: "念无双",
-        status: "completed",
-        releaseDay: "Wednesday",
-        releaseTime: "10:00",
-        currentEp: 24,
-        totalEp: 24,
-        poster: "",
-        watchUrl: "https://donghuastream.org/a-moment-but-forever/",
-        countdownUrl: "https://animecountdown.com/1815668/a-moment-but-forever",
-        notes: "The high goddess Wu Shuang descends to retrieve divine artifacts and falls in love with a mortal priest. Completed.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-12",
-        title: "Over the divine realms",
-        titleZh: "傲世九重天",
-        status: "completed",
-        releaseDay: "Wednesday",
-        releaseTime: "10:00",
-        currentEp: 12,
-        totalEp: 12,
-        poster: "",
-        watchUrl: "https://donghuastream.org/over-the-divine-realms/",
-        countdownUrl: "https://animecountdown.com/1815194/over-the-divine-realms",
-        notes: "Chu Yang restarts his life to save his companions and master the Nine Tribulations Sword. Completed.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-13",
-        title: "Against the gods",
-        titleZh: "逆天邪神",
-        status: "ongoing",
-        releaseDay: "Friday",
-        releaseTime: "10:00",
-        currentEp: 43,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/against-the-gods/",
-        countdownUrl: "https://animecountdown.com/1815187/against-the-gods",
-        notes: "Yun Che reincarnates with the Sky Poison Pearl to fight against fate and cosmic powers. Season 2 Episode 13.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-14",
-        title: "Stellars transformation",
-        titleZh: "星辰变",
-        status: "completed",
-        releaseDay: "Monday",
-        releaseTime: "10:00",
-        currentEp: 84,
-        totalEp: 84,
-        poster: "",
-        watchUrl: "https://donghuastream.org/stellars-transformation/",
-        countdownUrl: "https://animecountdown.com/1815195/stellars-transformation",
-        notes: "Qin Yu transcends physical limits by practicing stellar techniques. Completed Season 7 Episode 12.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-15",
-        title: "In the search of gods",
-        titleZh: "寻找神仙",
-        status: "ongoing",
-        releaseDay: "Tuesday",
-        releaseTime: "10:00",
-        currentEp: 1,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/in-search-of-gods/",
-        countdownUrl: "https://animecountdown.com/1815200/in-search-of-gods",
-        notes: "A journey through mythical mountains in search of legendary immortals.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-16",
-        title: "The Great Ruler",
-        titleZh: "大主宰",
-        status: "ongoing",
-        releaseDay: "Friday",
-        releaseTime: "10:00",
-        currentEp: 79,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/the-great-ruler/",
-        countdownUrl: "https://animecountdown.com/1815188/the-great-ruler",
-        notes: "Mu Chen rises from a small spiritual academy to rule over the Great Thousand World.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-17",
-        title: "Tomb of the fallen gods",
-        titleZh: "神墓",
-        status: "ongoing",
-        releaseDay: "Saturday",
-        releaseTime: "10:00",
-        currentEp: 80,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/tomb-of-the-fallen-gods/",
-        countdownUrl: "https://animecountdown.com/1815196/tomb-of-the-fallen-gods",
-        notes: "Chen Nan wakes up from a grave in the tomb of gods after ten thousand years. Currently watching Season 3 Episode 48.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-18",
-        title: "Shrouding the heavens",
-        titleZh: "遮天",
-        status: "ongoing",
-        releaseDay: "Wednesday",
-        releaseTime: "10:00",
-        currentEp: 168,
-        totalEp: 0,
-        poster: "",
-        watchUrl: "https://donghuastream.org/shrouding-the-heavens/",
-        countdownUrl: "https://animecountdown.com/1815160/shrouding-the-heavens",
-        notes: "Ye Fan is pulled into a galactic journey by a casket pulled by nine dragon corpses.",
-        lastUpdated: Date.now()
-    }
-];
+/// Default mock data to populate local storage on first load (empty by default)
+const DEFAULT_DONGHUA = [];
 
-// Load shows from localStorage or default
-let shows = JSON.parse(localStorage.getItem('donghua_shows'));
-const FORCE_SEED_VERSION = 6;
-
-if (!shows || shows.length === 0) {
-    shows = DEFAULT_DONGHUA;
-    localStorage.setItem('donghua_shows', JSON.stringify(shows));
-    localStorage.setItem('force_seed_version', String(FORCE_SEED_VERSION));
-} else if (localStorage.getItem('force_seed_version') !== String(FORCE_SEED_VERSION)) {
-    // Add any missing default shows without touching existing ones
-    if (!shows) shows = [];
-    DEFAULT_DONGHUA.forEach(defaultShow => {
-        if (!shows.some(s => s.title.toLowerCase() === defaultShow.title.toLowerCase())) {
-            shows.push(defaultShow);
-        }
-    });
-    localStorage.setItem('donghua_shows', JSON.stringify(shows));
-    localStorage.setItem('force_seed_version', String(FORCE_SEED_VERSION));
+// Load shows from localStorage
+let shows = [];
+try {
+    const saved = localStorage.getItem('donghua_shows');
+    shows = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(shows)) shows = [];
+} catch (e) {
+    shows = [];
 }
 
 // Active filters state
@@ -756,8 +475,45 @@ function renderShowsGrid() {
         }
     });
     
+    if (shows.length === 0) {
+        containerEl.innerHTML = '';
+        emptyStateEl.innerHTML = `
+            <i class="fa-solid fa-compass" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 1rem; opacity: 0.8;"></i>
+            <h3>Track Your First Donghua</h3>
+            <p>Your watchlist is empty. Click the search input above to query shows, or tap <strong>Add Show</strong> to create a custom tracker!</p>
+            <button class="btn btn-primary" id="btn-reset-filters" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; color: #fff;" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i> Add Donghua
+            </button>
+        `;
+        emptyStateEl.style.display = 'flex';
+        return;
+    }
+
     if (filteredShows.length === 0) {
         containerEl.innerHTML = '';
+        emptyStateEl.innerHTML = `
+            <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>No Matches Found</h3>
+            <p>We couldn't find any shows matching your current search or status filter.</p>
+            <button class="btn btn-secondary" id="btn-reset-filters" style="margin-top: 0.5rem;">Reset Filters</button>
+        `;
+        // Re-bind the reset filters button click handler
+        const resetBtn = emptyStateEl.querySelector('#btn-reset-filters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                filters.search = '';
+                filters.status = 'all';
+                filters.scheduleDay = 'all';
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.value = '';
+                const tabAll = document.querySelector('.filter-tab[data-status="all"]');
+                if (tabAll) {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tabAll.classList.add('active');
+                }
+                saveState();
+            });
+        }
         emptyStateEl.style.display = 'flex';
         return;
     }
@@ -1144,6 +900,117 @@ function saveState() {
 }
 
 /**
+ * Opens the details and episodes modal.
+ * @param {Object} show - The show data to display.
+ */
+function openDetailsModal(show) {
+    const detailsModal = document.getElementById('details-modal');
+    const detailsTitle = document.getElementById('details-modal-title');
+    const detailsContent = document.getElementById('details-modal-content');
+    if (!detailsModal || !detailsContent) return;
+
+    detailsTitle.innerText = show.title;
+
+    // Compute status badge
+    let statusClass = show.status;
+    let statusText = show.status.toUpperCase();
+
+    // Compute total/current episodes
+    const maxEps = show.totalEp > 0 ? show.totalEp : Math.max(12, show.currentEp + 10);
+    
+    // Poster or placeholder
+    let posterHtml = '';
+    if (show.poster) {
+        posterHtml = `<img src="${show.poster}" style="width: 90px; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.5);" alt="${show.title}">`;
+    } else {
+        const hash = [...show.title].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const gradient = GRADIENTS[hash % GRADIENTS.length];
+        const initials = show.title.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase();
+        posterHtml = `
+            <div style="width: 90px; height: 130px; background: ${gradient}; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                <div style="font-size: 1.4rem; font-weight: 800; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2;">${initials}</div>
+                ${show.titleZh ? `<div style="position: absolute; bottom: 4px; right: 4px; font-size: 1.6rem; font-weight: 800; color: rgba(255,255,255,0.06); pointer-events: none; z-index: 1;">${show.titleZh[0]}</div>` : ''}
+            </div>
+        `;
+    }
+
+    // Build episode pills
+    let epPills = '';
+    for (let i = 1; i <= maxEps; i++) {
+        const isWatched = i <= show.currentEp;
+        const activeStyle = isWatched ? 'background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; font-weight: bold;' : 'background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-secondary);';
+        epPills += `
+            <button class="ep-pill-btn" data-ep="${i}" style="padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; ${activeStyle}">
+                ${i}
+            </button>
+        `;
+    }
+
+    detailsContent.innerHTML = `
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            ${posterHtml}
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                    <span class="status-badge ${statusClass}" style="padding: 0.2rem 0.5rem; font-size: 0.65rem; border-radius: 4px; text-transform: uppercase;">${statusText}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="margin-right: 0.2rem;"></i> ${show.releaseDay} at ${show.releaseTime}</span>
+                </div>
+                <h3 style="font-size: 1rem; color: #fff; margin: 0.2rem 0 0 0; font-family: var(--font-heading); font-weight: 700;">${show.title}</h3>
+                ${show.titleZh ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">${show.titleZh}</div>` : ''}
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem;">
+                    Watched: <strong style="color: var(--accent-cyan);">${show.currentEp}</strong> / ${show.totalEp > 0 ? show.totalEp : '?'} episodes
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 style="font-size: 0.8rem; color: #fff; margin: 0 0 0.4rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Synopsis</h4>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                ${show.notes ? show.notes : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
+            </p>
+        </div>
+
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h4 style="font-size: 0.8rem; color: #fff; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Episodes</h4>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Click to update progress</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 0.4rem; max-height: 200px; overflow-y: auto; padding-right: 0.2rem;">
+                ${epPills}
+            </div>
+        </div>
+    `;
+
+    // Add click listeners to the episode buttons inside details modal
+    detailsContent.querySelectorAll('.ep-pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newEp = parseInt(btn.dataset.ep, 10);
+            
+            // Toggle logic: if clicking on current episode, toggle to X - 1 watched
+            if (newEp === show.currentEp) {
+                show.currentEp = Math.max(0, newEp - 1);
+            } else {
+                show.currentEp = newEp;
+            }
+            
+            show.lastUpdated = Date.now();
+            
+            // Handle completed transition
+            if (show.totalEp > 0 && show.currentEp === show.totalEp) {
+                show.status = 'completed';
+            } else if (show.status === 'completed' && show.currentEp < show.totalEp) {
+                show.status = 'ongoing';
+            }
+            
+            saveState();
+            openDetailsModal(show); // Refresh modal view
+        });
+    });
+
+    detailsModal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+
+/**
  * Opens the add/edit modal.
  * @param {Object} [showData=null] - The show data if editing, null if adding new.
  */
@@ -1236,6 +1103,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (importModal) {
         importModal.addEventListener('click', (e) => {
             if (e.target.id === 'import-modal') closeImportModal();
+        });
+    }
+
+    // Details Modal Triggers
+    const detailsModal = document.getElementById('details-modal');
+    const btnCloseDetails = document.getElementById('btn-close-details');
+    
+    const closeDetailsModal = () => {
+        if (detailsModal) {
+            detailsModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    };
+    
+    if (btnCloseDetails) btnCloseDetails.addEventListener('click', closeDetailsModal);
+    if (detailsModal) {
+        detailsModal.addEventListener('click', (e) => {
+            if (e.target.id === 'details-modal') closeDetailsModal();
         });
     }
     
@@ -1404,54 +1289,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = e.target.closest('.show-card');
         if (!card) return;
         
+        // Action buttons check
+        const isPlus = e.target.closest('.btn-plus');
+        const isMinus = e.target.closest('.btn-minus');
+        const isEdit = e.target.closest('.edit-btn');
+        const isDelete = e.target.closest('.delete-btn');
+        const isStream = e.target.closest('.watch-btn');
+        const isCountdown = e.target.closest('.countdown-link');
+        
         const showId = card.dataset.id;
         const showIdx = shows.findIndex(s => s.id === showId);
         if (showIdx === -1) return;
         const show = shows[showIdx];
         
-        // Plus button clicked
-        if (e.target.closest('.btn-plus')) {
-            e.stopPropagation();
+        if (isPlus) {
             if (show.totalEp === 0 || show.currentEp < show.totalEp) {
                 show.currentEp++;
                 show.lastUpdated = Date.now();
-                
-                // If it hits total episodes, automatically prompt or transition to completed status
                 if (show.totalEp > 0 && show.currentEp === show.totalEp) {
                     show.status = 'completed';
                 }
                 saveState();
             }
-        }
-        
-        // Minus button clicked
-        else if (e.target.closest('.btn-minus')) {
-            e.stopPropagation();
+        } else if (isMinus) {
             if (show.currentEp > 0) {
                 show.currentEp--;
                 show.lastUpdated = Date.now();
-                // If they reduce below total episode, transition back to ongoing if it was completed
                 if (show.status === 'completed' && show.currentEp < show.totalEp) {
                     show.status = 'ongoing';
                 }
                 saveState();
             }
-        }
-        
-        // Edit button clicked
-        else if (e.target.closest('.edit-btn')) {
-            e.stopPropagation();
+        } else if (isEdit) {
             openModal(show);
-        }
-        
-        // Delete button clicked
-        else if (e.target.closest('.delete-btn')) {
-            e.stopPropagation();
+        } else if (isDelete) {
             const confirmDelete = confirm(`Are you sure you want to remove "${show.title}" from your list?`);
             if (confirmDelete) {
                 shows.splice(showIdx, 1);
                 saveState();
             }
+        } else if (isStream || isCountdown) {
+            // Let watch screen / countdown trigger target behaviors
+            return;
+        } else {
+            // Opened by touching details/body of the card
+            openDetailsModal(show);
         }
     });
 
