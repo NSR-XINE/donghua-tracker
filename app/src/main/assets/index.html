@@ -148,9 +148,47 @@
                                 <div style="color: var(--text-secondary); font-size: 0.75rem; line-height: 1.3;">Real-time Countdown, Segmented Dashboard, Daily Weekly Calendar, Floating Action Tabs, Scrollable Modals, WebView Launch Splash Screen, Exit Confirmations</div>
                             </div>
                         </div>
+                </div>
+
+                <div class="glass-card panel-backup-info" style="margin-top: 1rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-database" style="color: var(--accent-cyan);"></i> Backup & Restore</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.82rem;">
+                        <p style="color: var(--text-muted); line-height: 1.4; margin: 0;">
+                            Export your watchlist to a JSON backup and share it, or import a previously exported JSON string.
+                        </p>
+                        <div style="display: flex; gap: 0.8rem; margin-top: 0.4rem;">
+                            <button id="btn-export-data" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <i class="fa-solid fa-file-export"></i> Export JSON
+                            </button>
+                            <button id="btn-trigger-import" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <i class="fa-solid fa-file-import"></i> Import JSON
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <!-- Import Backup Modal -->
+            <div class="modal-wrapper" id="import-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 6, 10, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; align-items: center; justify-content: center; padding: 1.5rem;">
+                <div class="glass-card" style="width: 100%; max-width: 480px; display: flex; flex-direction: column; max-height: 90vh; min-height: 0;">
+                    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.2rem;">
+                        <h2 style="font-family: var(--font-heading); font-size: 1.2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-file-import" style="color: var(--accent-cyan);"></i> Import Watchlist
+                        </h2>
+                        <button id="btn-close-import" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; min-height: 0; padding-bottom: 1rem;">
+                        <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; margin: 0;">
+                            Paste your exported JSON backup string below. Importing will merge or overwrite your current watchlist data.
+                        </p>
+                        <textarea id="import-json-textarea" placeholder='[{"title": "Swallowed Star", ...}]' style="width: 100%; height: 180px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); padding: 0.8rem; font-family: monospace; font-size: 0.75rem; resize: none; outline: none;"></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <button id="btn-cancel-import" class="btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Cancel</button>
+                        <button id="btn-submit-import" class="btn" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Import</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Content Area -->
             <section class="content-area">

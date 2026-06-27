@@ -537,7 +537,16 @@ function fetchShowBanner(showId, countdownUrl) {
     
     // Generate unique callback
     const callbackName = "cb_banner_" + showId.replace(/[^a-zA-Z0-9]/g, '') + "_" + Math.floor(Math.random() * 1000000);
+    
+    // Safety timeout to clean up callback if native call fails completely
+    const timeoutId = setTimeout(() => {
+        if (window[callbackName]) {
+            delete window[callbackName];
+        }
+    }, 30000);
+
     window[callbackName] = function(html) {
+        clearTimeout(timeoutId);
         delete window[callbackName];
         if (!html) return;
         
@@ -934,6 +943,60 @@ function updateTimers() {
    EVENT HANDLERS & INITIALIZATION
    ========================================================================== */
 
+let timerInterval = null;
+
+function pauseTimers() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function resumeTimers() {
+    if (!timerInterval) {
+        timerInterval = setInterval(updateTimers, 1000);
+    }
+}
+
+window.pauseTimers = pauseTimers;
+window.resumeTimers = resumeTimers;
+
+function exportData() {
+    if (!window.AndroidApp || !window.AndroidApp.shareText) {
+        alert("Export is only supported inside the Android application wrapper.");
+        return;
+    }
+    const data = localStorage.getItem('donghua_shows') || "[]";
+    window.AndroidApp.shareText(data);
+}
+
+function importData(jsonString) {
+    if (!jsonString) return false;
+    try {
+        const parsed = JSON.parse(jsonString);
+        if (!Array.isArray(parsed)) {
+            alert("Invalid backup format: root must be a JSON array.");
+            return false;
+        }
+        
+        // Simple schema verification
+        for (const item of parsed) {
+            if (!item.title || !item.id) {
+                alert("Invalid backup data: shows must have a 'title' and 'id'.");
+                return false;
+            }
+        }
+        
+        shows = parsed;
+        saveState();
+        alert("Watchlist backup imported successfully!");
+        return true;
+    } catch (e) {
+        alert("Failed to import backup: " + e.message);
+        return false;
+    }
+}
+
 /**
  * Saves the current shows list state to LocalStorage and triggers layout updates.
  */
@@ -1002,7 +1065,58 @@ document.addEventListener('DOMContentLoaded', () => {
     renderShowsGrid();
     
     // Clock/Timer Loop
-    setInterval(updateTimers, 1000);
+    resumeTimers();
+    
+    // Export Data Trigger
+    const btnExport = document.getElementById('btn-export-data');
+    if (btnExport) {
+        btnExport.addEventListener('click', exportData);
+    }
+    
+    // Import Modal Triggers
+    const importModal = document.getElementById('import-modal');
+    const btnTriggerImport = document.getElementById('btn-trigger-import');
+    const btnCloseImport = document.getElementById('btn-close-import');
+    const btnCancelImport = document.getElementById('btn-cancel-import');
+    const btnSubmitImport = document.getElementById('btn-submit-import');
+    const importTextarea = document.getElementById('import-json-textarea');
+    
+    if (btnTriggerImport && importModal) {
+        btnTriggerImport.addEventListener('click', () => {
+            if (importTextarea) importTextarea.value = '';
+            importModal.style.display = 'flex';
+            document.body.classList.add('modal-open');
+        });
+    }
+    
+    const closeImportModal = () => {
+        if (importModal) {
+            importModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    };
+    
+    if (btnCloseImport) btnCloseImport.addEventListener('click', closeImportModal);
+    if (btnCancelImport) btnCancelImport.addEventListener('click', closeImportModal);
+    if (importModal) {
+        importModal.addEventListener('click', (e) => {
+            if (e.target.id === 'import-modal') closeImportModal();
+        });
+    }
+    
+    if (btnSubmitImport && importTextarea) {
+        btnSubmitImport.addEventListener('click', () => {
+            const rawJson = importTextarea.value.trim();
+            if (!rawJson) {
+                alert("Please paste your JSON backup data first.");
+                return;
+            }
+            const success = importData(rawJson);
+            if (success) {
+                closeImportModal();
+            }
+        });
+    }
     
     // Auto-fetch missing posters from saved countdown links
     setTimeout(() => {
@@ -1201,6 +1315,7 @@ function switchTab(tabName) {
     const searchPanel = document.querySelector('.panel-search');
     const filtersPanel = document.querySelector('.panel-filters');
     const devPanel = document.querySelector('.panel-dev-info');
+    const backupPanel = document.querySelector('.panel-backup-info');
     const scheduleContainer = document.querySelector('.schedule-container');
     const heroBanner = document.getElementById('next-up-banner');
     const sectionsContainer = document.getElementById('shows-sections-container');
@@ -1213,6 +1328,7 @@ function switchTab(tabName) {
         if (searchPanel) searchPanel.style.setProperty('display', 'none', 'important');
         if (filtersPanel) filtersPanel.style.setProperty('display', 'none', 'important');
         if (devPanel) devPanel.style.setProperty('display', 'none', 'important');
+        if (backupPanel) backupPanel.style.setProperty('display', 'none', 'important');
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
@@ -1233,12 +1349,14 @@ function switchTab(tabName) {
             if (filtersPanel) filtersPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'info') {
             if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
+            if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
         }
     } else {
         // Desktop Viewport: Restore standard styles and clear important display sets
         if (searchPanel) searchPanel.style.display = '';
         if (filtersPanel) filtersPanel.style.display = '';
         if (devPanel) devPanel.style.display = '';
+        if (backupPanel) backupPanel.style.display = '';
         if (scheduleContainer) scheduleContainer.style.display = '';
         if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';

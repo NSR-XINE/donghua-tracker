@@ -18,3 +18,5 @@ Thumbs.db
 
 # Keep the compiled release APK for direct downloads
 # (we do not ignore the root donghua-tracker.apk)
+
+gradle/wrapper/gradle-wrapper.jar
