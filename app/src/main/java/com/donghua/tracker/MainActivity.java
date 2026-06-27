@@ -32,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(false);
         webSettings.setDisplayZoomControls(false);
 
+        // Force WebView to respect the HTML viewport meta tag and scale to screen size
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+
         // Disable WebView long click to prevent text selection and context menu popups
         webView.setOnLongClickListener(v -> true);
         webView.setLongClickable(false);
