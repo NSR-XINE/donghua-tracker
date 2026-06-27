@@ -1022,3 +1022,28 @@ function triggerAddModal() {
 window.addEventListener('resize', () => {
     switchTab(activeTab);
 });
+
+// Exit Confirmation Modal Controllers
+function showExitModal() {
+    const modal = document.getElementById('exit-modal');
+    if (modal) {
+        modal.style.setProperty('display', 'flex', 'important');
+    }
+}
+
+function closeExitModal() {
+    const modal = document.getElementById('exit-modal');
+    if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+    }
+}
+
+function confirmExitApp() {
+    if (window.AndroidApp && window.AndroidApp.exitApp) {
+        window.AndroidApp.exitApp();
+    } else {
+        // Fallback for non-android environments
+        closeExitModal();
+        console.log("App Exited");
+    }
+}

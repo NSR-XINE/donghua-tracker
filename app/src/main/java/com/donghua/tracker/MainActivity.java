@@ -39,9 +39,16 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
 
-        // Disable WebView long click to prevent text selection and context menu popups
         webView.setOnLongClickListener(v -> true);
         webView.setLongClickable(false);
+
+        // Add JavascriptInterface to allow web pages to trigger native exit
+        webView.addJavascriptInterface(new Object() {
+            @android.webkit.JavascriptInterface
+            public void exitApp() {
+                runOnUiThread(() -> finish());
+            }
+        }, "AndroidApp");
 
         // Load our index.html from assets
         webView.loadUrl("file:///android_asset/index.html");
@@ -52,24 +59,7 @@ public class MainActivity extends AppCompatActivity {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            showExitConfirmationDialog();
+            webView.evaluateJavascript("showExitModal();", null);
         }
-    }
-
-    private void showExitConfirmationDialog() {
-        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Exit Application")
-            .setMessage("Do you want to close Donghua Tracker?")
-            .setPositiveButton("Exit", (dialogInterface, i) -> finish())
-            .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
-            .create();
-
-        dialog.show();
-
-        // Style dialog action button text colors to match our dark neon theme
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
-            .setTextColor(android.graphics.Color.parseColor("#00f2fe")); // Cyan accent
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
-            .setTextColor(android.graphics.Color.parseColor("#a0aec0")); // Muted silver
     }
 }
