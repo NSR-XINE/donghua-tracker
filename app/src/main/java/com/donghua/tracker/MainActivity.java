@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Enable immersive full-screen sticky mode
-        setImmersiveFullScreen();
-
         setContentView(R.layout.activity_main);
+
+        // Enable immersive full-screen sticky mode (called after contentView inflation to ensure system UI controller is ready)
+        setImmersiveFullScreen();
 
         webView = findViewById(R.id.webview);
         webView.setWebViewClient(new WebViewClient());
@@ -118,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    activity.webView.evaluateJavascript(callbackName + "(" + org.json.JSONObject.quote(finalHtml) + ");", null);
+                                    String responsePayload = (finalHtml == null) ? "null" : org.json.JSONObject.quote(finalHtml);
+                                    activity.webView.evaluateJavascript(callbackName + "(" + responsePayload + ");", null);
                                 }
                             });
                         }
