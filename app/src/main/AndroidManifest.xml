@@ -24,10 +24,11 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".NotificationReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <activity
+            android:name=".WatchActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.DonghuaTracker.NoActionBar" />
     </application>
 
 </manifest>

@@ -942,7 +942,7 @@ input, textarea {
     margin-top: auto;
 }
 
-.watch-link {
+.watch-link, .watch-btn {
     font-size: 0.8rem;
     color: var(--accent-cyan);
     text-decoration: none;
@@ -951,9 +951,15 @@ input, textarea {
     gap: 0.4rem;
     font-weight: 600;
     transition: var(--transition-smooth);
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
 }
 
-.watch-link:hover {
+.watch-link:hover, .watch-btn:hover {
     color: #fff;
     text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
 }
