@@ -267,6 +267,29 @@
         </div>
     </div>
 
+    <!-- Floating Bottom Navigation Bar (Mobile Only) -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-btn-home" onclick="switchTab('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" id="nav-btn-schedule" onclick="switchTab('schedule')">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Schedule</span>
+        </button>
+        <button class="nav-item nav-btn-add-shortcut" id="nav-btn-add" onclick="triggerAddModal()">
+            <div class="nav-add-icon"><i class="fa-solid fa-plus"></i></div>
+        </button>
+        <button class="nav-item" id="nav-btn-filters" onclick="switchTab('filters')">
+            <i class="fa-solid fa-filter"></i>
+            <span>Filters</span>
+        </button>
+        <button class="nav-item" id="nav-btn-info" onclick="switchTab('info')">
+            <i class="fa-solid fa-code"></i>
+            <span>Developer</span>
+        </button>
+    </nav>
+
     <!-- Custom Script -->
     <script src="app.js"></script>
 </body>

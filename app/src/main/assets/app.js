@@ -944,4 +944,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Disable context menu for a fully native app feel
     document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Initialize mobile navigation tab state
+    switchTab('home');
+});
+
+// Mobile Navigation View Controller
+let activeTab = 'home';
+
+function switchTab(tabName) {
+    if (tabName === 'add') return;
+    activeTab = tabName;
+    
+    // Update nav items class states
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById(`nav-btn-${tabName}`);
+    if (activeBtn) activeBtn.classList.add('active');
+    
+    // Target main container elements
+    const searchPanel = document.querySelector('.panel-search');
+    const filtersPanel = document.querySelector('.panel-filters');
+    const devPanel = document.querySelector('.panel-dev-info');
+    const scheduleContainer = document.querySelector('.schedule-container');
+    const heroBanner = document.getElementById('hero-banner-container');
+    const sectionsContainer = document.getElementById('shows-sections-container');
+    
+    // Mobile Viewport Check (corresponds to CSS max-width: 1024px)
+    const isMobile = window.innerWidth <= 1024;
+    if (isMobile) {
+        // Hide all major areas first
+        if (searchPanel) searchPanel.style.setProperty('display', 'none', 'important');
+        if (filtersPanel) filtersPanel.style.setProperty('display', 'none', 'important');
+        if (devPanel) devPanel.style.setProperty('display', 'none', 'important');
+        if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
+        if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
+        if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
+        
+        // Show only the selected tab
+        if (tabName === 'home') {
+            if (heroBanner) heroBanner.style.setProperty('display', 'block', 'important');
+            if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+        } else if (tabName === 'schedule') {
+            if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
+        } else if (tabName === 'filters') {
+            if (searchPanel) searchPanel.style.setProperty('display', 'block', 'important');
+            if (filtersPanel) filtersPanel.style.setProperty('display', 'block', 'important');
+        } else if (tabName === 'info') {
+            if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
+        }
+    } else {
+        // Desktop Viewport: Restore standard styles and clear important display sets
+        if (searchPanel) searchPanel.style.display = '';
+        if (filtersPanel) filtersPanel.style.display = '';
+        if (devPanel) devPanel.style.display = '';
+        if (scheduleContainer) scheduleContainer.style.display = '';
+        if (heroBanner) heroBanner.style.display = '';
+        if (sectionsContainer) sectionsContainer.style.display = '';
+    }
+}
+
+function triggerAddModal() {
+    openModal();
+}
+
+// Re-evaluate layouts on window size changes
+window.addEventListener('resize', () => {
+    switchTab(activeTab);
 });
