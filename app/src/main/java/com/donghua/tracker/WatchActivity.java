@@ -18,54 +18,59 @@ public class WatchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            // Fullscreen immersive
+            applyImmersiveMode();
 
-        // Fullscreen immersive
-        applyImmersiveMode();
+            // Lock to landscape for video
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
-        // Lock to landscape for video
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            playerView = new WebView(this);
+            setContentView(playerView);
+            playerView.setBackgroundColor(android.graphics.Color.BLACK);
 
-        playerView = new WebView(this);
-        setContentView(playerView);
-        playerView.setBackgroundColor(android.graphics.Color.BLACK);
+            WebSettings s = playerView.getSettings();
+            s.setJavaScriptEnabled(true);
+            s.setDomStorageEnabled(true);
+            s.setMediaPlaybackRequiresUserGesture(false);
+            s.setAllowFileAccess(false);
+            s.setSupportZoom(true);
+            s.setBuiltInZoomControls(true);
+            s.setDisplayZoomControls(false);
+            s.setUseWideViewPort(true);
+            s.setLoadWithOverviewMode(true);
+            s.setUserAgentString("Mozilla/5.0 (Linux; Android 11; Pixel 5) "
+                + "AppleWebkit/537.36 (KHTML, like Gecko) "
+                + "Chrome/120.0.0.0 Mobile Safari/537.36");
 
-        WebSettings s = playerView.getSettings();
-        s.setJavaScriptEnabled(true);
-        s.setDomStorageEnabled(true);
-        s.setMediaPlaybackRequiresUserGesture(false);
-        s.setAllowFileAccess(false);
-        s.setSupportZoom(true);
-        s.setBuiltInZoomControls(true);
-        s.setDisplayZoomControls(false);
-        s.setUseWideViewPort(true);
-        s.setLoadWithOverviewMode(true);
-        s.setUserAgentString("Mozilla/5.0 (Linux; Android 11; Pixel 5) "
-            + "AppleWebkit/537.36 (KHTML, like Gecko) "
-            + "Chrome/120.0.0.0 Mobile Safari/537.36");
+            playerView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    view.loadUrl(request.getUrl().toString());
+                    return true;
+                }
+            });
+            playerView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onShowCustomView(View view, CustomViewCallback callback) {
+                    // Allow full-screen video player inside the activity
+                    setContentView(view);
+                }
+                @Override
+                public void onHideCustomView() {
+                    setContentView(playerView);
+                }
+            });
 
-        playerView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                view.loadUrl(request.getUrl().toString());
-                return true;
+            String url = getIntent().getStringExtra("watch_url");
+            if (url != null && !url.isEmpty()) {
+                playerView.loadUrl(url);
+            } else {
+                finish();
             }
-        });
-        playerView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onShowCustomView(View view, CustomViewCallback callback) {
-                // Allow full-screen video player inside the activity
-                setContentView(view);
-            }
-            @Override
-            public void onHideCustomView() {
-                setContentView(playerView);
-            }
-        });
-
-        String url = getIntent().getStringExtra("watch_url");
-        if (url != null && !url.isEmpty()) {
-            playerView.loadUrl(url);
-        } else {
+        } catch (Exception e) {
+            android.util.Log.e("DonghuaTracker", "Crash in WatchActivity onCreate", e);
+            android.widget.Toast.makeText(this, "Crash starting player: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
             finish();
         }
     }

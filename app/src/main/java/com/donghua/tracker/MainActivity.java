@@ -169,9 +169,14 @@ public class MainActivity extends AppCompatActivity {
             @JavascriptInterface
             public void openWatchScreen(final String url) {
                 runOnUiThread(() -> {
-                    Intent intent = new Intent(MainActivity.this, WatchActivity.class);
-                    intent.putExtra("watch_url", url);
-                    startActivity(intent);
+                    try {
+                        Intent intent = new Intent(MainActivity.this, WatchActivity.class);
+                        intent.putExtra("watch_url", url);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        android.util.Log.e("DonghuaTracker", "Failed to start WatchActivity", e);
+                        android.widget.Toast.makeText(MainActivity.this, "Error starting player: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                    }
                 });
             }
 

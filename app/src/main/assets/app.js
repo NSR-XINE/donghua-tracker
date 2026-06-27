@@ -925,7 +925,7 @@ function renderShowsGrid() {
                         
                         <!-- Card Footer Actions -->
                         <div class="card-actions">
-                            <button class="watch-link watch-btn" data-watch-url="${show.watchUrl || 'https://donghuastream.org/?s=' + encodeURIComponent(show.title)}" onclick="openWatchScreen('${show.watchUrl || 'https://donghuastream.org/?s=' + encodeURIComponent(show.title)}')">
+                            <button class="watch-link watch-btn" data-watch-url="${show.watchUrl || 'https://donghuastream.org/?s=' + encodeURIComponent(show.title)}" onclick="openWatchScreen(this.getAttribute('data-watch-url'))">
                                 <i class="fa-solid fa-circle-play"></i> Stream
                             </button>
 
