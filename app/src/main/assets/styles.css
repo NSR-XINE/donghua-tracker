@@ -1075,6 +1075,12 @@ input, textarea {
     flex: 1;
     overflow-y: auto;
     padding: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.modal-open {
+    overflow: hidden !important;
+    height: 100vh !important;
 }
 
 .modal-header h2 {

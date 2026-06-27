@@ -773,10 +773,12 @@ function openModal(showData = null) {
     }
     
     modalEl.style.display = 'flex';
+    document.body.classList.add('modal-open');
 }
 
 function closeModal() {
     document.getElementById('donghua-modal').style.display = 'none';
+    document.body.classList.remove('modal-open');
 }
 
 // Bind Global UI Listeners
@@ -1025,6 +1027,7 @@ function showExitModal() {
     const modal = document.getElementById('exit-modal');
     if (modal) {
         modal.style.setProperty('display', 'flex', 'important');
+        document.body.classList.add('modal-open');
     }
 }
 
@@ -1032,6 +1035,7 @@ function closeExitModal() {
     const modal = document.getElementById('exit-modal');
     if (modal) {
         modal.style.setProperty('display', 'none', 'important');
+        document.body.classList.remove('modal-open');
     }
 }
 
