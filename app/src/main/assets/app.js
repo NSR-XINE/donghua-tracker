@@ -2,7 +2,7 @@
    STATE MANAGEMENT & DEFAULT DATA
    ========================================================================== */
 
-// Default mock data to populate local storage on first load
+/// Default mock data to populate local storage on first load
 const DEFAULT_DONGHUA = [
     {
         id: "dh-1",
@@ -15,6 +15,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815156/swallowed-star-2",
         notes: "Luo Feng strives to protect Earth and reach the peak of cosmic cultivation in a post-apocalyptic future.",
         lastUpdated: Date.now()
     },
@@ -29,6 +30,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1816738/perfect-world-episode-275",
         notes: "Shi Hao, a cultivation genius born in a desolate wilderness, trains to become the savior of the universe.",
         lastUpdated: Date.now()
     },
@@ -43,6 +45,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 104,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815190/throne-of-seal",
         notes: "Long Haochen rises through the ranks of the Temple Alliance to defeat the Demon Emperor and save humanity.",
         lastUpdated: Date.now()
     },
@@ -57,6 +60,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815191/soul-land-2",
         notes: "Huo Yuhao and a new generation of Shrek Academy students revive the legendary Tang Sect.",
         lastUpdated: Date.now()
     },
@@ -71,13 +75,14 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "Han Li, an ordinary village boy, uses his cunning and a mysterious bottle to survive the cutthroat world of cultivators.",
+        countdownUrl: "https://animecountdown.com/1816560/a-mortals-journey-to-immortality-remake",
+        notes: "A poor village boy rises in the cultivation world despite having ordinary spiritual roots.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-6",
-        title: "Battle Through the Heavens",
-        titleZh: "斗破苍穹年番",
+        title: "Battle through the heavens",
+        titleZh: "斗破苍穹",
         status: "ongoing",
         releaseDay: "Sunday",
         releaseTime: "10:00",
@@ -85,12 +90,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "Xiao Yan works to obtain Heavenly Flames and defeat the sinister Hall of Souls.",
+        countdownUrl: "https://animecountdown.com/1815250/battle-through-the-heavens",
+        notes: "Xiao Yan masters flame techniques to reclaim his family honor and climb to the top of the Dou Qi world.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-7",
-        title: "Renegade Immortal",
+        title: "Renegade immortal",
         titleZh: "仙逆",
         status: "ongoing",
         releaseDay: "Monday",
@@ -99,12 +105,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "Wang Lin cultivates ruthlessly to seek vengeance and forge his own path of immortality.",
+        countdownUrl: "https://animecountdown.com/1815480/renegade-immortal",
+        notes: "Wang Lin overcomes mortal challenges to seek the supreme path of ruthlessness and immortality.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-8",
-        title: "Jade Dynasty",
+        title: "Jade dynasty",
         titleZh: "诛仙",
         status: "completed",
         releaseDay: "Saturday",
@@ -113,12 +120,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 26,
         poster: "",
         watchUrl: "",
-        notes: "Zhang Xiaofan gets caught in the tragic conflict between the righteous sects and the demonic faction.",
+        countdownUrl: "https://animecountdown.com/1815198/jade-dynasty",
+        notes: "Zhang Xiaofan gets caught in the conflict between righteous cultivation sects and demonic paths. Completed.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-9",
-        title: "Lingwu Continent",
+        title: "Lingwu continent",
         titleZh: "灵武大陆",
         status: "ongoing",
         releaseDay: "Tuesday",
@@ -127,7 +135,8 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "A young cultivator battles through adversity to become the sovereign of the Lingwu Continent.",
+        countdownUrl: "https://animecountdown.com/1815340/lingwu-continent",
+        notes: "A young martial artist unlocks dormant ancestral spirits to conquer the spiritual martial universe.",
         lastUpdated: Date.now()
     },
     {
@@ -137,17 +146,33 @@ const DEFAULT_DONGHUA = [
         status: "ongoing",
         releaseDay: "Friday",
         releaseTime: "10:00",
-        currentEp: 104,
+        currentEp: 78,
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "Luo Zheng trains his physical body to become a supreme weapon to rescue his sister. Stopped at Season 3 Episode 26.",
+        countdownUrl: "https://animecountdown.com/1815192/apotheosis",
+        notes: "Luo Zheng refines his body into a weapon to save his sister and discover cosmic truths. Season 3 Episode 26 stopped.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-11",
-        title: "A Moment But Forever",
+        title: "A moment but forever",
         titleZh: "念无双",
+        status: "completed",
+        releaseDay: "Wednesday",
+        releaseTime: "10:00",
+        currentEp: 24,
+        totalEp: 24,
+        poster: "",
+        watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815668/a-moment-but-forever",
+        notes: "The high goddess Wu Shuang descends to retrieve divine artifacts and falls in love with a mortal priest. Completed.",
+        lastUpdated: Date.now()
+    },
+    {
+        id: "dh-12",
+        title: "Over the divine realms",
+        titleZh: "傲世九重天",
         status: "completed",
         releaseDay: "Wednesday",
         releaseTime: "10:00",
@@ -155,26 +180,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 12,
         poster: "",
         watchUrl: "",
-        notes: "The emotional connection and battles of immortals spanning across realms.",
-        lastUpdated: Date.now()
-    },
-    {
-        id: "dh-12",
-        title: "Over the Divine Realms",
-        titleZh: "跨界神域",
-        status: "completed",
-        releaseDay: "Thursday",
-        releaseTime: "10:00",
-        currentEp: 12,
-        totalEp: 12,
-        poster: "",
-        watchUrl: "",
-        notes: "Legendary warriors break through boundaries and rule across divine boundaries.",
+        countdownUrl: "https://animecountdown.com/1815194/over-the-divine-realms",
+        notes: "Chu Yang restarts his life to save his companions and master the Nine Tribulations Sword. Completed.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-13",
-        title: "Against the Gods",
+        title: "Against the gods",
         titleZh: "逆天邪神",
         status: "ongoing",
         releaseDay: "Friday",
@@ -183,12 +195,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
-        notes: "Yun Che rises from a crippled state to defy the heavens using ancient artifacts. Currently watching Season 2 Episode 13.",
+        countdownUrl: "https://animecountdown.com/1815187/against-the-gods",
+        notes: "Yun Che reincarnates with the Sky Poison Pearl to fight against fate and cosmic powers. Season 2 Episode 13.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-14",
-        title: "Stellar Transformation",
+        title: "Stellars transformation",
         titleZh: "星辰变",
         status: "completed",
         releaseDay: "Monday",
@@ -197,12 +210,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 84,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815195/stellars-transformation",
         notes: "Qin Yu transcends physical limits by practicing stellar techniques. Completed Season 7 Episode 12.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-15",
-        title: "In the Search of Gods",
+        title: "In the search of gods",
         titleZh: "寻找神仙",
         status: "ongoing",
         releaseDay: "Tuesday",
@@ -211,6 +225,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815200/in-search-of-gods",
         notes: "A journey through mythical mountains in search of legendary immortals.",
         lastUpdated: Date.now()
     },
@@ -225,12 +240,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815188/the-great-ruler",
         notes: "Mu Chen rises from a small spiritual academy to rule over the Great Thousand World.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-17",
-        title: "Tomb of the Fallen Gods",
+        title: "Tomb of the fallen gods",
         titleZh: "神墓",
         status: "ongoing",
         releaseDay: "Saturday",
@@ -239,12 +255,13 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815196/tomb-of-the-fallen-gods",
         notes: "Chen Nan wakes up from a grave in the tomb of gods after ten thousand years. Currently watching Season 3 Episode 48.",
         lastUpdated: Date.now()
     },
     {
         id: "dh-18",
-        title: "Shrouding the Heavens",
+        title: "Shrouding the heavens",
         titleZh: "遮天",
         status: "ongoing",
         releaseDay: "Wednesday",
@@ -253,6 +270,7 @@ const DEFAULT_DONGHUA = [
         totalEp: 0,
         poster: "",
         watchUrl: "",
+        countdownUrl: "https://animecountdown.com/1815160/shrouding-the-heavens",
         notes: "Ye Fan is pulled into a galactic journey by a casket pulled by nine dragon corpses.",
         lastUpdated: Date.now()
     }
@@ -260,7 +278,7 @@ const DEFAULT_DONGHUA = [
 
 // Load shows from localStorage or default
 let shows = JSON.parse(localStorage.getItem('donghua_shows'));
-const FORCE_SEED_VERSION = 5;
+const FORCE_SEED_VERSION = 6;
 if (localStorage.getItem('force_seed_version') !== String(FORCE_SEED_VERSION) || !shows || shows.length === 0) {
     shows = DEFAULT_DONGHUA;
     localStorage.setItem('donghua_shows', JSON.stringify(shows));
@@ -802,13 +820,18 @@ function renderShowsGrid() {
                         <div class="card-actions">
                             ${show.watchUrl ? `
                                 <a class="watch-link" href="${show.watchUrl}" target="_blank" rel="noopener noreferrer">
-                                    <i class="fa-solid fa-circle-play"></i> Watch Now
+                                    <i class="fa-solid fa-circle-play"></i> Stream
                                 </a>
                             ` : `
                                 <span class="watch-link" style="opacity: 0.3; cursor: not-allowed;">
-                                    <i class="fa-solid fa-circle-play"></i> No Stream Link
+                                    <i class="fa-solid fa-circle-play"></i> Stream
                                 </span>
                             `}
+
+                            <a class="countdown-link" href="${show.countdownUrl || `https://www.google.com/search?q=site:animecountdown.com+` + encodeURIComponent(show.title)}" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-solid fa-hourglass-half"></i> Countdown
+                            </a>
+
                             <div class="card-ctrls">
                                 <button class="ctrl-btn edit-btn" title="Edit show"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button class="ctrl-btn delete-btn" title="Delete show"><i class="fa-solid fa-trash"></i></button>
@@ -877,6 +900,7 @@ function openModal(showData = null) {
         document.getElementById('show-title-zh').value = showData.titleZh || '';
         document.getElementById('show-status').value = showData.status;
         document.getElementById('show-watch-url').value = showData.watchUrl || '';
+        document.getElementById('show-countdown-url').value = showData.countdownUrl || '';
         document.getElementById('show-release-day').value = showData.releaseDay;
         document.getElementById('show-release-time').value = showData.releaseTime;
         document.getElementById('show-current-ep').value = showData.currentEp;
@@ -885,6 +909,8 @@ function openModal(showData = null) {
         document.getElementById('show-notes').value = showData.notes || '';
     } else {
         document.getElementById('modal-title').innerHTML = '<i class="fa-solid fa-circle-plus"></i> Add New Donghua';
+        document.getElementById('show-watch-url').value = '';
+        document.getElementById('show-countdown-url').value = '';
         // Set default release day based on today
         const todayDay = DAYS_ARRAY[new Date().getDay()];
         document.getElementById('show-release-day').value = todayDay;
@@ -931,6 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
             titleZh: document.getElementById('show-title-zh').value.trim(),
             status: document.getElementById('show-status').value,
             watchUrl: document.getElementById('show-watch-url').value.trim(),
+            countdownUrl: document.getElementById('show-countdown-url').value.trim(),
             releaseDay: document.getElementById('show-release-day').value,
             releaseTime: document.getElementById('show-release-time').value,
             currentEp: parseInt(document.getElementById('show-current-ep').value) || 0,

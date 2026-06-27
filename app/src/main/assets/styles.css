@@ -958,6 +958,22 @@ input, textarea {
     text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
 }
 
+.countdown-link {
+    font-size: 0.8rem;
+    color: var(--accent-purple);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.countdown-link:hover {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(157, 78, 221, 0.5);
+}
+
 .card-ctrls {
     display: flex;
     gap: 0.5rem;
