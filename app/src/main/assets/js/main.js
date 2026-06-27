@@ -89,11 +89,29 @@
             });
         });
 
+        // Dynamic loading status messages
+        const statusEl = document.getElementById('loading-status-text');
+        if (statusEl) {
+            const messages = [
+                "Initializing SQLite database...",
+                "Connecting notification receiver...",
+                "Migrating user preferences...",
+                "Drawing schedule calendars...",
+                "Starting tracker engines..."
+            ];
+            messages.forEach((msg, idx) => {
+                setTimeout(() => {
+                    if (statusEl) statusEl.innerText = msg;
+                }, idx * 300);
+            });
+        }
+
         // 9. Wipe loading splash overlay
         setTimeout(() => {
             const loader = document.getElementById('app-loading-screen');
             if (loader) {
                 loader.classList.add('fade-out');
+                document.body.classList.remove('loading-active');
                 setTimeout(() => loader.remove(), 600);
             }
         }, 1600);
