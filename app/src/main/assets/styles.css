@@ -1301,7 +1301,7 @@ body.modal-open {
 
 @media (max-width: 1024px) {
     .app-container {
-        padding: 80px 1.2rem 100px 1.2rem !important;
+        padding: 70px 1.2rem 100px 1.2rem !important;
     }
 
     /* Home tab: header has 2 rows (logo + stats) */
