@@ -426,7 +426,7 @@ input, textarea {
 
 .schedule-header h2 {
     font-family: var(--font-heading);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
