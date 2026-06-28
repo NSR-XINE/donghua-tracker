@@ -230,6 +230,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
+            public boolean dbUpdateShow(final String showJsonStr) {
+                try {
+                    JSONObject obj = new JSONObject(showJsonStr);
+                    return dbHelper.updateShow(obj);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return false;
+                }
+            }
+
+            @JavascriptInterface
             public boolean dbDeleteShow(final String showId) {
                 try {
                     return dbHelper.deleteShow(showId);
@@ -282,10 +293,10 @@ public class MainActivity extends AppCompatActivity {
             // ==========================================
 
             @JavascriptInterface
-            public void scheduleReminder(final String id, final String title, final String releaseDay, final String releaseTime) {
+            public void scheduleReminder(final String id, final String title, final String releaseDay, final String releaseTime, final int alarmCode) {
                 runOnUiThread(() -> {
                     try {
-                        AlarmScheduler.schedule(MainActivity.this, id, title, releaseDay, releaseTime);
+                        AlarmScheduler.schedule(MainActivity.this, id, title, releaseDay, releaseTime, alarmCode);
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
@@ -293,10 +304,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
-            public void cancelReminder(final String id) {
+            public void cancelReminder(final String id, final int alarmCode) {
                 runOnUiThread(() -> {
                     try {
-                        AlarmScheduler.cancel(MainActivity.this, id);
+                        AlarmScheduler.cancel(MainActivity.this, id, alarmCode);
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
@@ -332,6 +343,14 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if (webView != null) {
             webView.evaluateJavascript("resumeTimers();", null);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dbHelper != null) {
+            dbHelper.close();
         }
     }
 

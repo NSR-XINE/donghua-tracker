@@ -9,17 +9,20 @@ import java.util.Calendar;
 
 public class AlarmScheduler {
 
-    public static void schedule(Context context, String showId, String title, String releaseDay, String releaseTime) {
+    public static void schedule(Context context, String showId, String title, String releaseDay, String releaseTime, int alarmCode) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.putExtra("show_id", showId);
         intent.putExtra("show_title", title);
+        intent.putExtra("release_day", releaseDay);
+        intent.putExtra("release_time", releaseTime);
+        intent.putExtra("alarm_code", alarmCode);
 
         PendingIntent pi = PendingIntent.getBroadcast(
                 context,
-                showId.hashCode(),
+                alarmCode,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
         );
@@ -39,14 +42,14 @@ public class AlarmScheduler {
         }
     }
 
-    public static void cancel(Context context, String showId) {
+    public static void cancel(Context context, String showId, int alarmCode) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (am == null) return;
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(
                 context,
-                showId.hashCode(),
+                alarmCode,
                 intent,
                 PendingIntent.FLAG_NO_CREATE | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
         );

@@ -21,12 +21,14 @@ public class BootReceiver extends BroadcastReceiver {
                         JSONObject show = showsArray.getJSONObject(i);
                         String status = show.optString("status", "ongoing");
                         if ("ongoing".equals(status)) {
+                            int alarmCode = show.optInt("alarmRequestCode", show.getString("id").hashCode());
                             AlarmScheduler.schedule(
                                     context,
                                     show.getString("id"),
                                     show.getString("title"),
                                     show.optString("releaseDay", "Sunday"),
-                                    show.optString("releaseTime", "10:00")
+                                    show.optString("releaseTime", "10:00"),
+                                    alarmCode
                             );
                         }
                     }

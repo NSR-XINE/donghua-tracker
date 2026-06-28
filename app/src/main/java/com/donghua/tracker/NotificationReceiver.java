@@ -17,6 +17,8 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String showId = intent.getStringExtra("show_id");
         String title = intent.getStringExtra("show_title");
+        int alarmCode = intent.getIntExtra("alarm_code", -1);
+        
         if (title == null || title.isEmpty()) {
             title = "A Tracked Donghua";
         }
@@ -42,13 +44,13 @@ public class NotificationReceiver extends BroadcastReceiver {
         
         PendingIntent pi = PendingIntent.getActivity(
                 context,
-                showId != null ? showId.hashCode() : 0,
+                alarmCode != -1 ? alarmCode : (showId != null ? showId.hashCode() : 0),
                 activityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+                .setSmallIcon(R.drawable.ic_notification) // Use clean vector drawable (Bug 10)
                 .setContentTitle("New Episode Airing Soon!")
                 .setContentText(title + " is about to broadcast its next release.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -56,6 +58,14 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setAutoCancel(true)
                 .setContentIntent(pi);
 
-        nm.notify(showId != null ? showId.hashCode() : (int) System.currentTimeMillis(), builder.build());
+        int notifyId = alarmCode != -1 ? alarmCode : (showId != null ? showId.hashCode() : (int) System.currentTimeMillis());
+        nm.notify(notifyId, builder.build());
+
+        // Reschedule for the following week automatically (Bug 3)
+        String releaseDay = intent.getStringExtra("release_day");
+        String releaseTime = intent.getStringExtra("release_time");
+        if (showId != null && releaseDay != null && releaseTime != null && alarmCode != -1) {
+            AlarmScheduler.schedule(context, showId, title, releaseDay, releaseTime, alarmCode);
+        }
     }
 }

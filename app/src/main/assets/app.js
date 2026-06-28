@@ -38,6 +38,10 @@ try {
     shows = [];
 }
 
+// Keep track of show IDs already present in the database to prevent duplicate full-loop inserts (Bug 1)
+const existingShowIds = new Set();
+shows.forEach(s => existingShowIds.add(s.id));
+
 // Active filters state
 let filters = {
     search: '',
@@ -854,8 +858,13 @@ function openWatchScreen(url) {
 }
 
 function exportData() {
-    const json = localStorage.getItem('donghua_shows');
-    if (!json) { alert('No data to export.'); return; }
+    let json = null;
+    if (window.AndroidApp && window.AndroidApp.dbGetAllShows) {
+        json = window.AndroidApp.dbGetAllShows();
+    } else {
+        json = localStorage.getItem('donghua_shows');
+    }
+    if (!json || json === '[]') { alert('No data to export.'); return; }
     
     // File download trigger (creates a local .json file download)
     try {
@@ -918,9 +927,9 @@ function importData(jsonString) {
 function syncAlarm(show) {
     if (window.AndroidApp && window.AndroidApp.scheduleReminder) {
         if (show.status === 'ongoing') {
-            window.AndroidApp.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime);
+            window.AndroidApp.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime, show.alarmRequestCode || 0);
         } else {
-            window.AndroidApp.cancelReminder(show.id);
+            window.AndroidApp.cancelReminder(show.id, show.alarmRequestCode || 0);
         }
     }
 }
@@ -929,9 +938,14 @@ function syncAlarm(show) {
  * Saves the current shows list state to LocalStorage and triggers layout updates.
  */
 function saveState() {
-    if (window.AndroidApp && window.AndroidApp.dbInsertShow) {
+    if (window.AndroidApp && window.AndroidApp.dbInsertShow && window.AndroidApp.dbUpdateShow) {
         shows.forEach(show => {
-            window.AndroidApp.dbInsertShow(JSON.stringify(show));
+            if (existingShowIds.has(show.id)) {
+                window.AndroidApp.dbUpdateShow(JSON.stringify(show));
+            } else {
+                window.AndroidApp.dbInsertShow(JSON.stringify(show));
+                existingShowIds.add(show.id);
+            }
             syncAlarm(show);
         });
     } else {
@@ -1404,9 +1418,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmDelete) {
                 const showId = show.id;
                 shows.splice(showIdx, 1);
+                existingShowIds.delete(showId);
                 if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
                     window.AndroidApp.dbDeleteShow(showId);
-                    window.AndroidApp.cancelReminder(showId);
+                    window.AndroidApp.cancelReminder(showId, show.alarmRequestCode || 0);
                 }
                 saveState();
             }

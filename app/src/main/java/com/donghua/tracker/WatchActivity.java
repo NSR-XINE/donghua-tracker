@@ -10,6 +10,7 @@ import android.webkit.*;
 import android.os.Build;
 import android.view.View;
 import android.widget.FrameLayout;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class WatchActivity extends AppCompatActivity {
@@ -147,6 +148,17 @@ public class WatchActivity extends AppCompatActivity {
             } else {
                 finish();
             }
+
+            getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    if (playerView != null && playerView.canGoBack()) {
+                        playerView.goBack();
+                    } else {
+                        finish();
+                    }
+                }
+            });
         } catch (Throwable t) {
             android.util.Log.e("DonghuaTracker", "Crash in WatchActivity onCreate", t);
             android.widget.Toast.makeText(this, "Crash starting player: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show();
@@ -169,15 +181,6 @@ public class WatchActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             );
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (playerView.canGoBack()) {
-            playerView.goBack();
-        } else {
-            finish();
         }
     }
 }
