@@ -1256,6 +1256,15 @@ body.modal-open {
         padding: 135px 0.6rem 1rem;
     }
 
+    .control-panel,
+    .content-area {
+        padding-top: 0.8rem;
+    }
+
+    .panel-search {
+        display: none !important;
+    }
+
     .header-content-wrapper {
         flex-direction: row;
         align-items: center;
