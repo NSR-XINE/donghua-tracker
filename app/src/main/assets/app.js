@@ -1604,6 +1604,9 @@ function switchTab(tabName) {
             statsPanel.style.setProperty('display', 'none', 'important');
         }
     }
+    
+    // Automatically reset scroll position to top when switching views
+    window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function triggerAddModal() {
