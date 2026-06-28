@@ -94,20 +94,20 @@ public class WatchActivity extends AppCompatActivity {
                         if (request != null && request.getUrl() != null) {
                             String url = request.getUrl().toString();
                             if (url.startsWith("http://") || url.startsWith("https://")) {
-                                view.loadUrl(url);
+                                return false; // Allow standard web links to load natively
                             }
                         }
                     }
-                    return true;
+                    return true; // Block malicious redirects / custom schemes
                 }
 
                 @SuppressWarnings("deprecation")
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
-                        view.loadUrl(url);
+                        return false; // Allow standard web links to load natively
                     }
-                    return true;
+                    return true; // Block malicious redirects / custom schemes
                 }
             });
             playerView.setWebChromeClient(new WebChromeClient() {
