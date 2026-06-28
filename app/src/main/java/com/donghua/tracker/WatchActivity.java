@@ -38,6 +38,8 @@ public class WatchActivity extends AppCompatActivity {
             WebSettings s = playerView.getSettings();
             s.setJavaScriptEnabled(true);
             s.setDomStorageEnabled(true);
+            s.setDatabaseEnabled(true);
+            s.setJavaScriptCanOpenWindowsAutomatically(false); // Disable popups/redirects
             s.setMediaPlaybackRequiresUserGesture(false);
             s.setAllowFileAccess(false);
             s.setSupportZoom(true);
@@ -52,12 +54,27 @@ public class WatchActivity extends AppCompatActivity {
             // Allow mixed content so HTTP video links can load properly on HTTPS sites
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(playerView, true);
             }
 
             playerView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                    view.loadUrl(request.getUrl().toString());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        String url = request.getUrl().toString();
+                        if (url.startsWith("http://") || url.startsWith("https://")) {
+                            view.loadUrl(url);
+                        }
+                    }
+                    return true;
+                }
+
+                @SuppressWarnings("deprecation")
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    if (url.startsWith("http://") || url.startsWith("https://")) {
+                        view.loadUrl(url);
+                    }
                     return true;
                 }
             });
