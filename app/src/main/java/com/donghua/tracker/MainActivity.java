@@ -29,27 +29,6 @@ public class MainActivity extends AppCompatActivity {
         "https://img."
     };
 
-    private void applyImmersiveMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController ctrl = getWindow().getInsetsController();
-            if (ctrl != null) {
-                ctrl.hide(WindowInsets.Type.systemBars());
-                ctrl.setSystemBarsBehavior(
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            );
-        }
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -66,8 +45,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#05060a"));
+            getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#05060a"));
+        }
+
         dbHelper = new DatabaseHelper(this);
-        applyImmersiveMode();
 
         webView = findViewById(R.id.webview);
         
@@ -332,13 +315,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            applyImmersiveMode();
-        }
-    }
+
 
     @Override
     protected void onPause() {
