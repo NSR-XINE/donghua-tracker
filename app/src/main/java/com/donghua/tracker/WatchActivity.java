@@ -22,10 +22,16 @@ public class WatchActivity extends AppCompatActivity {
             // Fullscreen immersive
             applyImmersiveMode();
 
-            // Lock to landscape for video
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            // Lock to landscape for video (Guarded in a separate block in case the system rejects requested orientation changes)
+            try {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            } catch (Throwable t) {
+                android.util.Log.w("DonghuaTracker", "Could not lock screen orientation: " + t.getMessage());
+            }
 
             playerView = new WebView(this);
+            // Force hardware acceleration layer on the WebView for video rendering stability
+            playerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             setContentView(playerView);
             playerView.setBackgroundColor(android.graphics.Color.BLACK);
 
@@ -42,6 +48,11 @@ public class WatchActivity extends AppCompatActivity {
             s.setUserAgentString("Mozilla/5.0 (Linux; Android 11; Pixel 5) "
                 + "AppleWebkit/537.36 (KHTML, like Gecko) "
                 + "Chrome/120.0.0.0 Mobile Safari/537.36");
+
+            // Allow mixed content so HTTP video links can load properly on HTTPS sites
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            }
 
             playerView.setWebViewClient(new WebViewClient() {
                 @Override
@@ -68,9 +79,9 @@ public class WatchActivity extends AppCompatActivity {
             } else {
                 finish();
             }
-        } catch (Exception e) {
-            android.util.Log.e("DonghuaTracker", "Crash in WatchActivity onCreate", e);
-            android.widget.Toast.makeText(this, "Crash starting player: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+        } catch (Throwable t) {
+            android.util.Log.e("DonghuaTracker", "Crash in WatchActivity onCreate", t);
+            android.widget.Toast.makeText(this, "Crash starting player: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show();
             finish();
         }
     }
