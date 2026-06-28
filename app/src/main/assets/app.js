@@ -868,27 +868,45 @@ window.getWatchUrlById = function(id) {
     return window.getWatchUrl(show);
 };
 
-window.togglePreferredSource = function(isChecked) {
-    const source = isChecked ? 'luciferdonghua' : 'donghuastream';
+window.selectPreferredSource = function(source) {
     localStorage.setItem('pref_streaming_source', source);
-    
-    // Update active label styles
-    const lblDonghua = document.getElementById('source-toggle-lbl-donghua');
-    const lblLucifer = document.getElementById('source-toggle-lbl-lucifer');
-    
-    if (lblDonghua && lblLucifer) {
-        if (isChecked) {
-            lblDonghua.style.color = 'var(--text-muted)';
-            lblLucifer.style.color = 'var(--accent-cyan)';
-        } else {
-            lblDonghua.style.color = 'var(--accent-cyan)';
-            lblLucifer.style.color = 'var(--text-muted)';
-        }
-    }
+    window.updateSourceUI(source);
     
     // Re-render shows and hero banner so the updated links take effect immediately!
     renderShowsGrid();
     renderHeroBanner();
+};
+
+window.updateSourceUI = function(source) {
+    const cardDonghua = document.getElementById('source-card-donghua');
+    const cardLucifer = document.getElementById('source-card-lucifer');
+    
+    if (cardDonghua && cardLucifer) {
+        const badgeDonghua = cardDonghua.querySelector('.active-badge');
+        const badgeLucifer = cardLucifer.querySelector('.active-badge');
+        
+        if (source === 'luciferdonghua') {
+            cardDonghua.style.borderColor = 'var(--border-color)';
+            cardDonghua.style.background = 'rgba(255,255,255,0.02)';
+            cardDonghua.style.boxShadow = 'none';
+            if (badgeDonghua) badgeDonghua.style.display = 'none';
+            
+            cardLucifer.style.borderColor = 'var(--accent-purple)';
+            cardLucifer.style.background = 'rgba(157, 78, 221, 0.05)';
+            cardLucifer.style.boxShadow = '0 0 15px rgba(157, 78, 221, 0.2)';
+            if (badgeLucifer) badgeLucifer.style.display = 'block';
+        } else {
+            cardDonghua.style.borderColor = 'var(--accent-cyan)';
+            cardDonghua.style.background = 'rgba(0, 242, 254, 0.03)';
+            cardDonghua.style.boxShadow = '0 0 15px rgba(0, 242, 254, 0.15)';
+            if (badgeDonghua) badgeDonghua.style.display = 'block';
+            
+            cardLucifer.style.borderColor = 'var(--border-color)';
+            cardLucifer.style.background = 'rgba(255,255,255,0.02)';
+            cardLucifer.style.boxShadow = 'none';
+            if (badgeLucifer) badgeLucifer.style.display = 'none';
+        }
+    }
 };
 
 function openWatchScreen(url) {
@@ -1168,25 +1186,9 @@ function closeModal() {
 // Bind Global UI Listeners
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Initialize Preferred Source Toggle Switch state
-    const prefSwitch = document.getElementById('pref-source-switch');
-    if (prefSwitch) {
-        const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
-        prefSwitch.checked = (source === 'luciferdonghua');
-        
-        // Update label colors initial states
-        const lblDonghua = document.getElementById('source-toggle-lbl-donghua');
-        const lblLucifer = document.getElementById('source-toggle-lbl-lucifer');
-        if (lblDonghua && lblLucifer) {
-            if (prefSwitch.checked) {
-                lblDonghua.style.color = 'var(--text-muted)';
-                lblLucifer.style.color = 'var(--accent-cyan)';
-            } else {
-                lblDonghua.style.color = 'var(--accent-cyan)';
-                lblLucifer.style.color = 'var(--text-muted)';
-            }
-        }
-    }
+    // Initialize Preferred Source Card Selection UI state
+    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    window.updateSourceUI(source);
     
     // Update basic stats immediately
     updateStats();
