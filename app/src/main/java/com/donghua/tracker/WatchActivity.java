@@ -24,11 +24,11 @@ public class WatchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            // Lock to landscape for video (Guarded in a separate block in case the system rejects requested orientation changes)
+            // Support both portrait and landscape orientations dynamically based on user device sensors
             try {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
             } catch (Throwable t) {
-                android.util.Log.w("DonghuaTracker", "Could not lock screen orientation: " + t.getMessage());
+                android.util.Log.w("DonghuaTracker", "Could not configure sensor rotation: " + t.getMessage());
             }
 
             FrameLayout rootLayout = new FrameLayout(this);
