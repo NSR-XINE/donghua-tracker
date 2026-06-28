@@ -1,6 +1,7 @@
 package com.donghua.tracker;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.WindowInsets;
@@ -54,16 +55,25 @@ public class WatchActivity extends AppCompatActivity {
             // Allow mixed content so HTTP video links can load properly on HTTPS sites
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-                android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(playerView, true);
+                try {
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    if (cookieManager != null) {
+                        cookieManager.setAcceptThirdPartyCookies(playerView, true);
+                    }
+                } catch (Throwable t) {
+                    android.util.Log.w("DonghuaTracker", "CookieManager init failed: " + t.getMessage());
+                }
             }
 
             playerView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        String url = request.getUrl().toString();
-                        if (url.startsWith("http://") || url.startsWith("https://")) {
-                            view.loadUrl(url);
+                        if (request != null && request.getUrl() != null) {
+                            String url = request.getUrl().toString();
+                            if (url.startsWith("http://") || url.startsWith("https://")) {
+                                view.loadUrl(url);
+                            }
                         }
                     }
                     return true;
@@ -72,7 +82,7 @@ public class WatchActivity extends AppCompatActivity {
                 @SuppressWarnings("deprecation")
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    if (url.startsWith("http://") || url.startsWith("https://")) {
+                    if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
                         view.loadUrl(url);
                     }
                     return true;
@@ -90,7 +100,11 @@ public class WatchActivity extends AppCompatActivity {
                 }
             });
 
-            String url = getIntent().getStringExtra("watch_url");
+            Intent intent = getIntent();
+            String url = null;
+            if (intent != null) {
+                url = intent.getStringExtra("watch_url");
+            }
             if (url != null && !url.isEmpty()) {
                 playerView.loadUrl(url);
             } else {
