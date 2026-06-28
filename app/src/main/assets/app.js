@@ -506,7 +506,6 @@ function renderShowsGrid() {
         containerEl.innerHTML = '';
         emptyStateEl.innerHTML = `
             <i class="fa-solid fa-compass" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 1rem; opacity: 0.8;"></i>
-            <h3>Track Your First Donghua</h3>
             <p>Your watchlist is empty. Click the search input above to query shows, or tap <strong>Add Show</strong> to create a custom tracker!</p>
             <button class="btn btn-primary" id="btn-reset-filters" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; color: #fff;" onclick="openModal()">
                 <i class="fa-solid fa-plus"></i> Add Donghua
