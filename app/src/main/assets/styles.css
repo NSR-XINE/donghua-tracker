@@ -358,6 +358,13 @@ input, textarea {
     gap: 1.5rem;
 }
 
+/* Content Area */
+.content-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
 .search-box {
     display: flex;
     align-items: center;
@@ -412,7 +419,6 @@ input, textarea {
    WEEKLY SCHEDULE CALENDAR
    ========================================== */
 .schedule-container {
-    margin-bottom: 2rem;
 }
 
 .schedule-header {
