@@ -504,19 +504,25 @@ function renderShowsGrid() {
     
     if (shows.length === 0) {
         containerEl.innerHTML = '';
+        emptyStateEl.classList.remove('empty-state');
         emptyStateEl.innerHTML = `
-            <i class="fa-solid fa-compass" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 1rem; opacity: 0.8;"></i>
-            <p>Your watchlist is empty. Click the search input above to query shows, or tap <strong>Add Show</strong> to create a custom tracker!</p>
-            <button class="btn btn-primary" id="btn-reset-filters" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; color: #fff;" onclick="openModal()">
+            <button class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 600; cursor: pointer; color: #fff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);" onclick="openModal()">
                 <i class="fa-solid fa-plus"></i> Add Donghua
             </button>
         `;
-        emptyStateEl.style.display = 'flex';
+        emptyStateEl.style.setProperty('display', 'flex', 'important');
+        emptyStateEl.style.setProperty('justify-content', 'center', 'important');
+        emptyStateEl.style.setProperty('align-items', 'center', 'important');
+        emptyStateEl.style.setProperty('padding', '4rem 0', 'important');
         return;
     }
 
     if (filteredShows.length === 0) {
         containerEl.innerHTML = '';
+        emptyStateEl.classList.add('empty-state');
+        emptyStateEl.style.padding = '';
+        emptyStateEl.style.justifyContent = '';
+        emptyStateEl.style.alignItems = '';
         emptyStateEl.innerHTML = `
             <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
             <h3>No Matches Found</h3>
