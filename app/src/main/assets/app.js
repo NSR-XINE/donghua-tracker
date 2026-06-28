@@ -1541,7 +1541,7 @@ function switchTab(tabName) {
     activeTab = tabName;
     
     // Update nav items class states
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+    document.querySelectorAll('.bottom-nav .nav-item, .dev-header-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     const activeBtn = document.getElementById(`nav-btn-${tabName}`);
@@ -1582,6 +1582,7 @@ function switchTab(tabName) {
             if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'info') {
             if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
+        } else if (tabName === 'backup') {
             if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
         }
     } else {

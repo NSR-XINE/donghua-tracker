@@ -43,9 +43,13 @@
                 <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
                 <div class="logo-text">
                     <h1>东画 <span>Donghua Tracker</span></h1>
-                    <p>Track your Chinese anime releases in real-time</p>
+                    <p style="display: none;">Track your Chinese anime releases in real-time</p>
                 </div>
             </div>
+            
+            <button id="nav-btn-info" onclick="switchTab('info')" class="dev-header-btn" title="Developer Info">
+                <i class="fa-solid fa-code"></i>
+            </button>
             
             <!-- Quick Stats -->
             <div class="stats-panel">
@@ -384,9 +388,9 @@
             <i class="fa-solid fa-play"></i>
             <span>Sources</span>
         </button>
-        <button class="nav-item" id="nav-btn-info" onclick="switchTab('info')">
-            <i class="fa-solid fa-code"></i>
-            <span>Developer</span>
+        <button class="nav-item" id="nav-btn-backup" onclick="switchTab('backup')">
+            <i class="fa-solid fa-file-import"></i>
+            <span>Backup</span>
         </button>
     </nav>
 
