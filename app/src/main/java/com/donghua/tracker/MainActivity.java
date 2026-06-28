@@ -13,10 +13,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 import java.lang.ref.WeakReference;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     WebView webView;
+    private DatabaseHelper dbHelper;
 
     private static final String[] ALLOWED_PREFIXES = {
         "https://animecountdown.com/",
@@ -48,16 +50,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String targetShowId = intent.getStringExtra("target_show_id");
+        if (targetShowId != null && webView != null) {
+            webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 500);", null);
+        }
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dbHelper = new DatabaseHelper(this);
         applyImmersiveMode();
 
         webView = findViewById(R.id.webview);
-        webView.setWebViewClient(new WebViewClient());
+        
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                String targetShowId = getIntent().getStringExtra("target_show_id");
+                if (targetShowId != null) {
+                    webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 800);", null);
+                    getIntent().removeExtra("target_show_id");
+                }
+            }
+        });
 
         webView.setWebChromeClient(new android.webkit.WebChromeClient() {
             @Override
@@ -88,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true); // Required for LocalStorage
+        webSettings.setDomStorageEnabled(true); // Required for LocalStorage fallback
         webSettings.setAllowFileAccess(true);    // Allow reading assets/files
         webSettings.setAllowContentAccess(true);
         webSettings.setDatabaseEnabled(true);
@@ -156,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                             a.webView.evaluateJavascript(callbackName + "("
                                 + org.json.JSONObject.quote(html) + ");", null);
                         });
-                    } catch (Exception e) {
+                    } catch (Throwable t) {
                         activity.runOnUiThread(() -> {
                             MainActivity a = weakActivity.get();
                             if (a == null) return;
@@ -173,9 +197,9 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, WatchActivity.class);
                         intent.putExtra("watch_url", url);
                         startActivity(intent);
-                    } catch (Exception e) {
-                        android.util.Log.e("DonghuaTracker", "Failed to start WatchActivity", e);
-                        android.widget.Toast.makeText(MainActivity.this, "Error starting player: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                    } catch (Throwable t) {
+                        android.util.Log.e("DonghuaTracker", "Failed to start WatchActivity", t);
+                        android.widget.Toast.makeText(MainActivity.this, "Error starting player: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -183,11 +207,114 @@ public class MainActivity extends AppCompatActivity {
             @JavascriptInterface
             public void shareText(final String text) {
                 runOnUiThread(() -> {
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, text);
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Donghua Tracker Backup");
-                    startActivity(Intent.createChooser(intent, "Export Backup"));
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_TEXT, text);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Donghua Tracker Backup");
+                        startActivity(Intent.createChooser(intent, "Export Backup"));
+                    } catch (Throwable t) {
+                        android.util.Log.e("DonghuaTracker", "Share failed", t);
+                    }
+                });
+            }
+
+            // ==========================================
+            // NATIVE SQLITE DATABASE BRIDGE
+            // ==========================================
+
+            @JavascriptInterface
+            public String dbGetAllShows() {
+                try {
+                    return dbHelper.getAllShows();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return "[]";
+                }
+            }
+
+            @JavascriptInterface
+            public boolean dbInsertShow(final String showJsonStr) {
+                try {
+                    JSONObject obj = new JSONObject(showJsonStr);
+                    return dbHelper.insertShow(obj);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return false;
+                }
+            }
+
+            @JavascriptInterface
+            public boolean dbDeleteShow(final String showId) {
+                try {
+                    return dbHelper.deleteShow(showId);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return false;
+                }
+            }
+
+            @JavascriptInterface
+            public void dbAddWatchHistory(final String showId, final int episodeNum) {
+                try {
+                    dbHelper.addWatchHistory(showId, episodeNum);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+
+            @JavascriptInterface
+            public String dbGetWatchHistory() {
+                try {
+                    return dbHelper.getWatchHistory();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return "[]";
+                }
+            }
+
+            @JavascriptInterface
+            public void dbSaveSetting(final String key, final String value) {
+                try {
+                    dbHelper.saveSetting(key, value);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+
+            @JavascriptInterface
+            public String dbGetSetting(final String key, final String defaultVal) {
+                try {
+                    return dbHelper.getSetting(key, defaultVal);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return defaultVal;
+                }
+            }
+
+            // ==========================================
+            // ALARM REMINDER CONTROLS
+            // ==========================================
+
+            @JavascriptInterface
+            public void scheduleReminder(final String id, final String title, final String releaseDay, final String releaseTime) {
+                runOnUiThread(() -> {
+                    try {
+                        AlarmScheduler.schedule(MainActivity.this, id, title, releaseDay, releaseTime);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            @JavascriptInterface
+            public void cancelReminder(final String id) {
+                runOnUiThread(() -> {
+                    try {
+                        AlarmScheduler.cancel(MainActivity.this, id);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
                 });
             }
         }, "AndroidApp");

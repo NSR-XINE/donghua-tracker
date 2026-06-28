@@ -5,13 +5,36 @@
 /// Default mock data to populate local storage on first load (empty by default)
 const DEFAULT_DONGHUA = [];
 
-// Load shows from localStorage
+// Load shows from SQLite or fallback to localStorage
 let shows = [];
 try {
-    const saved = localStorage.getItem('donghua_shows');
-    shows = saved ? JSON.parse(saved) : [];
+    if (window.AndroidApp && window.AndroidApp.dbGetAllShows) {
+        const dbData = window.AndroidApp.dbGetAllShows();
+        shows = JSON.parse(dbData) || [];
+        
+        // Auto-migration from localStorage on first launch of SQLite version
+        const hasMigrated = window.AndroidApp.dbGetSetting('sqlite_migrated', 'false');
+        if (hasMigrated === 'false') {
+            const legacyData = localStorage.getItem('donghua_shows');
+            if (legacyData) {
+                const legacyShows = JSON.parse(legacyData);
+                if (Array.isArray(legacyShows) && legacyShows.length > 0) {
+                    legacyShows.forEach(s => {
+                        window.AndroidApp.dbInsertShow(JSON.stringify(s));
+                    });
+                    // Reload merged shows from database
+                    shows = JSON.parse(window.AndroidApp.dbGetAllShows()) || [];
+                }
+            }
+            window.AndroidApp.dbSaveSetting('sqlite_migrated', 'true');
+        }
+    } else {
+        const saved = localStorage.getItem('donghua_shows');
+        shows = saved ? JSON.parse(saved) : [];
+    }
     if (!Array.isArray(shows)) shows = [];
 } catch (e) {
+    console.error("Database load error", e);
     shows = [];
 }
 
@@ -889,10 +912,31 @@ function importData(jsonString) {
 }
 
 /**
+ * Synchronizes native alarm manager states for a specific show countdown.
+ * @param {Object} show
+ */
+function syncAlarm(show) {
+    if (window.AndroidApp && window.AndroidApp.scheduleReminder) {
+        if (show.status === 'ongoing') {
+            window.AndroidApp.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime);
+        } else {
+            window.AndroidApp.cancelReminder(show.id);
+        }
+    }
+}
+
+/**
  * Saves the current shows list state to LocalStorage and triggers layout updates.
  */
 function saveState() {
-    localStorage.setItem('donghua_shows', JSON.stringify(shows));
+    if (window.AndroidApp && window.AndroidApp.dbInsertShow) {
+        shows.forEach(show => {
+            window.AndroidApp.dbInsertShow(JSON.stringify(show));
+            syncAlarm(show);
+        });
+    } else {
+        localStorage.setItem('donghua_shows', JSON.stringify(shows));
+    }
     updateStats();
     renderWeeklySchedule();
     renderHeroBanner();
@@ -989,6 +1033,13 @@ function openDetailsModal(show) {
             if (newEp === show.currentEp) {
                 show.currentEp = Math.max(0, newEp - 1);
             } else {
+                if (newEp > show.currentEp) {
+                    for (let ep = show.currentEp + 1; ep <= newEp; ep++) {
+                        if (window.AndroidApp && window.AndroidApp.dbAddWatchHistory) {
+                            window.AndroidApp.dbAddWatchHistory(show.id, ep);
+                        }
+                    }
+                }
                 show.currentEp = newEp;
             }
             
@@ -1325,7 +1376,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (isDelete) {
             const confirmDelete = confirm(`Are you sure you want to remove "${show.title}" from your list?`);
             if (confirmDelete) {
+                const showId = show.id;
                 shows.splice(showIdx, 1);
+                if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
+                    window.AndroidApp.dbDeleteShow(showId);
+                    window.AndroidApp.cancelReminder(showId);
+                }
                 saveState();
             }
         } else if (isStream || isCountdown) {
@@ -1473,3 +1529,13 @@ function confirmExitApp() {
         console.log("App Exited");
     }
 }
+
+// Global target launcher called from native intents (e.g. notifications)
+function openDetailsById(showId) {
+    const show = shows.find(s => s.id === showId);
+    if (show) {
+        switchTab('home');
+        openDetailsModal(show);
+    }
+}
+window.openDetailsById = openDetailsById;
