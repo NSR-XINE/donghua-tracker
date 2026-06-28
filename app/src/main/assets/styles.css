@@ -1317,6 +1317,11 @@ body.modal-open {
         padding: 136px 0.8rem 100px 0.8rem !important;
     }
 
+    .schedule-container,
+    .panel-backup-info {
+        padding: 0 0.8rem;
+    }
+
     .bottom-nav {
         position: fixed;
         bottom: 20px;
