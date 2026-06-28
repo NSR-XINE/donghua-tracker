@@ -1307,10 +1307,30 @@ body.modal-open {
         gap: 0 !important;
     }
 
+    .panel-sources,
+    .panel-backup-info,
+    .schedule-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
     .panel-sources h3,
     .panel-backup-info h3,
     .schedule-header h2 {
         margin-top: 0 !important;
+        margin-bottom: 0.5rem !important;
+        padding: 0 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .schedule-header {
+        margin-bottom: 1rem !important;
     }
 
     .app-container {

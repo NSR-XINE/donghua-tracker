@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
         }, "AndroidApp");
 
         // Load our index.html from assets
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("file:///android_asset/index.html?v=" + System.currentTimeMillis());
     }
 
     @Override

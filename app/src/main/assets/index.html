@@ -11,7 +11,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=4.8">
 </head>
 <body class="loading-active">
     <!-- App Launch Loading Screen -->
@@ -201,18 +201,14 @@
                 <!-- Backup & Restore Panel -->
                 <div class="panel-backup-info">
                     <h3><i class="fa-solid fa-database" style="color: var(--accent-cyan);"></i> Backup & Restore</h3>
-                    <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.82rem;">
-                        <p style="color: var(--text-muted); line-height: 1.4; margin: 0;">
-                            Export your watchlist to a JSON backup and share it, or import a previously exported JSON string.
-                        </p>
-                        <div style="display: flex; gap: 0.8rem; margin-top: 0.4rem;">
-                            <button id="btn-export-data" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                                <i class="fa-solid fa-file-export"></i> Export JSON
-                            </button>
-                            <button id="btn-trigger-import" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                                <i class="fa-solid fa-file-import"></i> Import JSON
-                            </button>
-                        </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; margin-bottom: 1rem;">Export your watchlist to a JSON backup and share it, or import a previously exported JSON string.</p>
+                    <div style="display: flex; gap: 0.8rem; margin-top: 0.4rem;">
+                        <button id="btn-export-data" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                            <i class="fa-solid fa-file-export"></i> Export JSON
+                        </button>
+                        <button id="btn-trigger-import" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                            <i class="fa-solid fa-file-import"></i> Import JSON
+                        </button>
                     </div>
                 </div>
 
@@ -396,6 +392,6 @@
     </nav>
 
     <!-- Custom Script -->
-    <script src="app.js"></script>
+    <script src="app.js?v=4.8"></script>
 </body>
 </html>
