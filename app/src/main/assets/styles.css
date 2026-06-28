@@ -1314,12 +1314,7 @@ body.modal-open {
     }
 
     .app-container {
-        padding: 136px 0.8rem 100px 0.8rem !important;
-    }
-
-    .schedule-container,
-    .panel-backup-info {
-        padding: 0 0.8rem;
+        padding: 136px 1.2rem 100px 1.2rem !important;
     }
 
     .bottom-nav {
