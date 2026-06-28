@@ -380,59 +380,6 @@ input, textarea {
     color: var(--text-muted);
 }
 
-.panel-filters h3 {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.filter-group {
-    margin-bottom: 1.2rem;
-}
-
-.filter-group label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.filter-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filter-chip {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 0.6rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    text-align: left;
-    transition: var(--transition-smooth);
-    width: 100%;
-}
-
-.filter-chip:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-}
-
-.filter-chip.active {
-    background: rgba(0, 242, 254, 0.12);
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
-    font-weight: 600;
-}
-
 .form-select {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
