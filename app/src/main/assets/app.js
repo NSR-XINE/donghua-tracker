@@ -506,9 +506,7 @@ function renderShowsGrid() {
         containerEl.innerHTML = '';
         emptyStateEl.classList.remove('empty-state');
         emptyStateEl.innerHTML = `
-            <button class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 600; cursor: pointer; color: #fff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);" onclick="openModal()">
-                <i class="fa-solid fa-plus"></i> Add Donghua
-            </button>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; text-align: center; max-width: 320px; line-height: 1.5; margin: 0; font-family: var(--font-body);">Your watchlist is empty. Search for a show above to start tracking!</p>
         `;
         emptyStateEl.style.setProperty('display', 'flex', 'important');
         emptyStateEl.style.setProperty('justify-content', 'center', 'important');
