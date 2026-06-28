@@ -1503,12 +1503,10 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
-        if (statsPanel) statsPanel.style.setProperty('display', 'none', 'important');
         
         // Show only the selected tab
         if (tabName === 'home') {
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
-            if (statsPanel) statsPanel.style.setProperty('display', 'flex', 'important');
             if (heroBanner) {
                 heroBanner.style.display = ''; // Clear important override
                 renderHeroBanner();
@@ -1530,7 +1528,15 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.display = '';
         if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';
-        if (statsPanel) statsPanel.style.display = '';
+    }
+
+    // Toggle stats-panel display based on active tab globally (home-only)
+    if (statsPanel) {
+        if (tabName === 'home') {
+            statsPanel.style.setProperty('display', 'flex', 'important');
+        } else {
+            statsPanel.style.setProperty('display', 'none', 'important');
+        }
     }
 }
 
