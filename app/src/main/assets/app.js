@@ -1293,35 +1293,57 @@ document.addEventListener('DOMContentLoaded', () => {
         renderShowsGrid();
     });
     
-    // Status filters chips
-    document.getElementById('filter-status').addEventListener('click', (e) => {
-        if (e.target.classList.contains('filter-chip')) {
-            // Remove active from others
-            document.querySelectorAll('#filter-status .filter-chip').forEach(c => c.classList.remove('active'));
-            // Set active to clicked
-            e.target.classList.add('active');
-            
-            filters.status = e.target.dataset.value;
-            renderShowsGrid();
-        }
-    });
-    
-    // Sort dropdown change
-    document.getElementById('sort-select').addEventListener('change', (e) => {
-        filters.sortBy = e.target.value;
-        renderShowsGrid();
-    });
-    
-    // Reset filters button in Empty State
-    document.getElementById('btn-reset-filters').addEventListener('click', () => {
-        filters.search = '';
-        filters.status = 'all';
-        document.getElementById('search-input').value = '';
-        document.querySelectorAll('#filter-status .filter-chip').forEach(c => {
-            if (c.dataset.value === 'all') c.classList.add('active');
-            else c.classList.remove('active');
+    // Status filters chips (guarded if layout element exists)
+    const filterStatusEl = document.getElementById('filter-status');
+    if (filterStatusEl) {
+        filterStatusEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-chip')) {
+                document.querySelectorAll('#filter-status .filter-chip').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                filters.status = e.target.dataset.value;
+                renderShowsGrid();
+            }
         });
-        renderShowsGrid();
+    }
+    
+    // Sort dropdown change (guarded if layout element exists)
+    const sortSelectEl = document.getElementById('sort-select');
+    if (sortSelectEl) {
+        sortSelectEl.addEventListener('change', (e) => {
+            filters.sortBy = e.target.value;
+            renderShowsGrid();
+        });
+    }
+    
+    // Reset filters button in Empty State (guarded if layout element exists)
+    const btnResetFiltersEl = document.getElementById('btn-reset-filters');
+    if (btnResetFiltersEl) {
+        btnResetFiltersEl.addEventListener('click', () => {
+            filters.search = '';
+            filters.status = 'all';
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+            const chips = document.querySelectorAll('#filter-status .filter-chip');
+            if (chips) {
+                chips.forEach(c => {
+                    if (c.dataset.value === 'all') c.classList.add('active');
+                    else c.classList.remove('active');
+                });
+            }
+            renderShowsGrid();
+        });
+    }
+
+    // Intercept clicks on streaming source buttons to open natively in player activity
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.stream-source-btn');
+        if (btn) {
+            const url = btn.getAttribute('data-watch-url');
+            if (url && window.AndroidApp && window.AndroidApp.openWatchScreen) {
+                e.preventDefault();
+                window.AndroidApp.openWatchScreen(url);
+            }
+        }
     });
     
     // Weekly Schedule Tab selection
@@ -1443,7 +1465,7 @@ function switchTab(tabName) {
     
     // Target main container elements
     const searchPanel = document.querySelector('.panel-search');
-    const filtersPanel = document.querySelector('.panel-filters');
+    const sourcesPanel = document.querySelector('.panel-sources');
     const devPanel = document.querySelector('.panel-dev-info');
     const backupPanel = document.querySelector('.panel-backup-info');
     const scheduleContainer = document.querySelector('.schedule-container');
@@ -1456,7 +1478,7 @@ function switchTab(tabName) {
     if (isMobile) {
         // Hide all major areas first
         if (searchPanel) searchPanel.style.setProperty('display', 'none', 'important');
-        if (filtersPanel) filtersPanel.style.setProperty('display', 'none', 'important');
+        if (sourcesPanel) sourcesPanel.style.setProperty('display', 'none', 'important');
         if (devPanel) devPanel.style.setProperty('display', 'none', 'important');
         if (backupPanel) backupPanel.style.setProperty('display', 'none', 'important');
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
@@ -1474,9 +1496,8 @@ function switchTab(tabName) {
             }
         } else if (tabName === 'schedule') {
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
-        } else if (tabName === 'filters') {
-            if (searchPanel) searchPanel.style.setProperty('display', 'block', 'important');
-            if (filtersPanel) filtersPanel.style.setProperty('display', 'block', 'important');
+        } else if (tabName === 'sources') {
+            if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'info') {
             if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
             if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
@@ -1484,7 +1505,7 @@ function switchTab(tabName) {
     } else {
         // Desktop Viewport: Restore standard styles and clear important display sets
         if (searchPanel) searchPanel.style.display = '';
-        if (filtersPanel) filtersPanel.style.display = '';
+        if (sourcesPanel) sourcesPanel.style.display = '';
         if (devPanel) devPanel.style.display = '';
         if (backupPanel) backupPanel.style.display = '';
         if (scheduleContainer) scheduleContainer.style.display = '';

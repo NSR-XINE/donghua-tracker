@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         "https://api.jikan.moe/",
         "https://donghuastream.org/",
         "https://www.donghuastream.org/",
+        "https://luciferdonghua.org/",
+        "https://www.luciferdonghua.org/",
         "https://cdn.",
         "https://img."
     };

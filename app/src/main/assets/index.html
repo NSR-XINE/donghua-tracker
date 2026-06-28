@@ -85,27 +85,15 @@
                     </div>
                 </div>
 
-                <div class="glass-card panel-filters">
-                    <h3><i class="fa-solid fa-filter"></i> Filters</h3>
-                    
-                    <div class="filter-group">
-                        <label>Status</label>
-                        <div class="filter-options" id="filter-status">
-                            <button class="filter-chip active" data-value="all">All</button>
-                            <button class="filter-chip" data-value="ongoing">Ongoing</button>
-                            <button class="filter-chip" data-value="upcoming">Upcoming</button>
-                            <button class="filter-chip" data-value="completed">Completed</button>
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Sort By</label>
-                        <select class="form-select" id="sort-select">
-                            <option value="countdown">Next Release</option>
-                            <option value="alphabetical">Title (A-Z)</option>
-                            <option value="progress">Completion %</option>
-                            <option value="last-updated">Last Updated</option>
-                        </select>
+                <div class="glass-card panel-sources">
+                    <h3><i class="fa-solid fa-play"></i> Streaming Sources</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+                        <a href="https://donghuastream.org/" class="btn btn-primary stream-source-btn" target="_blank" data-watch-url="https://donghuastream.org/" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-decoration: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);">
+                            <i class="fa-solid fa-circle-play"></i> Donghua Stream
+                        </a>
+                        <a href="https://luciferdonghua.org/" class="btn btn-secondary stream-source-btn" target="_blank" data-watch-url="https://luciferdonghua.org/" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-decoration: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary);">
+                            <i class="fa-solid fa-dragon"></i> Lucifer Donghua
+                        </a>
                     </div>
                 </div>
 
@@ -379,9 +367,9 @@
         <button class="nav-item nav-btn-add-shortcut" id="nav-btn-add" onclick="triggerAddModal()">
             <div class="nav-add-icon"><i class="fa-solid fa-plus"></i></div>
         </button>
-        <button class="nav-item" id="nav-btn-filters" onclick="switchTab('filters')">
-            <i class="fa-solid fa-filter"></i>
-            <span>Filters</span>
+        <button class="nav-item" id="nav-btn-sources" onclick="switchTab('sources')">
+            <i class="fa-solid fa-play"></i>
+            <span>Sources</span>
         </button>
         <button class="nav-item" id="nav-btn-info" onclick="switchTab('info')">
             <i class="fa-solid fa-code"></i>
