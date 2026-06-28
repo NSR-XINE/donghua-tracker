@@ -1300,8 +1300,16 @@ body.modal-open {
 }
 
 @media (max-width: 1024px) {
-    .main-content {
+    .main-content,
+    .control-panel,
+    .content-area {
         gap: 0 !important;
+    }
+
+    .panel-sources h3,
+    .panel-backup-info h3,
+    .schedule-header h2 {
+        margin-top: 0 !important;
     }
 
     .app-container {
