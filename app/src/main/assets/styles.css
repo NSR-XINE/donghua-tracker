@@ -114,20 +114,25 @@ input, textarea {
    HEADER COMPONENT
    ========================================== */
 .app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 1.2rem;
-    padding: 0.8rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background: #05060a;
+    border-bottom: 1px solid var(--border-color);
     z-index: 200;
+}
+
+.header-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.8rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .header-logo {
@@ -1238,7 +1243,7 @@ body.modal-open {
         padding: 140px 0.6rem 1rem;
     }
 
-    .app-header {
+    .header-content-wrapper {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;

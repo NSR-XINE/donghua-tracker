@@ -39,35 +39,37 @@
         
         <!-- Header Section -->
         <header class="app-header">
-            <div class="header-logo">
-                <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
-                <div class="logo-text">
-                    <h1>东画 <span>Donghua Tracker</span></h1>
-                    <p style="display: none;">Track your Chinese anime releases in real-time</p>
+            <div class="header-content-wrapper">
+                <div class="header-logo">
+                    <div class="logo-icon"><i class="fa-solid fa-dragon"></i></div>
+                    <div class="logo-text">
+                        <h1>东画 <span>Donghua Tracker</span></h1>
+                        <p style="display: none;">Track your Chinese anime releases in real-time</p>
+                    </div>
                 </div>
-            </div>
-            
-            <button id="nav-btn-info" onclick="switchTab('info')" class="dev-header-btn" title="Developer Info">
-                <i class="fa-solid fa-code"></i>
-            </button>
-            
-            <!-- Quick Stats -->
-            <div class="stats-panel">
-                <div class="stat-card">
-                    <span class="stat-val" id="stat-total">0</span>
-                    <span class="stat-lbl">Tracked</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-val" id="stat-watching">0</span>
-                    <span class="stat-lbl">Watching</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-val" id="stat-completed">0</span>
-                    <span class="stat-lbl">Completed</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-val" id="stat-episodes">0</span>
-                    <span class="stat-lbl">Episodes</span>
+                
+                <button id="nav-btn-info" onclick="switchTab('info')" class="dev-header-btn" title="Developer Info">
+                    <i class="fa-solid fa-code"></i>
+                </button>
+                
+                <!-- Quick Stats -->
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <span class="stat-val" id="stat-total">0</span>
+                        <span class="stat-lbl">Tracked</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="stat-watching">0</span>
+                        <span class="stat-lbl">Watching</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="stat-completed">0</span>
+                        <span class="stat-lbl">Completed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="stat-episodes">0</span>
+                        <span class="stat-lbl">Episodes</span>
+                    </div>
                 </div>
             </div>
         </header>
