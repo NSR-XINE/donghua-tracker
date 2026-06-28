@@ -1300,6 +1300,10 @@ body.modal-open {
 }
 
 @media (max-width: 1024px) {
+    .main-content {
+        gap: 0 !important;
+    }
+
     .app-container {
         padding: 70px 1.2rem 100px 1.2rem !important;
     }
