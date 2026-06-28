@@ -1540,6 +1540,10 @@ function switchTab(tabName) {
     if (tabName === 'add') return;
     activeTab = tabName;
     
+    // Update body class for active tab
+    document.body.classList.remove('tab-home', 'tab-schedule', 'tab-sources', 'tab-info', 'tab-backup');
+    document.body.classList.add(`tab-${tabName}`);
+    
     // Update nav items class states
     document.querySelectorAll('.bottom-nav .nav-item, .dev-header-btn').forEach(btn => {
         btn.classList.remove('active');

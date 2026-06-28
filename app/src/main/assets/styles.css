@@ -1239,6 +1239,19 @@ body.modal-open {
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
+    /* Home tab: header has 2 rows (logo + stats) */
+    body.tab-home .app-container {
+        padding-top: 135px !important;
+    }
+
+    /* Other tabs: stats hidden, header is 1 row */
+    body.tab-schedule .app-container,
+    body.tab-sources .app-container,
+    body.tab-info .app-container,
+    body.tab-backup .app-container {
+        padding-top: 80px !important;
+    }
+
     .app-container {
         padding: 135px 0.6rem 1rem;
     }
