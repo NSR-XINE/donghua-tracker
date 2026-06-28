@@ -43,20 +43,19 @@
 
 html, body {
     overscroll-behavior-y: contain;
-    height: 100%;
-    overflow: hidden;
 }
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-primary);
     font-family: var(--font-body);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
     position: relative;
     line-height: 1.5;
     -webkit-user-select: none;
     user-select: none;
+    padding-bottom: 70px; /* Leave space for bottom nav bar */
 }
 
 input, textarea {
@@ -106,38 +105,27 @@ input, textarea {
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 1rem 1.5rem 0 1.5rem;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    padding: 0 1.5rem;
     position: relative;
     z-index: 1;
-}
-
-.scrollable-content-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding-bottom: 90px; /* Leaves space for mobile bottom nav bar */
-    -webkit-overflow-scrolling: touch;
 }
 
 /* ==========================================
    HEADER COMPONENT
    ========================================== */
 .app-header {
-    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1.5rem;
     margin-bottom: 1.2rem;
-    padding: 0.8rem 0;
+    padding: 0.8rem 1.5rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
     border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
+    position: sticky;
+    top: 0;
     background: #05060a;
     z-index: 100;
 }
@@ -1314,7 +1302,7 @@ body.modal-open {
     }
 
     /* Padding for page bottom so content doesn't hide behind navigation bar */
-    .scrollable-content-wrapper {
+    .app-container {
         padding-bottom: 100px !important;
     }
 
