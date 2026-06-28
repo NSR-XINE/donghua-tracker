@@ -9,11 +9,14 @@ import android.view.WindowInsetsController;
 import android.webkit.*;
 import android.os.Build;
 import android.view.View;
+import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class WatchActivity extends AppCompatActivity {
 
     private WebView playerView;
+    private FrameLayout fullscreenContainer;
+    private WebChromeClient.CustomViewCallback customViewCallback;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -30,11 +33,29 @@ public class WatchActivity extends AppCompatActivity {
                 android.util.Log.w("DonghuaTracker", "Could not lock screen orientation: " + t.getMessage());
             }
 
+            FrameLayout rootLayout = new FrameLayout(this);
+            rootLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+
             playerView = new WebView(this);
             // Force hardware acceleration layer on the WebView for video rendering stability
             playerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-            setContentView(playerView);
+            playerView.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
             playerView.setBackgroundColor(android.graphics.Color.BLACK);
+            rootLayout.addView(playerView);
+
+            fullscreenContainer = new FrameLayout(this);
+            fullscreenContainer.setLayoutParams(new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+            fullscreenContainer.setVisibility(View.GONE);
+            fullscreenContainer.setBackgroundColor(android.graphics.Color.BLACK);
+            rootLayout.addView(fullscreenContainer);
+
+            setContentView(rootLayout);
 
             WebSettings s = playerView.getSettings();
             s.setJavaScriptEnabled(true);
@@ -91,12 +112,28 @@ public class WatchActivity extends AppCompatActivity {
             playerView.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public void onShowCustomView(View view, CustomViewCallback callback) {
-                    // Allow full-screen video player inside the activity
-                    setContentView(view);
+                    customViewCallback = callback;
+                    if (fullscreenContainer != null) {
+                        fullscreenContainer.addView(view);
+                        fullscreenContainer.setVisibility(View.VISIBLE);
+                        if (playerView != null) {
+                            playerView.setVisibility(View.GONE);
+                        }
+                    }
                 }
                 @Override
                 public void onHideCustomView() {
-                    setContentView(playerView);
+                    if (fullscreenContainer != null) {
+                        fullscreenContainer.setVisibility(View.GONE);
+                        fullscreenContainer.removeAllViews();
+                        if (playerView != null) {
+                            playerView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if (customViewCallback != null) {
+                        customViewCallback.onCustomViewHidden();
+                        customViewCallback = null;
+                    }
                 }
             });
 

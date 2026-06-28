@@ -1338,10 +1338,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.stream-source-btn');
         if (btn) {
+            e.preventDefault();
             const url = btn.getAttribute('data-watch-url');
-            if (url && window.AndroidApp && window.AndroidApp.openWatchScreen) {
-                e.preventDefault();
-                window.AndroidApp.openWatchScreen(url);
+            if (url) {
+                if (window.AndroidApp && window.AndroidApp.openWatchScreen) {
+                    window.AndroidApp.openWatchScreen(url);
+                } else {
+                    window.location.href = url;
+                }
             }
         }
     });
