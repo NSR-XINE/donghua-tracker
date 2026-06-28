@@ -574,10 +574,10 @@ function renderShowsGrid() {
         
         // Render section title and count badge
         html += `
-            <div class="shows-section" id="section-${group.id}" style="margin-bottom: 2.5rem;">
-                <div class="section-title-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
-                    <h2 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; color: var(--text-primary);">${group.title}</h2>
-                    <span class="count-tag" style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 20px; color: var(--text-secondary);">${group.shows.length} show${group.shows.length === 1 ? '' : 's'}</span>
+            <div class="shows-section" id="section-${group.id}">
+                <div class="section-title-row">
+                    <h2>${group.title}</h2>
+                    <span class="count-tag">${group.shows.length} show${group.shows.length === 1 ? '' : 's'}</span>
                 </div>
                 <div class="shows-grid">
         `;
@@ -1560,6 +1560,8 @@ function switchTab(tabName) {
     const heroBanner = document.getElementById('next-up-banner');
     const sectionsContainer = document.getElementById('shows-sections-container');
     const statsPanel = document.querySelector('.stats-panel');
+    const controlPanel = document.querySelector('.control-panel');
+    const contentArea = document.querySelector('.content-area');
     
     // Mobile Viewport Check (corresponds to CSS max-width: 1024px)
     const isMobile = window.innerWidth <= 1024;
@@ -1573,20 +1575,29 @@ function switchTab(tabName) {
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
         
-        // Show only the selected tab
+        // Hide unused parent sections on mobile to eliminate whitespace/gap bugs
+        if (controlPanel) controlPanel.style.setProperty('display', 'none', 'important');
+        if (contentArea) contentArea.style.setProperty('display', 'none', 'important');
+        
+        // Show only the selected tab and its parent section
         if (tabName === 'home') {
+            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             if (heroBanner) {
                 heroBanner.style.display = ''; // Clear important override
                 renderHeroBanner();
             }
         } else if (tabName === 'schedule') {
+            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'sources') {
+            if (controlPanel) controlPanel.style.setProperty('display', 'flex', 'important');
             if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'info') {
+            if (controlPanel) controlPanel.style.setProperty('display', 'flex', 'important');
             if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'backup') {
+            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
             if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
         }
     } else {
@@ -1598,6 +1609,8 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.display = '';
         if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';
+        if (controlPanel) controlPanel.style.display = '';
+        if (contentArea) contentArea.style.display = '';
     }
 
     // Toggle stats-panel display based on active tab globally (home-only)

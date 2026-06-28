@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setAllowFileAccess(true);    // Allow reading assets/files
         webSettings.setAllowContentAccess(true);
         webSettings.setDatabaseEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webView.clearCache(true);
 
         // Lock zoom levels and disable user scaling to make it feel native
         webSettings.setSupportZoom(false);
