@@ -266,7 +266,7 @@ function renderHeroBanner() {
             <div class="banner-meta">
                 <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
                 <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
-                ${show.watchUrl ? `<span><a href="${show.watchUrl}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</a></span>` : ''}
+                ${show.watchUrl ? `<span><span onclick="openWatchScreen('${show.watchUrl}')" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>` : ''}
             </div>
         </div>
         ${countdownHtml}
@@ -853,7 +853,7 @@ function openWatchScreen(url) {
     if (window.AndroidApp && window.AndroidApp.openWatchScreen) {
         window.AndroidApp.openWatchScreen(url);
     } else {
-        window.open(url, '_blank');
+        window.location.href = url;
     }
 }
 
