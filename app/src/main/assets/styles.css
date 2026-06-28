@@ -1303,6 +1303,7 @@ body.modal-open {
     .main-content,
     .control-panel,
     .content-area {
+        display: block !important;
         gap: 0 !important;
     }
 

@@ -1566,6 +1566,8 @@ function switchTab(tabName) {
     const controlPanel = document.querySelector('.control-panel');
     const contentArea = document.querySelector('.content-area');
     
+    const emptyStateEl = document.getElementById('empty-state');
+    
     // Mobile Viewport Check (corresponds to CSS max-width: 1024px)
     const isMobile = window.innerWidth <= 1024;
     if (isMobile) {
@@ -1577,6 +1579,7 @@ function switchTab(tabName) {
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
+        if (emptyStateEl) emptyStateEl.style.setProperty('display', 'none', 'important');
         
         // Hide unused parent sections on mobile to eliminate whitespace/gap bugs
         if (controlPanel) controlPanel.style.setProperty('display', 'none', 'important');
@@ -1584,23 +1587,30 @@ function switchTab(tabName) {
         
         // Show only the selected tab and its parent section
         if (tabName === 'home') {
-            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
+            if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             if (heroBanner) {
                 heroBanner.style.display = ''; // Clear important override
                 renderHeroBanner();
             }
+            if (emptyStateEl) {
+                const hasNoShows = typeof shows !== 'undefined' && shows.length === 0;
+                const hasNoFiltered = typeof filteredShows !== 'undefined' && filteredShows.length === 0;
+                if (hasNoShows || hasNoFiltered) {
+                    emptyStateEl.style.setProperty('display', 'flex', 'important');
+                }
+            }
         } else if (tabName === 'schedule') {
-            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
+            if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'sources') {
-            if (controlPanel) controlPanel.style.setProperty('display', 'flex', 'important');
+            if (controlPanel) controlPanel.style.setProperty('display', 'block', 'important');
             if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'info') {
-            if (controlPanel) controlPanel.style.setProperty('display', 'flex', 'important');
+            if (controlPanel) controlPanel.style.setProperty('display', 'block', 'important');
             if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
         } else if (tabName === 'backup') {
-            if (contentArea) contentArea.style.setProperty('display', 'flex', 'important');
+            if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
         }
     } else {
