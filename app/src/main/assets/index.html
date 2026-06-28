@@ -157,22 +157,7 @@
                     </div>
                 </div>
 
-                <div class="glass-card panel-backup-info" style="margin-top: 1rem;">
-                    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-database" style="color: var(--accent-cyan);"></i> Backup & Restore</h3>
-                    <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.82rem;">
-                        <p style="color: var(--text-muted); line-height: 1.4; margin: 0;">
-                            Export your watchlist to a JSON backup and share it, or import a previously exported JSON string.
-                        </p>
-                        <div style="display: flex; gap: 0.8rem; margin-top: 0.4rem;">
-                            <button id="btn-export-data" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                                <i class="fa-solid fa-file-export"></i> Export JSON
-                            </button>
-                            <button id="btn-trigger-import" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                                <i class="fa-solid fa-file-import"></i> Import JSON
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
             </section>
 
             <!-- Details & Episodes Modal -->
@@ -237,6 +222,24 @@
                     <!-- Mini Calendar list -->
                     <div class="schedule-grid" id="schedule-list">
                         <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Backup & Restore Panel -->
+                <div class="glass-card panel-backup-info" style="margin-top: 1.5rem;">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;"><i class="fa-solid fa-database" style="color: var(--accent-cyan);"></i> Backup & Restore</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.82rem;">
+                        <p style="color: var(--text-muted); line-height: 1.4; margin: 0;">
+                            Export your watchlist to a JSON backup and share it, or import a previously exported JSON string.
+                        </p>
+                        <div style="display: flex; gap: 0.8rem; margin-top: 0.4rem;">
+                            <button id="btn-export-data" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <i class="fa-solid fa-file-export"></i> Export JSON
+                            </button>
+                            <button id="btn-trigger-import" class="btn" style="flex: 1; padding: 0.6rem 0.8rem; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                                <i class="fa-solid fa-file-import"></i> Import JSON
+                            </button>
+                        </div>
                     </div>
                 </div>
 
