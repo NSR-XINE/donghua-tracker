@@ -1307,30 +1307,45 @@ body.modal-open {
         gap: 0 !important;
     }
 
-    .panel-sources,
-    .panel-backup-info,
-    .schedule-container {
-        margin: 0 !important;
-        padding: 0 !important;
+    .redesigned-panel {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
         border: none !important;
         background: transparent !important;
     }
 
-    .panel-sources h3,
-    .panel-backup-info h3,
-    .schedule-header h2 {
+    .redesigned-panel h3,
+    .redesigned-panel h2 {
         margin-top: 0 !important;
-        margin-bottom: 0.5rem !important;
-        padding: 0 !important;
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
+        margin-bottom: 0.6rem !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
         display: flex;
         align-items: center;
         gap: 0.6rem;
     }
 
-    .schedule-header {
+    .redesigned-panel p {
+        font-size: 0.78rem !important;
+        color: var(--text-muted) !important;
+        margin-top: 0 !important;
+        margin-bottom: 1.2rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .redesigned-panel .schedule-header {
+        margin-top: 0 !important;
         margin-bottom: 1rem !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .app-container {
