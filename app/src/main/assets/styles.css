@@ -1314,6 +1314,12 @@ body.modal-open {
         padding-bottom: 100px !important;
     }
 
+    .panel-sources,
+    .panel-backup-info,
+    .schedule-container {
+        margin-top: 1.5rem;
+    }
+
     .nav-item {
         background: transparent;
         border: none;
