@@ -1308,16 +1308,8 @@ body.modal-open {
                     0 0 15px rgba(0, 242, 254, 0.15);
     }
 
-    /* Padding for page bottom so content doesn't hide behind navigation bar */
     .app-container {
-        padding-top: 80px !important;
         padding-bottom: 100px !important;
-    }
-
-    .panel-sources,
-    .panel-backup-info,
-    .schedule-container {
-        margin-top: 1.5rem;
     }
 
     .nav-item {
