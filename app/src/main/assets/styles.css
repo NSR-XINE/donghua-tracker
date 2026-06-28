@@ -105,7 +105,7 @@ input, textarea {
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 75px 1.5rem 0 1.5rem;
     position: relative;
     z-index: 1;
 }
@@ -120,14 +120,14 @@ input, textarea {
     gap: 1.5rem;
     margin-bottom: 1.2rem;
     padding: 0.8rem 1.5rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
     border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     background: #05060a;
-    z-index: 100;
+    z-index: 200;
 }
 
 .header-logo {
@@ -1235,12 +1235,13 @@ body.modal-open {
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .app-container {
-        padding: 1rem 0.6rem;
+        padding: 140px 0.6rem 1rem;
     }
 
     .app-header {
         flex-direction: column;
         align-items: flex-start;
+        padding: 0.8rem 0.6rem;
     }
     
     .stats-panel {
@@ -1303,6 +1304,7 @@ body.modal-open {
 
     /* Padding for page bottom so content doesn't hide behind navigation bar */
     .app-container {
+        padding-top: 75px !important;
         padding-bottom: 100px !important;
     }
 
