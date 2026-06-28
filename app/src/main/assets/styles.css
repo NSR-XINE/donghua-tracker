@@ -1600,3 +1600,25 @@ body.theme-accent-gold {
 .ep-pill-btn::-webkit-scrollbar {
     width: 4px;
 }
+
+/* ==========================================
+   SLIDER TOGGLE SWITCH COMPONENT
+   ========================================== */
+.switch input:checked + .slider {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border-color: transparent;
+}
+.switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+.switch input:checked + .slider:before {
+    transform: translateX(18px);
+}

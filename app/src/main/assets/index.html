@@ -87,7 +87,21 @@
 
                 <div class="glass-card panel-sources">
                     <h3><i class="fa-solid fa-play"></i> Streaming Sources</h3>
-                    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+
+                    <!-- Default Source Switch -->
+                    <div class="source-toggle-container" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-primary);">Search Fallback</span>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span id="source-toggle-lbl-donghua" style="font-size: 0.7rem; font-weight: 700; color: var(--accent-cyan);">DonghuaStream</span>
+                            <label class="switch" style="position: relative; display: inline-block; width: 36px; height: 18px; margin: 0;">
+                                <input type="checkbox" id="pref-source-switch" onchange="window.togglePreferredSource(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px; border: 1px solid var(--border-color);"></span>
+                            </label>
+                            <span id="source-toggle-lbl-lucifer" style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">Lucifer</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.8rem;">
                         <a href="https://donghuastream.org/" class="btn btn-primary stream-source-btn" target="_blank" data-watch-url="https://donghuastream.org/" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; text-decoration: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);">
                             <i class="fa-solid fa-circle-play"></i> Donghua Stream
                         </a>

@@ -266,7 +266,7 @@ function renderHeroBanner() {
             <div class="banner-meta">
                 <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
                 <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
-                ${show.watchUrl ? `<span><span onclick="openWatchScreen('${show.watchUrl}')" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>` : ''}
+                <span><span onclick="openWatchScreen(window.getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
             </div>
         </div>
         ${countdownHtml}
@@ -708,7 +708,7 @@ function renderShowsGrid() {
                         
                         <!-- Card Footer Actions -->
                         <div class="card-actions">
-                            <button class="watch-link watch-btn" data-watch-url="${show.watchUrl || 'https://donghuastream.org/?s=' + encodeURIComponent(show.title)}" onclick="openWatchScreen(this.getAttribute('data-watch-url'))">
+                            <button class="watch-link watch-btn" data-watch-url="${window.getWatchUrl(show)}" onclick="openWatchScreen(this.getAttribute('data-watch-url'))">
                                 <i class="fa-solid fa-circle-play"></i> Stream
                             </button>
 
@@ -847,6 +847,49 @@ function resumeTimers() {
 
 window.pauseTimers = pauseTimers;
 window.resumeTimers = resumeTimers;
+
+// Global Watch URL Fallback helper based on preferred streaming source
+window.getWatchUrl = function(show) {
+    if (!show) return '';
+    if (show.watchUrl && show.watchUrl.trim() !== '') {
+        return show.watchUrl;
+    }
+    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    if (source === 'luciferdonghua') {
+        return 'https://luciferdonghua.org/?s=' + encodeURIComponent(show.title);
+    } else {
+        return 'https://donghuastream.org/?s=' + encodeURIComponent(show.title);
+    }
+};
+
+window.getWatchUrlById = function(id) {
+    const show = shows.find(s => s.id === id || String(s.id) === String(id));
+    if (!show) return '';
+    return window.getWatchUrl(show);
+};
+
+window.togglePreferredSource = function(isChecked) {
+    const source = isChecked ? 'luciferdonghua' : 'donghuastream';
+    localStorage.setItem('pref_streaming_source', source);
+    
+    // Update active label styles
+    const lblDonghua = document.getElementById('source-toggle-lbl-donghua');
+    const lblLucifer = document.getElementById('source-toggle-lbl-lucifer');
+    
+    if (lblDonghua && lblLucifer) {
+        if (isChecked) {
+            lblDonghua.style.color = 'var(--text-muted)';
+            lblLucifer.style.color = 'var(--accent-cyan)';
+        } else {
+            lblDonghua.style.color = 'var(--accent-cyan)';
+            lblLucifer.style.color = 'var(--text-muted)';
+        }
+    }
+    
+    // Re-render shows and hero banner so the updated links take effect immediately!
+    renderShowsGrid();
+    renderHeroBanner();
+};
 
 function openWatchScreen(url) {
     if (!url) return;
@@ -1124,6 +1167,26 @@ function closeModal() {
 
 // Bind Global UI Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // Initialize Preferred Source Toggle Switch state
+    const prefSwitch = document.getElementById('pref-source-switch');
+    if (prefSwitch) {
+        const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+        prefSwitch.checked = (source === 'luciferdonghua');
+        
+        // Update label colors initial states
+        const lblDonghua = document.getElementById('source-toggle-lbl-donghua');
+        const lblLucifer = document.getElementById('source-toggle-lbl-lucifer');
+        if (lblDonghua && lblLucifer) {
+            if (prefSwitch.checked) {
+                lblDonghua.style.color = 'var(--text-muted)';
+                lblLucifer.style.color = 'var(--accent-cyan)';
+            } else {
+                lblDonghua.style.color = 'var(--accent-cyan)';
+                lblLucifer.style.color = 'var(--text-muted)';
+            }
+        }
+    }
     
     // Update basic stats immediately
     updateStats();
