@@ -326,8 +326,8 @@ input, textarea {
 }
 
 .countdown-box {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
     padding: 0.8rem 1rem;
     border-radius: 12px;
     min-width: 75px;
@@ -477,7 +477,7 @@ input, textarea {
 .current-time-display {
     font-size: 0.85rem;
     color: var(--text-secondary);
-    background: rgba(255,255,255,0.05);
+    background: var(--bg-input);
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
 }
@@ -490,7 +490,7 @@ input, textarea {
     scrollbar-width: none;
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .schedule-tabs::-webkit-scrollbar {
@@ -596,7 +596,7 @@ input, textarea {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
 }
 
