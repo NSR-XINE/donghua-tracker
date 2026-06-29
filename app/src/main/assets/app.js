@@ -1172,6 +1172,19 @@ function openDetailsModal(show) {
 function openModal(showData = null) {
     const modalEl = document.getElementById('donghua-modal');
     const formEl = document.getElementById('donghua-form');
+    const statusSelect = document.getElementById('show-status');
+    
+    if (statusSelect) {
+        statusSelect.innerHTML = '';
+        if (showData && showData.status === 'ongoing') {
+            statusSelect.innerHTML += '<option value="ongoing">Airing (Ongoing)</option>';
+        }
+        statusSelect.innerHTML += `
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+            <option value="stopped">Stopped</option>
+        `;
+    }
     
     // Reset Form
     formEl.reset();
@@ -1418,6 +1431,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (statusSelect) {
                     const malStatus = entry.status.toLowerCase();
                     if (malStatus.includes('currently airing')) {
+                        // Ensure 'ongoing' option exists in the dropdown
+                        if (!statusSelect.querySelector('option[value="ongoing"]')) {
+                            const ongoingOpt = document.createElement('option');
+                            ongoingOpt.value = 'ongoing';
+                            ongoingOpt.textContent = 'Airing (Ongoing)';
+                            statusSelect.insertBefore(ongoingOpt, statusSelect.firstChild);
+                        }
                         statusSelect.value = 'ongoing';
                     } else if (malStatus.includes('finished airing')) {
                         statusSelect.value = 'completed';
