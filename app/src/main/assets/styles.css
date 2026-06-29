@@ -1796,3 +1796,15 @@ body.light-theme .theme-btn.active {
 body.light-theme .stars-bg {
     opacity: 0 !important;
 }
+
+/* Status Bar Blocker to cover transparent status bar area and hide scrolling content */
+.status-bar-blocker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--status-bar-height, 0px);
+    background: var(--bg-darker);
+    z-index: 201;
+    pointer-events: none;
+}
