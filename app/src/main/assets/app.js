@@ -1044,7 +1044,7 @@ function openDetailsModal(show) {
     let epPills = '';
     for (let i = 1; i <= maxEps; i++) {
         const isWatched = i <= show.currentEp;
-        const activeStyle = isWatched ? 'background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; font-weight: bold;' : 'background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-secondary);';
+        const activeStyle = isWatched ? 'background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: #fff; font-weight: bold;' : 'background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-secondary);';
         epPills += `
             <button class="ep-pill-btn" data-ep="${i}" style="padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; ${activeStyle}">
                 ${i}
@@ -1170,8 +1170,10 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 }
 
-// Bind Global UI Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Theme Mode
+    const savedTheme = localStorage.getItem('app_theme') || 'dark';
+    window.setThemeMode(savedTheme);
     
     // Initialize Preferred Source Card Selection UI state
     const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
@@ -1741,3 +1743,21 @@ function closeSettingsModal() {
     }
 }
 window.closeSettingsModal = closeSettingsModal;
+
+// Theme Manager
+function setThemeMode(mode) {
+    document.body.classList.remove('light-theme', 'amoled');
+    
+    if (mode === 'light') {
+        document.body.classList.add('light-theme');
+    } else if (mode === 'amoled') {
+        document.body.classList.add('amoled');
+    }
+    
+    localStorage.setItem('app_theme', mode);
+    
+    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btn-theme-${mode}`);
+    if (activeBtn) activeBtn.classList.add('active');
+}
+window.setThemeMode = setThemeMode;

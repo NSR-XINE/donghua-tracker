@@ -212,6 +212,25 @@
                     </div>
                 </div>
 
+                <!-- Section: Theme Mode -->
+                <div class="settings-section" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.2rem;">
+                    <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-palette" style="color: var(--accent-cyan);"></i> Theme Mode
+                    </h3>
+                    <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0 0 0.8rem 0;">Choose your preferred visual style</p>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="btn-theme-dark" onclick="window.setThemeMode('dark')" class="btn theme-btn" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.2rem;">
+                            <i class="fa-solid fa-moon"></i> Dark
+                        </button>
+                        <button id="btn-theme-light" onclick="window.setThemeMode('light')" class="btn theme-btn" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.2rem;">
+                            <i class="fa-solid fa-sun"></i> Light
+                        </button>
+                        <button id="btn-theme-amoled" onclick="window.setThemeMode('amoled')" class="btn theme-btn" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.2rem;">
+                            <i class="fa-solid fa-circle"></i> AMOLED
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Section: Backup & Restore -->
                 <div class="settings-section" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.2rem;">
                     <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem 0; display: flex; align-items: center; gap: 0.5rem;">
