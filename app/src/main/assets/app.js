@@ -1759,5 +1759,10 @@ function setThemeMode(mode) {
     document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`btn-theme-${mode}`);
     if (activeBtn) activeBtn.classList.add('active');
+
+    // Notify Android wrapper to update status/navigation bar icon styles
+    if (window.AndroidApp && window.AndroidApp.setSystemThemeMode) {
+        window.AndroidApp.setSystemThemeMode(mode);
+    }
 }
 window.setThemeMode = setThemeMode;

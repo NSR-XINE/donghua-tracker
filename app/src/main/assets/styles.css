@@ -154,7 +154,7 @@ input, textarea {
     justify-content: space-between;
     align-items: center;
     gap: 1.5rem;
-    padding: 0.6rem 1.5rem;
+    padding: calc(var(--status-bar-height, 0px) + 0.6rem) 1.5rem 0.6rem 1.5rem;
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -1383,17 +1383,17 @@ body.modal-open {
     }
 
     .app-container {
-        padding: 70px 1.2rem 100px 1.2rem !important;
+        padding: calc(var(--status-bar-height, 0px) + 70px) 1.2rem calc(var(--navigation-bar-height, 0px) + 100px) 1.2rem !important;
     }
 
     /* Home tab: header has 2 rows (logo + stats) */
     body.tab-home .app-container {
-        padding-top: 136px !important;
+        padding-top: calc(var(--status-bar-height, 0px) + 136px) !important;
     }
 
     .bottom-nav {
         position: fixed;
-        bottom: 20px;
+        bottom: calc(var(--navigation-bar-height, 0px) + 20px);
         left: 50%;
         transform: translateX(-50%);
         width: calc(100% - 40px);

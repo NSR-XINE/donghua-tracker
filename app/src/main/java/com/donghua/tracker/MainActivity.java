@@ -45,8 +45,35 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#05060a"));
-            getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#05060a"));
+            getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            );
+            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            getWindow().getDecorView().setOnApplyWindowInsetsListener((view, insets) -> {
+                int topInset = insets.getSystemWindowInsetTop();
+                int bottomInset = insets.getSystemWindowInsetBottom();
+                
+                float density = getResources().getDisplayMetrics().density;
+                float topDp = topInset / density;
+                float bottomDp = bottomInset / density;
+                
+                if (webView != null) {
+                    webView.post(() -> {
+                        webView.evaluateJavascript(
+                            "document.documentElement.style.setProperty('--status-bar-height', '" + topDp + "px');" +
+                            "document.documentElement.style.setProperty('--navigation-bar-height', '" + bottomDp + "px');",
+                            null
+                        );
+                    });
+                }
+                return insets;
+            });
         }
 
         dbHelper = new DatabaseHelper(this);
@@ -140,6 +167,52 @@ public class MainActivity extends AppCompatActivity {
             @JavascriptInterface
             public void exitApp() {
                 runOnUiThread(() -> finish());
+            }
+
+            @JavascriptInterface
+            public void setSystemThemeMode(final String themeMode) {
+                runOnUiThread(() -> {
+                    try {
+                        boolean isLight = "light".equalsIgnoreCase(themeMode);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            android.view.Window w = getWindow();
+                            android.view.WindowInsetsController controller = w.getInsetsController();
+                            if (controller != null) {
+                                int appearance = 0;
+                                if (isLight) {
+                                    appearance = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | 
+                                                 android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                                }
+                                controller.setSystemBarsAppearance(
+                                    appearance,
+                                    android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | 
+                                    android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+                                );
+                            }
+                        } else {
+                            // Legacy pre-R flag toggling
+                            int flags = getWindow().getDecorView().getSystemUiVisibility();
+                            if (isLight) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                                }
+                            } else {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                                }
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                                }
+                            }
+                            getWindow().getDecorView().setSystemUiVisibility(flags);
+                        }
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
             }
 
             @JavascriptInterface
