@@ -1276,30 +1276,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, 2000);
 
-    // Fetch poster from title in the edit modal
+    // Fetch poster, Chinese Title, and Synopsis from Jikan MAL API in the edit modal
     document.getElementById('btn-fetch-poster').addEventListener('click', () => {
         const title = document.getElementById('show-title').value.trim();
-        const showId = document.getElementById('show-id').value;
-        if (!title) { alert('Enter a title first.'); return; }
-        if (!window.AndroidApp) { alert('Only works in the Android app.'); return; }
+        if (!title) { alert('Please enter an English title first.'); return; }
+        
         const query = encodeURIComponent(title);
         const url = 'https://api.jikan.moe/v4/anime?q=' + query + '&limit=1';
-        const cbName = 'cb_modal_poster_' + Date.now();
-        window[cbName] = function(json) {
-            delete window[cbName];
-            if (!json) { alert('Could not fetch poster.'); return; }
-            try {
-                const data = JSON.parse(json);
-                const entry = data && data.data && data.data[0];
-                const imgUrl = entry && entry.images && entry.images.jpg && entry.images.jpg.large_image_url;
-                if (imgUrl) {
-                    document.getElementById('show-poster').value = imgUrl;
-                } else {
-                    alert('No poster found for this title.');
+        
+        const handleResponse = (data) => {
+            const entry = data && data.data && data.data[0];
+            if (!entry) {
+                alert('No matching show found on MyAnimeList.');
+                return;
+            }
+            
+            // Auto-fill Poster Image
+            const imgUrl = entry.images && entry.images.jpg && entry.images.jpg.large_image_url;
+            if (imgUrl) {
+                const posterInput = document.getElementById('show-poster');
+                if (posterInput) posterInput.value = imgUrl;
+            }
+            
+            // Auto-fill Chinese Title
+            if (entry.title_japanese) {
+                const titleZhEl = document.getElementById('show-title-zh');
+                if (titleZhEl && !titleZhEl.value.trim()) {
+                    titleZhEl.value = entry.title_japanese;
                 }
-            } catch(e) { alert('Error parsing response.'); }
+            }
+            
+            // Auto-fill Synopsis
+            if (entry.synopsis) {
+                const notesEl = document.getElementById('show-notes');
+                if (notesEl && !notesEl.value.trim()) {
+                    notesEl.value = entry.synopsis;
+                }
+            }
+            
+            alert('Auto-filled Chinese Title, Synopsis, and Poster successfully!');
         };
-        window.AndroidApp.fetchUrl(url, cbName);
+
+        if (window.AndroidApp && window.AndroidApp.fetchUrl) {
+            const cbName = 'cb_modal_poster_' + Date.now();
+            window[cbName] = function(json) {
+                delete window[cbName];
+                if (!json) { alert('Could not fetch data from MyAnimeList.'); return; }
+                try {
+                    const data = JSON.parse(json);
+                    handleResponse(data);
+                } catch(e) { alert('Error parsing MAL response.'); }
+            };
+            window.AndroidApp.fetchUrl(url, cbName);
+        } else {
+            // Web browser fallback
+            fetch(url)
+                .then(r => {
+                    if (!r.ok) throw new Error('API response error');
+                    return r.json();
+                })
+                .then(data => handleResponse(data))
+                .catch(err => {
+                    console.error(err);
+                    alert('Error fetching details from MyAnimeList API. Please check your network connection.');
+                });
+        }
     });
     
     // Modal Close buttons
