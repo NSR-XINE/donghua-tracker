@@ -535,9 +535,7 @@ function renderShowsGrid() {
         if (filters.sortBy === 'alphabetical') {
             return a.title.localeCompare(b.title);
         } else if (filters.sortBy === 'progress') {
-            const pctA = a.totalEp > 0 ? (a.currentEp / a.totalEp) : 0;
-            const pctB = b.totalEp > 0 ? (b.currentEp / b.totalEp) : 0;
-            return pctB - pctA; // Descending order
+            return b.currentEp - a.currentEp; // Descending order
         } else if (filters.sortBy === 'last-updated') {
             return (b.lastUpdated || 0) - (a.lastUpdated || 0);
         } else {
@@ -622,9 +620,6 @@ function renderShowsGrid() {
     
     // Render each card inside the section grid
     html += filteredShows.map(show => {
-            const progressPct = show.totalEp > 0 ? Math.min(100, Math.round((show.currentEp / show.totalEp) * 100)) : 0;
-            const progressDisplay = show.totalEp > 0 ? `${show.currentEp}/${show.totalEp}` : `${show.currentEp}/?`;
-            
             const isReleasingToday = show.status === 'ongoing' && show.releaseDay === todayName;
             
             // Poster Image or Gradient Placeholder
@@ -728,14 +723,11 @@ function renderShowsGrid() {
                         <!-- Progress Section -->
                         <div class="card-progress-section">
                             <div class="progress-header">
-                                <div class="ep-counter">Watched: <span>${progressDisplay}</span></div>
+                                <div class="ep-counter">Watched: <span>${show.currentEp} episodes</span></div>
                                 <div class="ep-buttons">
                                     <button class="ep-btn btn-minus" title="Decrease episode"><i class="fa-solid fa-minus"></i></button>
                                     <button class="ep-btn btn-plus" title="Increase episode"><i class="fa-solid fa-plus"></i></button>
                                 </div>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
                             </div>
                         </div>
                         
@@ -1072,7 +1064,7 @@ function openDetailsModal(show) {
     let statusText = getStatusDisplayName(show.status).toUpperCase();
 
     // Compute total/current episodes
-    const maxEps = show.totalEp > 0 ? show.totalEp : Math.max(12, show.currentEp + 10);
+    const maxEps = Math.min(Math.max(12, show.currentEp + 10), 150);
     
     // Poster or placeholder
     let posterHtml = '';
@@ -1113,7 +1105,7 @@ function openDetailsModal(show) {
                 <h3 style="font-size: 1rem; color: #fff; margin: 0.2rem 0 0 0; font-family: var(--font-heading); font-weight: 700;">${show.title}</h3>
                 ${show.titleZh ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">${show.titleZh}</div>` : ''}
                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem;">
-                    Watched: <strong style="color: var(--accent-cyan);">${show.currentEp}</strong> / ${show.totalEp > 0 ? show.totalEp : '?'} episodes
+                    Watched: <strong style="color: var(--accent-cyan);">${show.currentEp}</strong> episodes
                 </div>
             </div>
         </div>
@@ -1201,7 +1193,6 @@ function openModal(showData = null) {
         document.getElementById('show-release-day').value = showData.releaseDay;
         document.getElementById('show-release-time').value = showData.releaseTime;
         document.getElementById('show-current-ep').value = showData.currentEp;
-        document.getElementById('show-total-ep').value = showData.totalEp;
         document.getElementById('show-poster').value = showData.poster || '';
         document.getElementById('show-notes').value = showData.notes || '';
     } else {
@@ -1213,37 +1204,10 @@ function openModal(showData = null) {
         document.getElementById('show-release-day').value = todayDay;
         document.getElementById('show-release-time').value = "10:00";
         document.getElementById('show-current-ep').value = 0;
-        document.getElementById('show-total-ep').value = 12;
     }
     
     modalEl.style.display = 'flex';
     document.body.classList.add('modal-open');
-    toggleTotalEpVisibility();
-}
-
-/**
- * Toggles the visibility of the Total Episodes field based on status selection.
- * If status is ongoing, hides the field and expands the Current Watched Episode field.
- */
-function toggleTotalEpVisibility() {
-    const statusSelect = document.getElementById('show-status');
-    const totalEpGroup = document.getElementById('total-ep-group');
-    const currentEpGroup = document.getElementById('current-ep-group');
-    if (!statusSelect) return;
-    
-    if (statusSelect.value === 'ongoing') {
-        if (totalEpGroup) totalEpGroup.style.display = 'none';
-        if (currentEpGroup) {
-            currentEpGroup.classList.remove('col-6');
-            currentEpGroup.classList.add('col-12');
-        }
-    } else {
-        if (totalEpGroup) totalEpGroup.style.display = '';
-        if (currentEpGroup) {
-            currentEpGroup.classList.remove('col-12');
-            currentEpGroup.classList.add('col-6');
-        }
-    }
 }
 
 function closeModal() {
@@ -1444,15 +1408,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (malStatus.includes('not yet aired')) {
                         statusSelect.value = 'upcoming';
                     }
-                    toggleTotalEpVisibility(); // Update total episodes display dynamically
-                }
-            }
-
-            // Auto-fill Total Episodes
-            if (entry.episodes) {
-                const totalEpInput = document.getElementById('show-total-ep');
-                if (totalEpInput) {
-                    totalEpInput.value = entry.episodes;
                 }
             }
             
@@ -1505,11 +1460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auto-toggle Total Episodes layout visibility when status selection changes
-    const statusSelect = document.getElementById('show-status');
-    if (statusSelect) {
-        statusSelect.addEventListener('change', toggleTotalEpVisibility);
-    }
+
     
     // Modal Close buttons
     document.getElementById('btn-close-modal').addEventListener('click', closeModal);
@@ -1532,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
             releaseDay: document.getElementById('show-release-day').value,
             releaseTime: document.getElementById('show-release-time').value,
             currentEp: parseInt(document.getElementById('show-current-ep').value) || 0,
-            totalEp: parseInt(document.getElementById('show-total-ep').value) || 0,
+            totalEp: 0,
             poster: document.getElementById('show-poster').value.trim(),
             notes: document.getElementById('show-notes').value.trim(),
             lastUpdated: Date.now()
