@@ -71,18 +71,7 @@ function checkAndMigrateStatuses() {
                 changed = true;
             }
         }
-        // 2. Ongoing -> Completed when current ep reaches total ep
-        if (show.status === 'ongoing' && show.totalEp > 0 && show.currentEp >= show.totalEp) {
-            show.status = 'completed';
-            show.lastUpdated = Date.now();
-            changed = true;
-        }
-        // 3. Completed -> Ongoing if current ep is less than total ep
-        if (show.status === 'completed' && show.totalEp > 0 && show.currentEp < show.totalEp) {
-            show.status = 'ongoing';
-            show.lastUpdated = Date.now();
-            changed = true;
-        }
+
     });
     if (changed) {
         if (window.AndroidApp && window.AndroidApp.dbUpdateShow) {
@@ -1167,14 +1156,6 @@ function openDetailsModal(show) {
             }
             
             show.lastUpdated = Date.now();
-            
-            // Handle completed transition
-            if (show.totalEp > 0 && show.currentEp === show.totalEp) {
-                show.status = 'completed';
-            } else if (show.status === 'completed' && show.currentEp < show.totalEp) {
-                show.status = 'ongoing';
-            }
-            
             saveState();
             openDetailsModal(show); // Refresh modal view
         });
@@ -1601,21 +1582,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const show = shows[showIdx];
         
         if (isPlus) {
-            if (show.totalEp === 0 || show.currentEp < show.totalEp) {
-                show.currentEp++;
-                show.lastUpdated = Date.now();
-                if (show.totalEp > 0 && show.currentEp === show.totalEp) {
-                    show.status = 'completed';
-                }
-                saveState();
-            }
+            show.currentEp++;
+            show.lastUpdated = Date.now();
+            saveState();
         } else if (isMinus) {
             if (show.currentEp > 0) {
                 show.currentEp--;
                 show.lastUpdated = Date.now();
-                if (show.status === 'completed' && show.currentEp < show.totalEp) {
-                    show.status = 'ongoing';
-                }
                 saveState();
             }
         } else if (isEdit) {
