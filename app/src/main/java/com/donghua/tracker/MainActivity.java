@@ -16,6 +16,10 @@ public class MainActivity extends AppCompatActivity {
 
     WebView webView;
     private DatabaseHelper dbHelper;
+    private float statusBarHeightDp = 0f;
+    private float navBarHeightDp = 0f;
+    private float safeAreaLeftDp = 0f;
+    private float safeAreaRightDp = 0f;
 
     private static final String[] ALLOWED_PREFIXES = {
         "https://animecountdown.com/",
@@ -58,20 +62,16 @@ public class MainActivity extends AppCompatActivity {
             getWindow().getDecorView().setOnApplyWindowInsetsListener((view, insets) -> {
                 int topInset = insets.getSystemWindowInsetTop();
                 int bottomInset = insets.getSystemWindowInsetBottom();
+                int leftInset = insets.getSystemWindowInsetLeft();
+                int rightInset = insets.getSystemWindowInsetRight();
                 
                 float density = getResources().getDisplayMetrics().density;
-                float topDp = topInset / density;
-                float bottomDp = bottomInset / density;
+                statusBarHeightDp = topInset / density;
+                navBarHeightDp = bottomInset / density;
+                safeAreaLeftDp = leftInset / density;
+                safeAreaRightDp = rightInset / density;
                 
-                if (webView != null) {
-                    webView.post(() -> {
-                        webView.evaluateJavascript(
-                            "document.documentElement.style.setProperty('--status-bar-height', '" + topDp + "px');" +
-                            "document.documentElement.style.setProperty('--navigation-bar-height', '" + bottomDp + "px');",
-                            null
-                        );
-                    });
-                }
+                updateWebViewInsets();
                 return insets;
             });
         }
@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                updateWebViewInsets();
                 String targetShowId = getIntent().getStringExtra("target_show_id");
                 if (targetShowId != null) {
                     webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 800);", null);
@@ -411,6 +412,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Load our index.html from assets
         webView.loadUrl("file:///android_asset/index.html?v=" + System.currentTimeMillis());
+    }
+
+    private void updateWebViewInsets() {
+        if (webView != null) {
+            webView.post(() -> {
+                webView.evaluateJavascript(
+                    "document.documentElement.style.setProperty('--status-bar-height', '" + statusBarHeightDp + "px');" +
+                    "document.documentElement.style.setProperty('--navigation-bar-height', '" + navBarHeightDp + "px');" +
+                    "document.documentElement.style.setProperty('--safe-area-left', '" + safeAreaLeftDp + "px');" +
+                    "document.documentElement.style.setProperty('--safe-area-right', '" + safeAreaRightDp + "px');",
+                    null
+                );
+            });
+        }
     }
 
     @Override

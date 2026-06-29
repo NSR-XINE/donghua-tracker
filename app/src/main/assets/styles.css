@@ -131,7 +131,7 @@ input, textarea {
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 80px 1.5rem 0 1.5rem;
+    padding: 80px calc(var(--safe-area-right, 0px) + 1.5rem) 0 calc(var(--safe-area-left, 0px) + 1.5rem);
     position: relative;
     z-index: 1;
 }
@@ -154,7 +154,7 @@ input, textarea {
     justify-content: space-between;
     align-items: center;
     gap: 1.5rem;
-    padding: calc(var(--status-bar-height, 0px) + 0.6rem) 1.5rem 0.6rem 1.5rem;
+    padding: calc(var(--status-bar-height, 0px) + 0.6rem) calc(var(--safe-area-right, 0px) + 1.5rem) 0.6rem calc(var(--safe-area-left, 0px) + 1.5rem);
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -1344,8 +1344,8 @@ body.modal-open {
         margin-bottom: 0 !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
-        padding-left: 0.8rem !important;
-        padding-right: 0.8rem !important;
+        padding-left: calc(var(--safe-area-left, 0px) + 0.8rem) !important;
+        padding-right: calc(var(--safe-area-right, 0px) + 0.8rem) !important;
         border: none !important;
         background: transparent !important;
     }
@@ -1383,7 +1383,7 @@ body.modal-open {
     }
 
     .app-container {
-        padding: calc(var(--status-bar-height, 0px) + 70px) 1.2rem calc(var(--navigation-bar-height, 0px) + 100px) 1.2rem !important;
+        padding: calc(var(--status-bar-height, 0px) + 70px) calc(var(--safe-area-right, 0px) + 1.2rem) calc(var(--navigation-bar-height, 0px) + 100px) calc(var(--safe-area-left, 0px) + 1.2rem) !important;
     }
 
     /* Home tab: header has 2 rows (logo + stats) */
