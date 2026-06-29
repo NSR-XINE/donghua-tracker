@@ -1313,6 +1313,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     notesEl.value = entry.synopsis;
                 }
             }
+
+            // Auto-fill Status based on MAL airing status
+            if (entry.status) {
+                const statusSelect = document.getElementById('show-status');
+                if (statusSelect) {
+                    const malStatus = entry.status.toLowerCase();
+                    if (malStatus.includes('currently airing')) {
+                        statusSelect.value = 'ongoing';
+                    } else if (malStatus.includes('finished airing')) {
+                        statusSelect.value = 'completed';
+                    } else if (malStatus.includes('not yet aired')) {
+                        statusSelect.value = 'upcoming';
+                    }
+                }
+            }
+
+            // Auto-fill Total Episodes
+            if (entry.episodes) {
+                const totalEpInput = document.getElementById('show-total-ep');
+                if (totalEpInput) {
+                    totalEpInput.value = entry.episodes;
+                }
+            }
             
             alert('Auto-filled Chinese Title, Synopsis, and Poster successfully!');
         };
