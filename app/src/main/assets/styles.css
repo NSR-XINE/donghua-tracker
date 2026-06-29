@@ -1318,6 +1318,8 @@ body.modal-open {
         margin-bottom: 0 !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
         border: none !important;
         background: transparent !important;
     }
