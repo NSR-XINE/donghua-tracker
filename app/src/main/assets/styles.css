@@ -664,8 +664,6 @@ input, textarea {
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
-    object-position: top center;
-    display: block;
 }
 
 .show-card:hover .card-poster {
@@ -737,9 +735,7 @@ input, textarea {
     padding: 1.5rem;
     text-align: center;
     background: linear-gradient(135deg, #1c2333, #090b10);
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
 }
 
 .placeholder-symbol {

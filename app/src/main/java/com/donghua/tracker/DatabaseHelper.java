@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "donghua_tracker.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     // Table names
     public static final String TABLE_SHOWS = "shows";
@@ -36,7 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_SHOW_LAST_UPDATED = "last_updated";
     public static final String COL_SHOW_DATE_ADDED = "date_added";
     public static final String COL_SHOW_ALARM_CODE = "alarm_request_code"; // Bug 4 stable alarm identifier
-    public static final String COL_SHOW_SEASON_START = "season_start_date";
 
     // Watch History Columns
     public static final String COL_HIST_ID = "id";
@@ -72,8 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_SHOW_RATING + " INTEGER DEFAULT 0, " +
                 COL_SHOW_LAST_UPDATED + " INTEGER, " +
                 COL_SHOW_DATE_ADDED + " INTEGER, " +
-                COL_SHOW_ALARM_CODE + " INTEGER, " +
-                COL_SHOW_SEASON_START + " TEXT" +
+                COL_SHOW_ALARM_CODE + " INTEGER" +
                 ")";
         db.execSQL(createShowsTable);
 
@@ -98,11 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Safe incremental migrations to protect user data from drops (Bug 2)
         if (oldVersion < 2) {
-            try {
-                db.execSQL("ALTER TABLE " + TABLE_SHOWS + " ADD COLUMN " + COL_SHOW_SEASON_START + " TEXT");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // For future column updates or table expansions
         }
     }
 
@@ -130,11 +124,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COL_SHOW_RATING, showJson.optInt("rating", 0));
             values.put(COL_SHOW_LAST_UPDATED, showJson.optLong("lastUpdated", System.currentTimeMillis()));
             values.put(COL_SHOW_DATE_ADDED, showJson.optLong("dateAdded", System.currentTimeMillis()));
-            if (showJson.has("seasonStartDate") && !showJson.isNull("seasonStartDate")) {
-                values.put(COL_SHOW_SEASON_START, showJson.getString("seasonStartDate"));
-            } else {
-                values.putNull(COL_SHOW_SEASON_START);
-            }
 
             // Assign stable request code integer for Notification Alarm identifiers (Bug 4)
             int alarmCode = showJson.optInt("alarmRequestCode", -1);
@@ -182,11 +171,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COL_SHOW_IS_FAVORITE, showJson.optBoolean("isFavorite", false) ? 1 : 0);
             values.put(COL_SHOW_RATING, showJson.optInt("rating", 0));
             values.put(COL_SHOW_LAST_UPDATED, showJson.optLong("lastUpdated", System.currentTimeMillis()));
-            if (showJson.has("seasonStartDate") && !showJson.isNull("seasonStartDate")) {
-                values.put(COL_SHOW_SEASON_START, showJson.getString("seasonStartDate"));
-            } else {
-                values.putNull(COL_SHOW_SEASON_START);
-            }
             
             if (showJson.has("alarmRequestCode")) {
                 values.put(COL_SHOW_ALARM_CODE, showJson.getInt("alarmRequestCode"));
@@ -233,8 +217,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     obj.put("lastUpdated", cursor.getLong(cursor.getColumnIndexOrThrow(COL_SHOW_LAST_UPDATED)));
                     obj.put("dateAdded", cursor.getLong(cursor.getColumnIndexOrThrow(COL_SHOW_DATE_ADDED)));
                     obj.put("alarmRequestCode", cursor.getInt(cursor.getColumnIndexOrThrow(COL_SHOW_ALARM_CODE)));
-                    String seasonStart = cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_SEASON_START));
-                    obj.put("seasonStartDate", seasonStart != null ? seasonStart : JSONObject.NULL);
                     arr.put(obj);
                 } while (cursor.moveToNext());
             }

@@ -76,9 +76,6 @@ const GRADIENTS = [
     "linear-gradient(135deg, #1e3c72, #2a5298)"
 ];
 
-// Track elapsed shows to prevent duplicate full re-renders
-const elapsedShowIds = new Set();
-
 /* ==========================================================================
    DATE & COUNTDOWN CALCULATORS
    ========================================================================== */
@@ -218,7 +215,6 @@ function renderHeroBanner() {
     const nextUp = computedShows[0];
     const show = nextUp.show;
     const isAiring = nextUp.airingNow;
-    const upcomingQueue = computedShows.slice(1, 4);
     
     bannerEl.style.display = 'flex';
     
@@ -270,7 +266,7 @@ function renderHeroBanner() {
                 <i class="fa-solid ${isAiring ? 'fa-satellite-dish' : 'fa-clock'}"></i> 
                 ${isAiring ? 'Live Release' : 'Next Airing'}
             </span>
-            <h2 class="banner-title" onclick="openDetailsById('${show.id}')" style="cursor:pointer;">${show.title}</h2>
+            <h2 class="banner-title">${show.title}</h2>
             <div class="banner-meta">
                 <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
                 <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
@@ -278,26 +274,6 @@ function renderHeroBanner() {
             </div>
         </div>
         ${countdownHtml}
-        ${upcomingQueue.length > 0 ? `
-            <div style="display:flex; gap:0.6rem; margin-top:0.8rem; padding-top:0.8rem;
-                 border-top:1px solid var(--border-color); flex-wrap:wrap; align-items:center; width:100%;">
-                <span style="font-size:0.7rem; color:var(--text-muted); white-space:nowrap;">Also soon:</span>
-                ${upcomingQueue.map(item => {
-                    const t = calculateTimeRemaining(item.targetDate);
-                    const label = t.days > 0 ? `${t.days}d` : t.hours > 0 ? `${t.hours}h` : `${t.minutes}m`;
-                    return `<div onclick="openDetailsById('${item.show.id}')"
-                                style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;
-                                       background:rgba(255,255,255,0.04); border:1px solid var(--border-color);
-                                       border-radius:8px; padding:0.3rem 0.6rem; flex-shrink:0;">
-                                <span style="font-size:0.75rem; color:var(--text-primary); font-weight:600;
-                                      max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    ${item.show.title}
-                                </span>
-                                <span style="font-size:0.7rem; color:var(--accent-cyan);">${label}</span>
-                            </div>`;
-                }).join('')}
-            </div>
-        ` : ''}
     `;
 }
 
@@ -353,9 +329,6 @@ function fetchShowBanner(showId, countdownUrl) {
                 const idx = shows.findIndex(s => s.id === showId);
                 if (idx !== -1 && shows[idx].poster !== imageUrl) {
                     shows[idx].poster = imageUrl;
-                    if (window.AndroidApp && window.AndroidApp.dbUpdateShow) {
-                        window.AndroidApp.dbUpdateShow(JSON.stringify(shows[idx]));
-                    }
                     localStorage.setItem('donghua_shows', JSON.stringify(shows));
                     
                     // Re-render display
@@ -394,9 +367,6 @@ function fetchPosterFromJikan(showId, title) {
             const idx = shows.findIndex(s => s.id === showId);
             if (idx !== -1 && shows[idx].poster !== imageUrl) {
                 shows[idx].poster = imageUrl;
-                if (window.AndroidApp && window.AndroidApp.dbUpdateShow) {
-                    window.AndroidApp.dbUpdateShow(JSON.stringify(shows[idx]));
-                }
                 localStorage.setItem('donghua_shows', JSON.stringify(shows));
                 updateStats();
                 renderWeeklySchedule();
@@ -424,7 +394,7 @@ function renderWeeklySchedule() {
         return s.releaseDay === selectedDay;
     });
     
-    if (scheduledShows.length === 0 && selectedDay !== 'all') {
+    if (scheduledShows.length === 0) {
         listEl.innerHTML = `
             <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem 0;">
                 No shows scheduled
@@ -434,26 +404,13 @@ function renderWeeklySchedule() {
     }
     
     const todayName = DAYS_ARRAY[new Date().getDay()];
-    const weekOrder = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const startIdx = weekOrder.indexOf(todayName);
-    const daysOrder = [...weekOrder.slice(startIdx), ...weekOrder.slice(0, startIdx)];
+    const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const daysToRender = selectedDay === 'all' ? daysOrder : [selectedDay];
     
     let html = '';
     daysToRender.forEach(day => {
         const dayShows = scheduledShows.filter(s => s.releaseDay === day);
-        if (dayShows.length === 0) {
-            html += `
-                <div class="day-schedule-group" style="margin-bottom:1.2rem; opacity:0.4;">
-                    <div class="day-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem; padding:0 0.2rem;">
-                        <span style="font-family:var(--font-heading); font-size:0.85rem; font-weight:700; color:var(--text-secondary);">${day}</span>
-                        <span style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); font-size:0.65rem; padding:0.1rem 0.4rem; border-radius:10px; color:var(--text-muted);">0 shows</span>
-                    </div>
-                    <div style="font-size:0.78rem; color:var(--text-muted); padding:0.4rem 0.2rem; font-style:italic;">No releases</div>
-                </div>
-            `;
-            return;
-        }
+        if (dayShows.length === 0) return; // Skip days with no releases
         
         // Sort shows chronologically for this specific day
         dayShows.sort((a, b) => a.releaseTime.localeCompare(b.releaseTime));
@@ -475,19 +432,6 @@ function renderWeeklySchedule() {
         `;
         
         html += dayShows.map(show => {
-            const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
-            const diffMs = schedule.targetDate - new Date();
-            let relLabel = '';
-            if (schedule.airingNow) {
-                relLabel = 'Airing Now';
-            } else if (diffMs < 3600000) {
-                relLabel = `in ${Math.floor(diffMs / 60000)}m`;
-            } else if (diffMs < 86400000) {
-                relLabel = `in ${Math.floor(diffMs / 3600000)}h`;
-            } else {
-                relLabel = `in ${Math.floor(diffMs / 86400000)}d`;
-            }
-            
             return `
                 <div class="schedule-item" onclick="window.openDetailsById('${show.id}')" style="cursor: pointer; ${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''}">
                     <div class="schedule-item-name">
@@ -496,7 +440,6 @@ function renderWeeklySchedule() {
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem">
                         <span class="schedule-item-time" style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="color: var(--accent-purple); margin-right: 0.2rem;"></i> ${show.releaseTime}</span>
-                        <span style="font-size:0.68rem; color:var(--text-muted);">${relLabel}</span>
                     </div>
                 </div>
             `;
@@ -549,55 +492,61 @@ function renderShowsGrid() {
             return pctB - pctA; // Descending order
         } else if (filters.sortBy === 'last-updated') {
             return (b.lastUpdated || 0) - (a.lastUpdated || 0);
-        } else if (filters.sortBy === 'countdown') {
-            const aDate = getNextReleaseDate(a.releaseDay, a.releaseTime).targetDate;
-            const bDate = getNextReleaseDate(b.releaseDay, b.releaseTime).targetDate;
-            return aDate - bDate;
         } else {
             return a.title.localeCompare(b.title);
         }
     });
+    
+    if (shows.length === 0) {
+        containerEl.innerHTML = '';
+        emptyStateEl.classList.add('empty-state');
+        emptyStateEl.innerHTML = `
+            <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>Watchlist is Empty</h3>
+            <p>Your watchlist is empty. Search for a show above to start tracking!</p>
+        `;
+        emptyStateEl.style.setProperty('display', 'flex', 'important');
+        emptyStateEl.style.setProperty('justify-content', 'center', 'important');
+        emptyStateEl.style.setProperty('align-items', 'center', 'important');
+        emptyStateEl.style.padding = '';
+        return;
+    }
 
-    // Check filteredShows to distinguish watchlist empty vs tab/search filter empty (BUG-8)
     if (filteredShows.length === 0) {
         containerEl.innerHTML = '';
         emptyStateEl.classList.add('empty-state');
         emptyStateEl.style.padding = '';
         emptyStateEl.style.justifyContent = '';
         emptyStateEl.style.alignItems = '';
-
-        const noShowsAtAll = shows.length === 0;
-        const hasActiveSearch = filters.search !== '';
-
-        if (noShowsAtAll) {
-            // Render "Watchlist is Empty" message
-            emptyStateEl.innerHTML = `
-                <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>Watchlist is Empty</h3>
-                <p>Your watchlist is empty. Search for a show above to start tracking!</p>
-            `;
-            emptyStateEl.style.setProperty('display', 'flex', 'important');
-            emptyStateEl.style.setProperty('justify-content', 'center', 'important');
-            emptyStateEl.style.setProperty('align-items', 'center', 'important');
-            emptyStateEl.style.padding = '';
-        } else {
-            // Render tab-specific "No X Donghuas" message
-            let msgTitle = "No Matches Found";
-            let msgText = "We couldn't find any shows matching your current search.";
-            if (!hasActiveSearch) {
-                let capitalizedTab = activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
-                if (activeTab === 'complete') capitalizedTab = 'Completed';
-                msgTitle = `No ${capitalizedTab} Donghuas`;
-                msgText = `You don't have any shows marked as ${activeTab} in your watchlist.`;
-            }
-            emptyStateEl.innerHTML = `
-                <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>${msgTitle}</h3>
-                <p>${msgText}</p>
-                ${hasActiveSearch ? `<button class="btn btn-secondary" id="btn-reset-filters" style="margin-top: 0.5rem;">Reset Filters</button>` : ''}
-            `;
-            emptyStateEl.style.display = 'flex';
+        
+        let msgTitle = "No Matches Found";
+        let msgText = "We couldn't find any shows matching your current search.";
+        if (filters.search === '') {
+            let capitalizedTab = activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+            if (activeTab === 'complete') capitalizedTab = 'Completed';
+            msgTitle = `No ${capitalizedTab} Donghuas`;
+            msgText = `You don't have any shows marked as ${activeTab} in your watchlist.`;
         }
+        
+        emptyStateEl.innerHTML = `
+            <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>${msgTitle}</h3>
+            <p>${msgText}</p>
+            <button class="btn btn-secondary" id="btn-reset-filters" style="margin-top: 0.5rem;">Reset Filters</button>
+        `;
+        
+        // Re-bind the reset filters button click handler
+        const resetBtn = emptyStateEl.querySelector('#btn-reset-filters');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                filters.search = '';
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) searchInput.value = '';
+                saveState();
+                renderShowsGrid();
+            });
+        }
+        emptyStateEl.style.display = 'flex';
         return;
     }
     
@@ -633,7 +582,7 @@ function renderShowsGrid() {
             // Poster Image or Gradient Placeholder
             let posterHtml = '';
             if (show.poster) {
-                posterHtml = `<img class="card-poster" src="${show.poster}" alt="${show.title} Poster" onerror="this.style.display='none'">`;
+                posterHtml = `<img class="card-poster" src="${show.poster}" alt="${show.title} Poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`;
             }
             
             // Text watermark for gradient poster
@@ -648,23 +597,6 @@ function renderShowsGrid() {
                     ${firstChineseChar ? `<div class="placeholder-zh">${firstChineseChar}</div>` : ''}
                 </div>
             `;
-            
-            // "Behind" indicator when currentEp < currently airing episode (SCHED-6)
-            let behindHtml = '';
-            if (show.status === 'ongoing' && show.seasonStartDate) {
-                const startDate = new Date(show.seasonStartDate);
-                const now = new Date();
-                const weeksSinceStart = Math.floor((now - startDate) / (7 * 24 * 60 * 60 * 1000));
-                const latestAiredEp = show.totalEp > 0
-                    ? Math.min(weeksSinceStart + 1, show.totalEp)
-                    : weeksSinceStart + 1;
-                const behind = latestAiredEp - show.currentEp;
-                if (behind > 0) {
-                    behindHtml = `<div style="font-size:0.7rem; color:#f59e0b; margin-top:0.2rem; font-weight:600;">
-                        ⚠ ${behind} ep${behind > 1 ? 's' : ''} behind
-                    </div>`;
-                }
-            }
             
             // Countdown Clock Section HTML
             let clockHtml = '';
@@ -757,7 +689,6 @@ function renderShowsGrid() {
                             <div class="progress-bar-container">
                                 <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
                             </div>
-                            ${behindHtml}
                         </div>
                         
                         <!-- Notes / Synopsis -->
@@ -817,10 +748,7 @@ function updateTimers() {
                 const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
                 const time = calculateTimeRemaining(schedule.targetDate);
                 if (time.elapsed) {
-                    if (!elapsedShowIds.has(show.id)) {
-                        elapsedShowIds.add(show.id);
-                        renderHeroBanner();
-                    }
+                    renderHeroBanner();
                 } else {
                     const numEls = heroCountdownBox.querySelectorAll('.num');
                     if (numEls.length === 4) {
@@ -847,20 +775,14 @@ function updateTimers() {
         if (schedule.airingNow) {
             const isAlreadyAiring = cdEl.querySelector('.c-val') && cdEl.querySelector('.c-val').innerText === "AIRING NOW / RELEASED";
             if (!isAlreadyAiring) {
-                if (!elapsedShowIds.has(show.id)) {
-                    elapsedShowIds.add(show.id);
-                    renderShowsGrid();
-                    renderHeroBanner();
-                }
+                renderShowsGrid();
+                renderHeroBanner();
             }
         } else {
             const time = calculateTimeRemaining(schedule.targetDate);
             if (time.elapsed) {
-                if (!elapsedShowIds.has(show.id)) {
-                    elapsedShowIds.add(show.id);
-                    renderShowsGrid();
-                    renderHeroBanner();
-                }
+                renderShowsGrid();
+                renderHeroBanner();
             } else {
                 const valEls = cdEl.querySelectorAll('.c-val');
                 if (valEls.length === 4) {
@@ -921,9 +843,7 @@ window.getWatchUrl = function(show) {
     if (show.watchUrl && show.watchUrl.trim() !== '') {
         return show.watchUrl;
     }
-    const source = (window.AndroidApp && window.AndroidApp.dbGetSetting
-        ? window.AndroidApp.dbGetSetting('pref_streaming_source', 'donghuastream')
-        : localStorage.getItem('pref_streaming_source') || 'donghuastream');
+    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
     if (source === 'luciferdonghua') {
         return 'https://luciferdonghua.org/?s=' + encodeURIComponent(show.title);
     } else {
@@ -938,11 +858,7 @@ window.getWatchUrlById = function(id) {
 };
 
 window.selectPreferredSource = function(source) {
-    if (window.AndroidApp && window.AndroidApp.dbSaveSetting) {
-        window.AndroidApp.dbSaveSetting('pref_streaming_source', source);
-    } else {
-        localStorage.setItem('pref_streaming_source', source);
-    }
+    localStorage.setItem('pref_streaming_source', source);
     window.updateSourceUI(source);
     
     // Re-render shows and hero banner so the updated links take effect immediately!
@@ -1044,8 +960,7 @@ function importData(jsonString) {
         }
         
         shows = parsed;
-        existingShowIds.clear();
-        shows.forEach(s => existingShowIds.add(s.id));
+        localStorage.setItem('donghua_shows', JSON.stringify(shows));
         saveState();
         alert('Import successful! ' + shows.length + ' shows loaded.');
         return true;
@@ -1073,7 +988,6 @@ function syncAlarm(show) {
  * Saves the current shows list state to LocalStorage and triggers layout updates.
  */
 function saveState() {
-    elapsedShowIds.clear();
     if (window.AndroidApp && window.AndroidApp.dbInsertShow && window.AndroidApp.dbUpdateShow) {
         shows.forEach(show => {
             if (existingShowIds.has(show.id)) {
@@ -1109,11 +1023,8 @@ function openDetailsModal(show) {
     let statusClass = show.status;
     let statusText = show.status.toUpperCase();
 
-    // Compute total/current episodes (capped at 150 pills to prevent UI lag - BUG-6)
-    const RAW_MAX = show.totalEp > 0 ? show.totalEp : Math.max(12, show.currentEp + 10);
-    const PILL_CAP = 150;
-    const maxEps = Math.min(RAW_MAX, PILL_CAP);
-    const isCapped = RAW_MAX > PILL_CAP;
+    // Compute total/current episodes
+    const maxEps = show.totalEp > 0 ? show.totalEp : Math.max(12, show.currentEp + 10);
     
     // Poster or placeholder
     let posterHtml = '';
@@ -1174,9 +1085,6 @@ function openDetailsModal(show) {
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 0.4rem; max-height: 200px; overflow-y: auto; padding-right: 0.2rem;">
                 ${epPills}
             </div>
-            ${isCapped ? `<p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem; text-align:center;">
-              Showing first ${PILL_CAP} episodes. Set total episode count to see the full grid.
-            </p>` : ''}
         </div>
     `;
 
@@ -1243,7 +1151,6 @@ function openModal(showData = null) {
         document.getElementById('show-total-ep').value = showData.totalEp;
         document.getElementById('show-poster').value = showData.poster || '';
         document.getElementById('show-notes').value = showData.notes || '';
-        document.getElementById('show-season-start').value = showData.seasonStartDate || '';
     } else {
         document.getElementById('modal-title').innerHTML = '<i class="fa-solid fa-circle-plus"></i> Add New Donghua';
         document.getElementById('show-watch-url').value = '';
@@ -1254,7 +1161,6 @@ function openModal(showData = null) {
         document.getElementById('show-release-time').value = "10:00";
         document.getElementById('show-current-ep').value = 0;
         document.getElementById('show-total-ep').value = 12;
-        document.getElementById('show-season-start').value = '';
     }
     
     modalEl.style.display = 'flex';
@@ -1272,9 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setThemeMode(savedTheme);
     
     // Initialize Preferred Source Card Selection UI state
-    const source = (window.AndroidApp && window.AndroidApp.dbGetSetting
-        ? window.AndroidApp.dbGetSetting('pref_streaming_source', 'donghuastream')
-        : localStorage.getItem('pref_streaming_source') || 'donghuastream');
+    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
     window.updateSourceUI(source);
     
     // Setup ResizeObservers to dynamically calculate header and bottom navigation heights (no magic numbers!)
@@ -1514,7 +1418,6 @@ document.addEventListener('DOMContentLoaded', () => {
             totalEp: parseInt(document.getElementById('show-total-ep').value) || 0,
             poster: document.getElementById('show-poster').value.trim(),
             notes: document.getElementById('show-notes').value.trim(),
-            seasonStartDate: document.getElementById('show-season-start').value || null,
             lastUpdated: Date.now()
         };
         
@@ -1524,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (idx !== -1) {
                 // Preserving id
                 newShowData.id = showId;
-                shows[idx] = { ...shows[idx], ...newShowData };
+                shows[idx] = newShowData;
             }
         } else {
             // Add new show
@@ -1574,84 +1477,110 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Grid Card Action Delegations & Reset Filters (delegated to content-area - BUG-4 Fix)
-    const contentAreaEl = document.querySelector('.content-area');
-    if (contentAreaEl) {
-        contentAreaEl.addEventListener('click', (e) => {
-            // Handle Reset Filters click delegation
-            if (e.target.closest('#btn-reset-filters')) {
-                filters.search = '';
-                filters.status = 'all';
-                const searchInput = document.getElementById('search-input');
-                if (searchInput) searchInput.value = '';
-                const chips = document.querySelectorAll('#filter-status .filter-chip');
-                if (chips) {
-                    chips.forEach(c => {
-                        if (c.dataset.value === 'all') c.classList.add('active');
-                        else c.classList.remove('active');
-                    });
-                }
-                renderShowsGrid();
-                return;
+    // Reset filters button in Empty State (guarded if layout element exists)
+    const btnResetFiltersEl = document.getElementById('btn-reset-filters');
+    if (btnResetFiltersEl) {
+        btnResetFiltersEl.addEventListener('click', () => {
+            filters.search = '';
+            filters.status = 'all';
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+            const chips = document.querySelectorAll('#filter-status .filter-chip');
+            if (chips) {
+                chips.forEach(c => {
+                    if (c.dataset.value === 'all') c.classList.add('active');
+                    else c.classList.remove('active');
+                });
             }
-
-            const card = e.target.closest('.show-card');
-            if (!card) return;
-            
-            // Action buttons check
-            const isPlus = e.target.closest('.btn-plus');
-            const isMinus = e.target.closest('.btn-minus');
-            const isEdit = e.target.closest('.edit-btn');
-            const isDelete = e.target.closest('.delete-btn');
-            const isStream = e.target.closest('.watch-btn');
-            const isCountdown = e.target.closest('.countdown-link');
-            
-            const showId = card.dataset.id;
-            const showIdx = shows.findIndex(s => s.id === showId);
-            if (showIdx === -1) return;
-            const show = shows[showIdx];
-            
-            if (isPlus) {
-                if (show.totalEp === 0 || show.currentEp < show.totalEp) {
-                    show.currentEp++;
-                    show.lastUpdated = Date.now();
-                    if (show.totalEp > 0 && show.currentEp === show.totalEp) {
-                        show.status = 'completed';
-                    }
-                    saveState();
-                }
-            } else if (isMinus) {
-                if (show.currentEp > 0) {
-                    show.currentEp--;
-                    show.lastUpdated = Date.now();
-                    if (show.status === 'completed' && show.currentEp < show.totalEp) {
-                        show.status = 'ongoing';
-                    }
-                    saveState();
-                }
-            } else if (isEdit) {
-                openModal(show);
-            } else if (isDelete) {
-                const confirmDelete = confirm(`Are you sure you want to remove "${show.title}" from your list?`);
-                if (confirmDelete) {
-                    const showId = show.id;
-                    shows.splice(showIdx, 1);
-                    existingShowIds.delete(showId);
-                    if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
-                        window.AndroidApp.dbDeleteShow(showId);
-                        window.AndroidApp.cancelReminder(showId, show.alarmRequestCode || 0);
-                    }
-                    saveState();
-                }
-            } else if (isStream || isCountdown) {
-                // Let watch screen / countdown trigger target behaviors
-                return;
-            } else {
-                // Opened by touching details/body of the card
-                openDetailsModal(show);
-            }
+            renderShowsGrid();
         });
     }
+
+    // Intercept clicks on streaming source buttons to open natively in player activity
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.stream-source-btn');
+        if (btn) {
+            e.preventDefault();
+            const url = btn.getAttribute('data-watch-url');
+            if (url) {
+                if (window.AndroidApp && window.AndroidApp.openWatchScreen) {
+                    window.AndroidApp.openWatchScreen(url);
+                } else {
+                    window.location.href = url;
+                }
+            }
+        }
+    });
+    
+    // Weekly Schedule Tab selection
+    document.getElementById('schedule-tabs').addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-btn')) {
+            document.querySelectorAll('#schedule-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            filters.scheduleDay = e.target.dataset.day;
+            renderWeeklySchedule();
+        }
+    });
+    
+    // Grid Card Action Delegations (increment, decrement, edit, delete)
+    document.getElementById('shows-sections-container').addEventListener('click', (e) => {
+        const card = e.target.closest('.show-card');
+        if (!card) return;
+        
+        // Action buttons check
+        const isPlus = e.target.closest('.btn-plus');
+        const isMinus = e.target.closest('.btn-minus');
+        const isEdit = e.target.closest('.edit-btn');
+        const isDelete = e.target.closest('.delete-btn');
+        const isStream = e.target.closest('.watch-btn');
+        const isCountdown = e.target.closest('.countdown-link');
+        
+        const showId = card.dataset.id;
+        const showIdx = shows.findIndex(s => s.id === showId);
+        if (showIdx === -1) return;
+        const show = shows[showIdx];
+        
+        if (isPlus) {
+            if (show.totalEp === 0 || show.currentEp < show.totalEp) {
+                show.currentEp++;
+                show.lastUpdated = Date.now();
+                if (show.totalEp > 0 && show.currentEp === show.totalEp) {
+                    show.status = 'completed';
+                }
+                saveState();
+            }
+        } else if (isMinus) {
+            if (show.currentEp > 0) {
+                show.currentEp--;
+                show.lastUpdated = Date.now();
+                if (show.status === 'completed' && show.currentEp < show.totalEp) {
+                    show.status = 'ongoing';
+                }
+                saveState();
+            }
+        } else if (isEdit) {
+            openModal(show);
+        } else if (isDelete) {
+            const confirmDelete = confirm(`Are you sure you want to remove "${show.title}" from your list?`);
+            if (confirmDelete) {
+                const showId = show.id;
+                shows.splice(showIdx, 1);
+                existingShowIds.delete(showId);
+                if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
+                    window.AndroidApp.dbDeleteShow(showId);
+                    window.AndroidApp.cancelReminder(showId, show.alarmRequestCode || 0);
+                }
+                saveState();
+            }
+        } else if (isStream || isCountdown) {
+            // Let watch screen / countdown trigger target behaviors
+            return;
+        } else {
+            // Opened by touching details/body of the card
+            openDetailsModal(show);
+        }
+    });
 
     // Disable context menu for a fully native app feel
     document.addEventListener('contextmenu', e => e.preventDefault());
@@ -1693,13 +1622,6 @@ let activeTab = 'home';
 function switchTab(tabName) {
     if (tabName === 'add') return;
     activeTab = tabName;
-    
-    // Sort by countdown by default on Upcoming tab (SCHED-4)
-    if (tabName === 'upcoming') {
-        filters.sortBy = 'countdown';
-        const sortEl = document.getElementById('sort-select');
-        if (sortEl) sortEl.value = 'countdown';
-    }
     
     // Update body class for active tab
     document.body.classList.remove('tab-home', 'tab-upcoming', 'tab-complete', 'tab-stopped');

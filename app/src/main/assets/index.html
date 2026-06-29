@@ -84,18 +84,10 @@
         <main class="main-content">
             <!-- Sidebar / Control Panel -->
             <section class="control-panel">
-                <div class="panel-search" style="display: flex; gap: 0.8rem; flex-wrap: wrap; width: 100%;">
-                    <div class="search-box" style="flex: 1; min-width: 200px;">
+                <div class="panel-search">
+                    <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text" id="search-input" placeholder="Search donghua...">
-                    </div>
-                    <div class="sort-box" style="min-width: 140px;">
-                        <select id="sort-select" class="form-select" style="padding: 0.75rem 1rem; border-radius: 10px; height: 100%;">
-                            <option value="alphabetical">Alphabetical</option>
-                            <option value="progress">Progress</option>
-                            <option value="last-updated">Last Updated</option>
-                            <option value="countdown">Soonest Release</option>
-                        </select>
                     </div>
                 </div>
             </section>
@@ -366,13 +358,6 @@
                         <div class="form-group col-6">
                             <label for="show-release-time">Release Time (Local Time) *</label>
                             <input type="time" id="show-release-time" required value="10:00">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <label style="font-size:0.8rem; color:var(--text-secondary);">Season Start Date <span style="color:var(--text-muted);">(optional)</span></label>
-                            <input type="date" id="show-season-start" style="width:100%;">
                         </div>
                     </div>
 
