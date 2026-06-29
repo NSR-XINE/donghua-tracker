@@ -42,6 +42,64 @@ try {
 const existingShowIds = new Set();
 shows.forEach(s => existingShowIds.add(s.id));
 
+/**
+ * Returns the user-friendly display name of a show status to match professional anime tracking apps.
+ */
+function getStatusDisplayName(status) {
+    if (status === 'ongoing') return 'Airing';
+    if (status === 'upcoming') return 'Upcoming';
+    if (status === 'completed') return 'Completed';
+    if (status === 'stopped') return 'Hiatus';
+    return status;
+}
+
+/**
+ * Automatically checks and migrates status values for shows based on start dates
+ * and watch progress (ongoing <-> completed).
+ */
+function checkAndMigrateStatuses() {
+    let changed = false;
+    const now = new Date();
+    shows.forEach(show => {
+        // 1. Upcoming -> Ongoing if seasonStartDate has arrived or passed
+        if (show.status === 'upcoming' && show.seasonStartDate) {
+            const startDate = new Date(show.seasonStartDate);
+            startDate.setHours(0, 0, 0, 0); // Start of start date
+            if (now >= startDate) {
+                show.status = 'ongoing';
+                show.lastUpdated = Date.now();
+                changed = true;
+            }
+        }
+        // 2. Ongoing -> Completed when current ep reaches total ep
+        if (show.status === 'ongoing' && show.totalEp > 0 && show.currentEp >= show.totalEp) {
+            show.status = 'completed';
+            show.lastUpdated = Date.now();
+            changed = true;
+        }
+        // 3. Completed -> Ongoing if current ep is less than total ep
+        if (show.status === 'completed' && show.totalEp > 0 && show.currentEp < show.totalEp) {
+            show.status = 'ongoing';
+            show.lastUpdated = Date.now();
+            changed = true;
+        }
+    });
+    if (changed) {
+        if (window.AndroidApp && window.AndroidApp.dbUpdateShow) {
+            shows.forEach(show => {
+                if (existingShowIds.has(show.id)) {
+                    window.AndroidApp.dbUpdateShow(JSON.stringify(show));
+                }
+            });
+        } else {
+            localStorage.setItem('donghua_shows', JSON.stringify(shows));
+        }
+    }
+}
+
+// Auto-run migrations on startup
+checkAndMigrateStatuses();
+
 // Active filters state
 let filters = {
     search: '',
@@ -458,6 +516,7 @@ function renderWeeklySchedule() {
  * Renders the main grid of shows based on searches, filters, and sorting.
  */
 function renderShowsGrid() {
+    checkAndMigrateStatuses();
     const containerEl = document.getElementById('shows-sections-container');
     const emptyStateEl = document.getElementById('empty-state');
     
@@ -653,7 +712,7 @@ function renderShowsGrid() {
                     <!-- Poster -->
                     <div class="card-header">
                         <div class="card-badges">
-                            <span class="status-badge ${show.status}">${show.status}</span>
+                            <span class="status-badge ${show.status}">${getStatusDisplayName(show.status)}</span>
                             ${isReleasingToday ? '<span class="status-badge" style="background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.4)">Airs Today</span>' : ''}
                         </div>
                         ${posterHtml}
@@ -1021,7 +1080,7 @@ function openDetailsModal(show) {
 
     // Compute status badge
     let statusClass = show.status;
-    let statusText = show.status.toUpperCase();
+    let statusText = getStatusDisplayName(show.status).toUpperCase();
 
     // Compute total/current episodes
     const maxEps = show.totalEp > 0 ? show.totalEp : Math.max(12, show.currentEp + 10);
