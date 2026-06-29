@@ -45,9 +45,17 @@
                 </div>
             </div>
             
-            <button id="nav-btn-info" onclick="switchTab('info')" class="dev-header-btn" title="Developer Info">
-                <i class="fa-solid fa-code"></i>
-            </button>
+            <div class="header-utility-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+                <button id="nav-btn-sources" onclick="switchTab('sources')" class="dev-header-btn" title="Streaming Sources">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                <button id="nav-btn-backup" onclick="switchTab('backup')" class="dev-header-btn" title="Backup & Restore">
+                    <i class="fa-solid fa-database"></i>
+                </button>
+                <button id="nav-btn-info" onclick="switchTab('info')" class="dev-header-btn" title="Developer Info">
+                    <i class="fa-solid fa-code"></i>
+                </button>
+            </div>
             
             <!-- Quick Stats -->
             <div class="stats-panel">
@@ -286,6 +294,7 @@
                                 <option value="ongoing">Ongoing</option>
                                 <option value="upcoming">Upcoming</option>
                                 <option value="completed">Completed</option>
+                                <option value="stopped">Stopped</option>
                             </select>
                         </div>
                         <div class="form-group col-6">
@@ -368,26 +377,25 @@
         </div>
     </div>
 
-    <!-- Floating Bottom Navigation Bar (Mobile Only) -->
     <nav class="bottom-nav">
         <button class="nav-item active" id="nav-btn-home" onclick="switchTab('home')">
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
         </button>
-        <button class="nav-item" id="nav-btn-schedule" onclick="switchTab('schedule')">
-            <i class="fa-solid fa-calendar-days"></i>
-            <span>Schedule</span>
+        <button class="nav-item" id="nav-btn-upcoming" onclick="switchTab('upcoming')">
+            <i class="fa-solid fa-rocket"></i>
+            <span>Upcoming</span>
         </button>
         <button class="nav-item nav-btn-add-shortcut" id="nav-btn-add" onclick="triggerAddModal()">
             <div class="nav-add-icon"><i class="fa-solid fa-plus"></i></div>
         </button>
-        <button class="nav-item" id="nav-btn-sources" onclick="switchTab('sources')">
-            <i class="fa-solid fa-play"></i>
-            <span>Sources</span>
+        <button class="nav-item" id="nav-btn-complete" onclick="switchTab('complete')">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Complete</span>
         </button>
-        <button class="nav-item" id="nav-btn-backup" onclick="switchTab('backup')">
-            <i class="fa-solid fa-file-import"></i>
-            <span>Backup</span>
+        <button class="nav-item" id="nav-btn-stopped" onclick="switchTab('stopped')">
+            <i class="fa-solid fa-circle-stop"></i>
+            <span>Stopped</span>
         </button>
     </nav>
 

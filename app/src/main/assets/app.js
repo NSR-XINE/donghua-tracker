@@ -429,7 +429,7 @@ function renderWeeklySchedule() {
         
         html += dayShows.map(show => {
             return `
-                <div class="schedule-item" style="${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''}">
+                <div class="schedule-item" onclick="window.openDetailsById('${show.id}')" style="cursor: pointer; ${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''}">
                     <div class="schedule-item-name">
                         ${isToday ? '<i class="fa-solid fa-circle-play" style="color: var(--accent-purple); font-size: 0.75rem; animation: pulse 1.5s infinite"></i>' : ''}
                         <span>${show.title}</span>
@@ -457,15 +457,25 @@ function renderShowsGrid() {
     const containerEl = document.getElementById('shows-sections-container');
     const emptyStateEl = document.getElementById('empty-state');
     
+    // Determine status filter based on activeTab
+    let statusFilter = '';
+    if (activeTab === 'upcoming') {
+        statusFilter = 'upcoming';
+    } else if (activeTab === 'complete') {
+        statusFilter = 'completed';
+    } else if (activeTab === 'stopped') {
+        statusFilter = 'stopped';
+    } else {
+        containerEl.innerHTML = '';
+        return;
+    }
+    
     // Apply search and status filters
     let filteredShows = shows.filter(show => {
         const matchesSearch = show.title.toLowerCase().includes(filters.search.toLowerCase()) || 
                              (show.titleZh && show.titleZh.toLowerCase().includes(filters.search.toLowerCase())) ||
                              (show.notes && show.notes.toLowerCase().includes(filters.search.toLowerCase()));
-                             
-        const matchesStatus = filters.status === 'all' ? true : show.status === filters.status;
-        
-        return matchesSearch && matchesStatus;
+        return matchesSearch && show.status === statusFilter;
     });
     
     // Sort array
@@ -479,25 +489,6 @@ function renderShowsGrid() {
         } else if (filters.sortBy === 'last-updated') {
             return (b.lastUpdated || 0) - (a.lastUpdated || 0);
         } else {
-            // Default: 'countdown' sort
-            // Ongoing shows with active countdowns first, then upcoming, then completed
-            const getPriority = (s) => {
-                if (s.status === 'ongoing') return 1;
-                if (s.status === 'upcoming') return 2;
-                return 3; // completed
-            };
-            
-            if (getPriority(a) !== getPriority(b)) {
-                return getPriority(a) - getPriority(b);
-            }
-            
-            // If both ongoing, sort by soonest release time
-            if (a.status === 'ongoing') {
-                const schedA = getNextReleaseDate(a.releaseDay, a.releaseTime);
-                const schedB = getNextReleaseDate(b.releaseDay, b.releaseTime);
-                return (schedA.targetDate - new Date()) - (schedB.targetDate - new Date());
-            }
-            
             return a.title.localeCompare(b.title);
         }
     });
@@ -521,27 +512,32 @@ function renderShowsGrid() {
         emptyStateEl.style.padding = '';
         emptyStateEl.style.justifyContent = '';
         emptyStateEl.style.alignItems = '';
+        
+        let msgTitle = "No Matches Found";
+        let msgText = "We couldn't find any shows matching your current search.";
+        if (filters.search === '') {
+            let capitalizedTab = activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+            if (activeTab === 'complete') capitalizedTab = 'Completed';
+            msgTitle = `No ${capitalizedTab} Donghuas`;
+            msgText = `You don't have any shows marked as ${activeTab} in your watchlist.`;
+        }
+        
         emptyStateEl.innerHTML = `
             <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
-            <h3>No Matches Found</h3>
-            <p>We couldn't find any shows matching your current search or status filter.</p>
+            <h3>${msgTitle}</h3>
+            <p>${msgText}</p>
             <button class="btn btn-secondary" id="btn-reset-filters" style="margin-top: 0.5rem;">Reset Filters</button>
         `;
+        
         // Re-bind the reset filters button click handler
         const resetBtn = emptyStateEl.querySelector('#btn-reset-filters');
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 filters.search = '';
-                filters.status = 'all';
-                filters.scheduleDay = 'all';
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) searchInput.value = '';
-                const tabAll = document.querySelector('.filter-tab[data-status="all"]');
-                if (tabAll) {
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                    tabAll.classList.add('active');
-                }
                 saveState();
+                renderShowsGrid();
             });
         }
         emptyStateEl.style.display = 'flex';
@@ -550,43 +546,28 @@ function renderShowsGrid() {
     
     emptyStateEl.style.display = 'none';
     
-    // Group into sections
-    const groups = [
-        {
-            id: 'ongoing',
-            title: '📺 Ongoing / Watching',
-            shows: filteredShows.filter(s => s.status === 'ongoing')
-        },
-        {
-            id: 'upcoming',
-            title: '🚀 Upcoming Releases',
-            shows: filteredShows.filter(s => s.status === 'upcoming')
-        },
-        {
-            id: 'completed',
-            title: '✅ Completed Series',
-            shows: filteredShows.filter(s => s.status === 'completed')
-        }
-    ];
+    let sectionTitle = '';
+    if (activeTab === 'upcoming') {
+        sectionTitle = '🚀 Upcoming Releases';
+    } else if (activeTab === 'complete') {
+        sectionTitle = '✅ Completed Series';
+    } else if (activeTab === 'stopped') {
+        sectionTitle = '🛑 Stopped / Paused';
+    }
+    
+    let html = `
+        <div class="shows-section">
+            <div class="section-title-row">
+                <h2>${sectionTitle}</h2>
+                <span class="count-tag">${filteredShows.length} show${filteredShows.length === 1 ? '' : 's'}</span>
+            </div>
+            <div class="shows-grid">
+    `;
     
     const todayName = DAYS_ARRAY[new Date().getDay()];
     
-    let html = '';
-    groups.forEach(group => {
-        if (group.shows.length === 0) return;
-        
-        // Render section title and count badge
-        html += `
-            <div class="shows-section" id="section-${group.id}">
-                <div class="section-title-row">
-                    <h2>${group.title}</h2>
-                    <span class="count-tag">${group.shows.length} show${group.shows.length === 1 ? '' : 's'}</span>
-                </div>
-                <div class="shows-grid">
-        `;
-        
-        // Render each card inside the section grid
-        html += group.shows.map(show => {
+    // Render each card inside the section grid
+    html += filteredShows.map(show => {
             const progressPct = show.totalEp > 0 ? Math.min(100, Math.round((show.currentEp / show.totalEp) * 100)) : 0;
             const progressDisplay = show.totalEp > 0 ? `${show.currentEp}/${show.totalEp}` : `${show.currentEp}/?`;
             
@@ -727,14 +708,13 @@ function renderShowsGrid() {
                     </div>
                 </article>
             `;
-        }).join('');
-        
-        // Close grid and section tags
-        html += `
-                </div>
+    }).join('');
+    
+    // Close grid and section tags
+    html += `
             </div>
-        `;
-    });
+        </div>
+    `;
     
     containerEl.innerHTML = html;
 }
@@ -1544,7 +1524,7 @@ function switchTab(tabName) {
     activeTab = tabName;
     
     // Update body class for active tab
-    document.body.classList.remove('tab-home', 'tab-schedule', 'tab-sources', 'tab-info', 'tab-backup');
+    document.body.classList.remove('tab-home', 'tab-upcoming', 'tab-complete', 'tab-stopped', 'tab-sources', 'tab-info', 'tab-backup');
     document.body.classList.add(`tab-${tabName}`);
     
     // Update nav items class states
@@ -1588,21 +1568,21 @@ function switchTab(tabName) {
         // Show only the selected tab and its parent section
         if (tabName === 'home') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
-            if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+            if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
             if (heroBanner) {
                 heroBanner.style.display = ''; // Clear important override
                 renderHeroBanner();
             }
             if (emptyStateEl) {
                 const hasNoShows = typeof shows !== 'undefined' && shows.length === 0;
-                const hasNoFiltered = typeof filteredShows !== 'undefined' && filteredShows.length === 0;
-                if (hasNoShows || hasNoFiltered) {
+                if (hasNoShows) {
                     emptyStateEl.style.setProperty('display', 'flex', 'important');
                 }
             }
-        } else if (tabName === 'schedule') {
+        } else if (tabName === 'upcoming' || tabName === 'complete' || tabName === 'stopped') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
-            if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
+            if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+            renderShowsGrid();
         } else if (tabName === 'sources') {
             if (controlPanel) controlPanel.style.setProperty('display', 'block', 'important');
             if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');

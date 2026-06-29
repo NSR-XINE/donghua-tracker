@@ -685,6 +685,12 @@ input, textarea {
     border: 1px solid rgba(57, 255, 20, 0.25);
 }
 
+.status-badge.stopped {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
 /* Styled Placeholder Poster */
 .poster-placeholder {
     width: 100%;
