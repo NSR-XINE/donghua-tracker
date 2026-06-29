@@ -1205,6 +1205,32 @@ function openModal(showData = null) {
     
     modalEl.style.display = 'flex';
     document.body.classList.add('modal-open');
+    toggleTotalEpVisibility();
+}
+
+/**
+ * Toggles the visibility of the Total Episodes field based on status selection.
+ * If status is ongoing, hides the field and expands the Current Watched Episode field.
+ */
+function toggleTotalEpVisibility() {
+    const statusSelect = document.getElementById('show-status');
+    const totalEpGroup = document.getElementById('total-ep-group');
+    const currentEpGroup = document.getElementById('current-ep-group');
+    if (!statusSelect) return;
+    
+    if (statusSelect.value === 'ongoing') {
+        if (totalEpGroup) totalEpGroup.style.display = 'none';
+        if (currentEpGroup) {
+            currentEpGroup.classList.remove('col-6');
+            currentEpGroup.classList.add('col-12');
+        }
+    } else {
+        if (totalEpGroup) totalEpGroup.style.display = '';
+        if (currentEpGroup) {
+            currentEpGroup.classList.remove('col-12');
+            currentEpGroup.classList.add('col-6');
+        }
+    }
 }
 
 function closeModal() {
@@ -1344,10 +1370,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, 2000);
 
-    // Fetch poster, Chinese Title, and Synopsis from Jikan MAL API in the edit modal
-    document.getElementById('btn-fetch-poster').addEventListener('click', () => {
-        const title = document.getElementById('show-title').value.trim();
-        if (!title) { alert('Please enter an English title first.'); return; }
+    /**
+     * Fetches details (Chinese Title, Synopsis, Status, Poster, Total Episodes) from MyAnimeList/Jikan API.
+     */
+    function fetchShowDetailsFromJikan(title, silent = true) {
+        if (!title) {
+            if (!silent) alert('Please enter an English title first.');
+            return;
+        }
         
         const query = encodeURIComponent(title);
         const url = 'https://api.jikan.moe/v4/anime?q=' + query + '&limit=1';
@@ -1355,7 +1385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const handleResponse = (data) => {
             const entry = data && data.data && data.data[0];
             if (!entry) {
-                alert('No matching show found on MyAnimeList.');
+                if (!silent) alert('No matching show found on MyAnimeList.');
                 return;
             }
             
@@ -1394,6 +1424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (malStatus.includes('not yet aired')) {
                         statusSelect.value = 'upcoming';
                     }
+                    toggleTotalEpVisibility(); // Update total episodes display dynamically
                 }
             }
 
@@ -1405,34 +1436,60 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            alert('Auto-filled Chinese Title, Synopsis, and Poster successfully!');
+            if (!silent) alert('Auto-filled Chinese Title, Synopsis, and Poster successfully!');
         };
 
         if (window.AndroidApp && window.AndroidApp.fetchUrl) {
             const cbName = 'cb_modal_poster_' + Date.now();
             window[cbName] = function(json) {
                 delete window[cbName];
-                if (!json) { alert('Could not fetch data from MyAnimeList.'); return; }
+                if (!json) {
+                    if (!silent) alert('Could not fetch data from MyAnimeList.');
+                    return;
+                }
                 try {
                     const data = JSON.parse(json);
                     handleResponse(data);
-                } catch(e) { alert('Error parsing MAL response.'); }
+                } catch(e) {
+                    if (!silent) alert('Error parsing MAL response.');
+                }
             };
             window.AndroidApp.fetchUrl(url, cbName);
         } else {
             // Web browser fallback
             fetch(url)
                 .then(r => {
-                    if (!r.ok) throw new Error('API response error');
+                    if (!r.ok) throw new Error('API response status ' + r.status);
                     return r.json();
                 })
                 .then(data => handleResponse(data))
                 .catch(err => {
                     console.error(err);
-                    alert('Error fetching details from MyAnimeList API. Please check your network connection.');
+                    if (!silent) alert('Error fetching details from MyAnimeList API. Please check your network connection.');
                 });
         }
+    }
+
+    // Manual Fetch trigger button
+    document.getElementById('btn-fetch-poster').addEventListener('click', () => {
+        const title = document.getElementById('show-title').value.trim();
+        fetchShowDetailsFromJikan(title, false);
     });
+
+    // Auto-fetch trigger when typing or changing the English Title
+    const showTitleInput = document.getElementById('show-title');
+    if (showTitleInput) {
+        showTitleInput.addEventListener('change', (e) => {
+            const title = e.target.value.trim();
+            fetchShowDetailsFromJikan(title, true);
+        });
+    }
+
+    // Auto-toggle Total Episodes layout visibility when status selection changes
+    const statusSelect = document.getElementById('show-status');
+    if (statusSelect) {
+        statusSelect.addEventListener('change', toggleTotalEpVisibility);
+    }
     
     // Modal Close buttons
     document.getElementById('btn-close-modal').addEventListener('click', closeModal);
