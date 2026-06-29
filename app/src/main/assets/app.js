@@ -1236,6 +1236,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.id === 'details-modal') closeDetailsModal();
         });
     }
+
+    // Settings Modal close on overlay touch
+    const settingsModal = document.getElementById('settings-modal');
+    if (settingsModal) {
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target.id === 'settings-modal') window.closeSettingsModal();
+        });
+    }
     
     if (btnSubmitImport && importTextarea) {
         btnSubmitImport.addEventListener('click', () => {
@@ -1524,11 +1532,11 @@ function switchTab(tabName) {
     activeTab = tabName;
     
     // Update body class for active tab
-    document.body.classList.remove('tab-home', 'tab-upcoming', 'tab-complete', 'tab-stopped', 'tab-sources', 'tab-info', 'tab-backup');
+    document.body.classList.remove('tab-home', 'tab-upcoming', 'tab-complete', 'tab-stopped');
     document.body.classList.add(`tab-${tabName}`);
     
     // Update nav items class states
-    document.querySelectorAll('.bottom-nav .nav-item, .dev-header-btn').forEach(btn => {
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
         btn.classList.remove('active');
     });
     const activeBtn = document.getElementById(`nav-btn-${tabName}`);
@@ -1536,9 +1544,6 @@ function switchTab(tabName) {
     
     // Target main container elements
     const searchPanel = document.querySelector('.panel-search');
-    const sourcesPanel = document.querySelector('.panel-sources');
-    const devPanel = document.querySelector('.panel-dev-info');
-    const backupPanel = document.querySelector('.panel-backup-info');
     const scheduleContainer = document.querySelector('.schedule-container');
     const heroBanner = document.getElementById('next-up-banner');
     const sectionsContainer = document.getElementById('shows-sections-container');
@@ -1553,9 +1558,6 @@ function switchTab(tabName) {
     if (isMobile) {
         // Hide all major areas first
         if (searchPanel) searchPanel.style.setProperty('display', 'none', 'important');
-        if (sourcesPanel) sourcesPanel.style.setProperty('display', 'none', 'important');
-        if (devPanel) devPanel.style.setProperty('display', 'none', 'important');
-        if (backupPanel) backupPanel.style.setProperty('display', 'none', 'important');
         if (scheduleContainer) scheduleContainer.style.setProperty('display', 'none', 'important');
         if (heroBanner) heroBanner.style.setProperty('display', 'none', 'important');
         if (sectionsContainer) sectionsContainer.style.setProperty('display', 'none', 'important');
@@ -1583,22 +1585,10 @@ function switchTab(tabName) {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             renderShowsGrid();
-        } else if (tabName === 'sources') {
-            if (controlPanel) controlPanel.style.setProperty('display', 'block', 'important');
-            if (sourcesPanel) sourcesPanel.style.setProperty('display', 'block', 'important');
-        } else if (tabName === 'info') {
-            if (controlPanel) controlPanel.style.setProperty('display', 'block', 'important');
-            if (devPanel) devPanel.style.setProperty('display', 'block', 'important');
-        } else if (tabName === 'backup') {
-            if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
-            if (backupPanel) backupPanel.style.setProperty('display', 'block', 'important');
         }
     } else {
         // Desktop Viewport: Restore standard styles and clear important display sets
         if (searchPanel) searchPanel.style.display = '';
-        if (sourcesPanel) sourcesPanel.style.display = '';
-        if (devPanel) devPanel.style.display = '';
-        if (backupPanel) backupPanel.style.display = '';
         if (scheduleContainer) scheduleContainer.style.display = '';
         if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';
@@ -1664,3 +1654,22 @@ function openDetailsById(showId) {
     }
 }
 window.openDetailsById = openDetailsById;
+
+// Settings Modal controllers
+function openSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.style.setProperty('display', 'flex', 'important');
+        document.body.classList.add('modal-open');
+    }
+}
+window.openSettingsModal = openSettingsModal;
+
+function closeSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.style.setProperty('display', 'none', 'important');
+        document.body.classList.remove('modal-open');
+    }
+}
+window.closeSettingsModal = closeSettingsModal;
