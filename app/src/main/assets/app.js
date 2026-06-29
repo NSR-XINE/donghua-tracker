@@ -180,7 +180,8 @@ function renderHeroBanner() {
     
     // Check mobile viewport and active tab
     const isMobile = window.innerWidth <= 1024;
-    if (isMobile && activeTab !== 'home') {
+    const allowedTabs = ['home', 'upcoming', 'complete', 'stopped'];
+    if (isMobile && !allowedTabs.includes(activeTab)) {
         if (bannerEl) bannerEl.style.setProperty('display', 'none', 'important');
         return;
     }
@@ -1676,6 +1677,10 @@ function switchTab(tabName) {
         } else if (tabName === 'upcoming' || tabName === 'complete' || tabName === 'stopped') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+            if (heroBanner) {
+                heroBanner.style.display = ''; // Clear important override
+                renderHeroBanner();
+            }
             renderShowsGrid();
         }
     } else {
