@@ -137,7 +137,7 @@ input, textarea {
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: var(--header-height, 80px) calc(var(--safe-area-right, 0px) + 1.5rem) 0 calc(var(--safe-area-left, 0px) + 1.5rem);
+    padding: calc(var(--status-bar-height, 0px) + var(--header-height, 80px)) calc(var(--safe-area-right, 0px) + 1.5rem) 0 calc(var(--safe-area-left, 0px) + 1.5rem);
     position: relative;
     z-index: 1;
 }
@@ -147,7 +147,7 @@ input, textarea {
    ========================================== */
 .app-header {
     position: fixed;
-    top: 0;
+    top: var(--status-bar-height, 0px);
     left: 0;
     right: 0;
     background: var(--bg-darker);
@@ -160,7 +160,7 @@ input, textarea {
     justify-content: space-between;
     align-items: center;
     gap: 1.5rem;
-    padding: calc(var(--status-bar-height, 0px) + 0.6rem) calc(var(--safe-area-right, 0px) + 1.5rem) 0.6rem calc(var(--safe-area-left, 0px) + 1.5rem);
+    padding: 0.6rem calc(var(--safe-area-right, 0px) + 1.5rem) 0.6rem calc(var(--safe-area-left, 0px) + 1.5rem);
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -1389,7 +1389,7 @@ body.modal-open {
     }
 
     .app-container {
-        padding-top: var(--header-height, calc(var(--status-bar-height, 0px) + 70px)) !important;
+        padding-top: calc(var(--status-bar-height, 0px) + var(--header-height, 70px)) !important;
         padding-bottom: calc(var(--bottom-nav-height, 100px) + 16px) !important;
         padding-left: calc(var(--safe-area-left, 0px) + 1.2rem) !important;
         padding-right: calc(var(--safe-area-right, 0px) + 1.2rem) !important;
@@ -1397,7 +1397,7 @@ body.modal-open {
 
     /* Home tab: header has 2 rows (logo + stats) */
     body.tab-home .app-container {
-        padding-top: var(--header-height, calc(var(--status-bar-height, 0px) + 136px)) !important;
+        padding-top: calc(var(--status-bar-height, 0px) + var(--header-height, 136px)) !important;
     }
 
     .bottom-nav {
