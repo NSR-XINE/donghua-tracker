@@ -52,6 +52,12 @@ body.light-theme {
     --shadow-neon-purple: 0 0 15px rgba(157, 78, 221, 0.25);
     --shadow-neon-rose: 0 0 15px rgba(255, 42, 95, 0.25);
     
+    /* Dynamic Safe Area & Insets (Android WindowInsets & CSS Fallbacks) */
+    --status-bar-height: env(safe-area-inset-top, 0px);
+    --navigation-bar-height: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+    
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --font-heading: 'Outfit', -apple-system, sans-serif;
     --font-body: 'Inter', -apple-system, sans-serif;
@@ -131,7 +137,7 @@ input, textarea {
 .app-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 80px calc(var(--safe-area-right, 0px) + 1.5rem) 0 calc(var(--safe-area-left, 0px) + 1.5rem);
+    padding: var(--header-height, 80px) calc(var(--safe-area-right, 0px) + 1.5rem) 0 calc(var(--safe-area-left, 0px) + 1.5rem);
     position: relative;
     z-index: 1;
 }
@@ -1383,12 +1389,15 @@ body.modal-open {
     }
 
     .app-container {
-        padding: calc(var(--status-bar-height, 0px) + 70px) calc(var(--safe-area-right, 0px) + 1.2rem) calc(var(--navigation-bar-height, 0px) + 100px) calc(var(--safe-area-left, 0px) + 1.2rem) !important;
+        padding-top: var(--header-height, calc(var(--status-bar-height, 0px) + 70px)) !important;
+        padding-bottom: calc(var(--bottom-nav-height, 100px) + 16px) !important;
+        padding-left: calc(var(--safe-area-left, 0px) + 1.2rem) !important;
+        padding-right: calc(var(--safe-area-right, 0px) + 1.2rem) !important;
     }
 
     /* Home tab: header has 2 rows (logo + stats) */
     body.tab-home .app-container {
-        padding-top: calc(var(--status-bar-height, 0px) + 136px) !important;
+        padding-top: var(--header-height, calc(var(--status-bar-height, 0px) + 136px)) !important;
     }
 
     .bottom-nav {

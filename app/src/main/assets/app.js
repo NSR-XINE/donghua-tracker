@@ -1179,6 +1179,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
     window.updateSourceUI(source);
     
+    // Setup ResizeObservers to dynamically calculate header and bottom navigation heights (no magic numbers!)
+    const header = document.querySelector('.app-header');
+    if (header && typeof ResizeObserver !== 'undefined') {
+        const headerObserver = new ResizeObserver(() => {
+            const height = header.getBoundingClientRect().height;
+            document.documentElement.style.setProperty('--header-height', height + 'px');
+        });
+        headerObserver.observe(header);
+    }
+
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav && typeof ResizeObserver !== 'undefined') {
+        const navObserver = new ResizeObserver(() => {
+            const rect = bottomNav.getBoundingClientRect();
+            const navTopOffset = window.innerHeight - rect.top;
+            document.documentElement.style.setProperty('--bottom-nav-height', navTopOffset + 'px');
+        });
+        navObserver.observe(bottomNav);
+    }
+    
     // Update basic stats immediately
     updateStats();
     renderWeeklySchedule();
