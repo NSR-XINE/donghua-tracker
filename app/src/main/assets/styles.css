@@ -1235,6 +1235,7 @@ body.modal-open {
     border: 1px dashed var(--border-color);
     border-radius: 16px;
     gap: 1rem;
+    margin-top: 1.5rem !important;
 }
 
 .empty-state i {
@@ -1807,4 +1808,24 @@ body.light-theme .stars-bg {
     background: var(--bg-darker);
     z-index: 201;
     pointer-events: none;
+}
+
+/* Force light/white text inside banner components for readable contrast against the dark poster gradients */
+.banner-section .banner-title {
+    color: #ffffff !important;
+}
+.banner-section .banner-meta,
+.banner-section .banner-meta span {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+.banner-section .countdown-box .num {
+    color: #ffffff !important;
+}
+.banner-section .countdown-box .label {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+.banner-section .banner-badge {
+    background: rgba(0, 242, 254, 0.15) !important;
+    color: #00f2fe !important;
+    border-color: rgba(0, 242, 254, 0.4) !important;
 }

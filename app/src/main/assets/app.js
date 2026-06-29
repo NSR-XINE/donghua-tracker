@@ -499,14 +499,16 @@ function renderShowsGrid() {
     
     if (shows.length === 0) {
         containerEl.innerHTML = '';
-        emptyStateEl.classList.remove('empty-state');
+        emptyStateEl.classList.add('empty-state');
         emptyStateEl.innerHTML = `
-            <p style="color: var(--text-secondary); font-size: 0.95rem; text-align: center; max-width: 320px; line-height: 1.5; margin: 0; font-family: var(--font-body);">Your watchlist is empty. Search for a show above to start tracking!</p>
+            <i class="fa-solid fa-seedling" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>Watchlist is Empty</h3>
+            <p>Your watchlist is empty. Search for a show above to start tracking!</p>
         `;
         emptyStateEl.style.setProperty('display', 'flex', 'important');
         emptyStateEl.style.setProperty('justify-content', 'center', 'important');
         emptyStateEl.style.setProperty('align-items', 'center', 'important');
-        emptyStateEl.style.setProperty('padding', '4rem 0', 'important');
+        emptyStateEl.style.padding = '';
         return;
     }
 
