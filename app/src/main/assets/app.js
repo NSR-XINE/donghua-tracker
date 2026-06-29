@@ -201,10 +201,14 @@ function renderHeroBanner() {
         };
     });
     
-    // Prioritize shows that are airing right now, otherwise sort by soonest release
+    // Prioritize shows that are airing right now, otherwise sort by soonest release.
+    // If multiple shows are airing concurrently, prioritize the one released most recently (less negative timeDiff).
     computedShows.sort((a, b) => {
         if (a.airingNow && !b.airingNow) return -1;
         if (!a.airingNow && b.airingNow) return 1;
+        if (a.airingNow && b.airingNow) {
+            return b.timeDiff - a.timeDiff;
+        }
         return a.timeDiff - b.timeDiff;
     });
     
