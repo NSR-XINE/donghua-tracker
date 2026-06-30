@@ -1231,27 +1231,26 @@ function closeModal() {
 function enableSwipeToClose(el, closeFn) {
     if (!el) return;
     let sx = 0, sy = 0, dx = 0, dragging = false;
-    const edge = 40;
     el.addEventListener('touchstart', (e) => {
-        const t = e.changedTouches[0];
-        if (t.clientX > edge && t.clientX < window.innerWidth - edge) return;
         if (e.target.closest('.modal-content')) return;
         dragging = true;
-        sx = t.clientX; sy = t.clientY; dx = 0;
-        el.style.transition = 'none';
+        sx = e.changedTouches[0].clientX;
+        sy = e.changedTouches[0].clientY;
+        dx = 0;
     }, { passive: true });
     el.addEventListener('touchmove', (e) => {
         if (!dragging) return;
         const t = e.changedTouches[0];
         dx = t.clientX - sx;
-        if (Math.abs(t.clientY - sy) > Math.abs(dx) * 1.5) { dragging = false; return; }
-        if (Math.abs(dx) > 0) e.preventDefault();
+        if (Math.abs(t.clientY - sy) > Math.abs(dx)) { dragging = false; return; }
+        if (Math.abs(dx) > 10) e.preventDefault();
+        el.style.background = `rgba(0,0,0,${Math.max(0.4, 0.7 - Math.abs(dx) / window.innerWidth * 0.7)})`;
     }, { passive: false });
     el.addEventListener('touchend', () => {
         if (!dragging) return;
         dragging = false;
-        el.style.transition = '';
-        if (Math.abs(dx) > window.innerWidth * 0.25) closeFn();
+        el.style.background = '';
+        if (Math.abs(dx) > window.innerWidth * 0.3) closeFn();
     }, { passive: true });
 }
 
