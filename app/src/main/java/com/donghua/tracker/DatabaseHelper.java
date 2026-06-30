@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "donghua_tracker.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Table names
     public static final String TABLE_SHOWS = "shows";
@@ -31,6 +31,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_SHOW_WATCH_URL = "watch_url";
     public static final String COL_SHOW_COUNTDOWN_URL = "countdown_url";
     public static final String COL_SHOW_NOTES = "notes";
+    public static final String COL_SHOW_SEASON_START = "season_start_date";
+    public static final String COL_SHOW_SEASON_END = "season_end_date";
     public static final String COL_SHOW_IS_FAVORITE = "is_favorite";
     public static final String COL_SHOW_RATING = "rating";
     public static final String COL_SHOW_LAST_UPDATED = "last_updated";
@@ -67,6 +69,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_SHOW_WATCH_URL + " TEXT, " +
                 COL_SHOW_COUNTDOWN_URL + " TEXT, " +
                 COL_SHOW_NOTES + " TEXT, " +
+                COL_SHOW_SEASON_START + " TEXT, " +
+                COL_SHOW_SEASON_END + " TEXT, " +
                 COL_SHOW_IS_FAVORITE + " INTEGER DEFAULT 0, " +
                 COL_SHOW_RATING + " INTEGER DEFAULT 0, " +
                 COL_SHOW_LAST_UPDATED + " INTEGER, " +
@@ -94,9 +98,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Safe incremental migrations to protect user data from drops (Bug 2)
         if (oldVersion < 2) {
-            // For future column updates or table expansions
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_SHOWS + " ADD COLUMN " + COL_SHOW_SEASON_START + " TEXT");
+            } catch (Exception e) { e.printStackTrace(); }
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_SHOWS + " ADD COLUMN " + COL_SHOW_SEASON_END + " TEXT");
+            } catch (Exception e) { e.printStackTrace(); }
         }
     }
 
@@ -120,6 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COL_SHOW_WATCH_URL, showJson.optString("watchUrl", ""));
             values.put(COL_SHOW_COUNTDOWN_URL, showJson.optString("countdownUrl", ""));
             values.put(COL_SHOW_NOTES, showJson.optString("notes", ""));
+            values.put(COL_SHOW_SEASON_START, showJson.optString("seasonStartDate", ""));
+            values.put(COL_SHOW_SEASON_END, showJson.optString("seasonEndDate", ""));
             values.put(COL_SHOW_IS_FAVORITE, showJson.optBoolean("isFavorite", false) ? 1 : 0);
             values.put(COL_SHOW_RATING, showJson.optInt("rating", 0));
             values.put(COL_SHOW_LAST_UPDATED, showJson.optLong("lastUpdated", System.currentTimeMillis()));
@@ -168,6 +178,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(COL_SHOW_WATCH_URL, showJson.optString("watchUrl", ""));
             values.put(COL_SHOW_COUNTDOWN_URL, showJson.optString("countdownUrl", ""));
             values.put(COL_SHOW_NOTES, showJson.optString("notes", ""));
+            values.put(COL_SHOW_SEASON_START, showJson.optString("seasonStartDate", ""));
+            values.put(COL_SHOW_SEASON_END, showJson.optString("seasonEndDate", ""));
             values.put(COL_SHOW_IS_FAVORITE, showJson.optBoolean("isFavorite", false) ? 1 : 0);
             values.put(COL_SHOW_RATING, showJson.optInt("rating", 0));
             values.put(COL_SHOW_LAST_UPDATED, showJson.optLong("lastUpdated", System.currentTimeMillis()));
@@ -212,6 +224,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     obj.put("watchUrl", cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_WATCH_URL)));
                     obj.put("countdownUrl", cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_COUNTDOWN_URL)));
                     obj.put("notes", cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_NOTES)));
+                    obj.put("seasonStartDate", cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_SEASON_START)));
+                    obj.put("seasonEndDate", cursor.getString(cursor.getColumnIndexOrThrow(COL_SHOW_SEASON_END)));
                     obj.put("isFavorite", cursor.getInt(cursor.getColumnIndexOrThrow(COL_SHOW_IS_FAVORITE)) == 1);
                     obj.put("rating", cursor.getInt(cursor.getColumnIndexOrThrow(COL_SHOW_RATING)));
                     obj.put("lastUpdated", cursor.getLong(cursor.getColumnIndexOrThrow(COL_SHOW_LAST_UPDATED)));

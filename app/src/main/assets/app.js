@@ -548,15 +548,13 @@ function renderShowsGrid() {
     const emptyStateEl = document.getElementById('empty-state');
     
     // Determine status filter based on activeTab
-    let statusFilter = '';
+    let statusFilters = [];
     if (activeTab === 'airing') {
-        statusFilter = 'ongoing';
+        statusFilters = ['ongoing'];
     } else if (activeTab === 'stopped') {
-        statusFilter = 'stopped';
+        statusFilters = ['upcoming', 'stopped'];
     } else if (activeTab === 'complete') {
-        statusFilter = 'completed';
-    } else if (activeTab === 'stopped') {
-        statusFilter = 'stopped';
+        statusFilters = ['completed'];
     } else {
         containerEl.innerHTML = '';
         return;
@@ -567,7 +565,7 @@ function renderShowsGrid() {
         const matchesSearch = show.title.toLowerCase().includes(filters.search.toLowerCase()) || 
                              (show.titleZh && show.titleZh.toLowerCase().includes(filters.search.toLowerCase())) ||
                              (show.notes && show.notes.toLowerCase().includes(filters.search.toLowerCase()));
-        return matchesSearch && show.status === statusFilter;
+        return matchesSearch && statusFilters.includes(show.status);
     });
     
     // Sort array
@@ -663,11 +661,9 @@ function renderShowsGrid() {
     if (activeTab === 'airing') {
         sectionTitle = '📡 Currently Airing';
     } else if (activeTab === 'stopped') {
-        sectionTitle = '🚀 Upcoming Releases';
+        sectionTitle = '📅 Upcoming & On Hiatus';
     } else if (activeTab === 'complete') {
         sectionTitle = '✅ Completed Series';
-    } else if (activeTab === 'stopped') {
-        sectionTitle = '🛑 Stopped / Paused';
     }
     
     let html = `
@@ -1137,6 +1133,8 @@ function importData(jsonString) {
         }
         
         shows = parsed;
+        existingShowIds.clear();
+        shows.forEach(s => existingShowIds.add(s.id));
         localStorage.setItem('donghua_shows', JSON.stringify(shows));
         saveState();
         alert('Import successful! ' + shows.length + ' shows loaded.');
@@ -1173,8 +1171,10 @@ function saveState() {
                 window.AndroidApp.dbInsertShow(JSON.stringify(show));
                 existingShowIds.add(show.id);
             }
-            syncAlarm(show);
         });
+        if (window.AndroidApp.syncAllAlarms) {
+            window.AndroidApp.syncAllAlarms();
+        }
     } else {
         localStorage.setItem('donghua_shows', JSON.stringify(shows));
     }

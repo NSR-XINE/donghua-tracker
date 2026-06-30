@@ -58,7 +58,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setAutoCancel(true)
                 .setContentIntent(pi);
 
-        int notifyId = alarmCode != -1 ? alarmCode : (showId != null ? showId.hashCode() : (int) System.currentTimeMillis());
+        int notifyId = alarmCode != -1 ? alarmCode : (showId != null ? Math.abs(showId.hashCode()) : (int) System.currentTimeMillis());
         nm.notify(notifyId, builder.build());
 
         // Reschedule for the following week automatically (Bug 3)

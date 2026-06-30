@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         String targetShowId = intent.getStringExtra("target_show_id");
         if (targetShowId != null && webView != null) {
             webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 500);", null);
+            getIntent().removeExtra("target_show_id");
         }
     }
 
@@ -403,6 +404,33 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     try {
                         AlarmScheduler.cancel(MainActivity.this, id, alarmCode);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            @JavascriptInterface
+            public void syncAllAlarms() {
+                runOnUiThread(() -> {
+                    try {
+                        String showsJson = dbHelper.getAllShows();
+                        org.json.JSONArray arr = new org.json.JSONArray(showsJson);
+                        for (int i = 0; i < arr.length(); i++) {
+                            org.json.JSONObject show = arr.getJSONObject(i);
+                            String id = show.getString("id");
+                            String title = show.getString("title");
+                            String status = show.optString("status", "ongoing");
+                            int alarmCode = show.optInt("alarmRequestCode", Math.abs(id.hashCode()));
+
+                            if ("ongoing".equals(status)) {
+                                AlarmScheduler.schedule(MainActivity.this, id, title,
+                                    show.optString("releaseDay", "Sunday"),
+                                    show.optString("releaseTime", "10:00"), alarmCode);
+                            } else {
+                                AlarmScheduler.cancel(MainActivity.this, id, alarmCode);
+                            }
+                        }
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
