@@ -777,8 +777,8 @@ function updateTimers() {
     // 2. Update the Hero Banner countdown in-place
     const heroCountdownBox = document.getElementById('hero-countdown-box');
     if (heroCountdownBox) {
-        const heroCard = document.querySelector('.hero-banner-card');
-        const heroShowId = heroCard ? heroCard.dataset.id : null;
+        const heroBanner = document.getElementById('next-up-banner');
+        const heroShowId = heroBanner ? heroBanner.dataset.id : null;
         if (heroShowId) {
             const show = shows.find(s => s.id === heroShowId);
             if (show && show.status === 'ongoing') {
