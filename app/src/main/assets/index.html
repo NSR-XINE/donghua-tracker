@@ -323,9 +323,10 @@
                         <div class="form-group col-6">
                             <label for="show-status">Status *</label>
                             <select id="show-status" required>
+                                <option value="ongoing">Airing</option>
                                 <option value="upcoming">Upcoming</option>
                                 <option value="completed">Completed</option>
-                                <option value="stopped">Stopped</option>
+                                <option value="stopped">Stopped / Hiatus</option>
                             </select>
                         </div>
                         <div class="form-group col-6">
@@ -361,9 +362,26 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group col-12">
-                            <label for="show-current-ep">Current Watched Episode *</label>
+                        <div class="form-group col-6">
+                            <label for="show-current-ep">Watched Episodes *</label>
                             <input type="number" id="show-current-ep" min="0" required value="0">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="show-total-ep">Total Episodes (Optional)</label>
+                            <input type="number" id="show-total-ep" min="0" value="0" placeholder="0 = unknown">
+                        </div>
+                    </div>
+
+                    <div class="form-row season-date-inputs">
+                        <div class="form-group col-6">
+                            <label for="show-season-start">Season Start Date</label>
+                            <input type="date" id="show-season-start">
+                            <small class="form-help">Auto-switches Upcoming → Airing on this date.</small>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="show-season-end">Season End Date</label>
+                            <input type="date" id="show-season-end">
+                            <small class="form-help">Auto-switches Airing → Completed on this date.</small>
                         </div>
                     </div>
 
@@ -420,9 +438,9 @@
             <i class="fa-solid fa-circle-check"></i>
             <span>Complete</span>
         </button>
-        <button class="nav-item" id="nav-btn-stopped" onclick="switchTab('stopped')">
-            <i class="fa-solid fa-circle-stop"></i>
-            <span>Stopped</span>
+        <button class="nav-item" id="nav-btn-airing" onclick="switchTab('airing')">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <span>Airing</span>
         </button>
     </nav>
 
