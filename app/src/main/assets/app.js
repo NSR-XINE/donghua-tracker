@@ -1810,10 +1810,11 @@ function switchTab(tabName) {
         // Desktop Viewport: Restore standard styles and clear important display sets
         if (searchPanel) searchPanel.style.display = '';
         if (scheduleContainer) scheduleContainer.style.display = '';
-        if (heroBanner) heroBanner.style.display = '';
         if (sectionsContainer) sectionsContainer.style.display = '';
         if (controlPanel) controlPanel.style.display = '';
         if (contentArea) contentArea.style.display = '';
+        // Re-render the hero banner so it's visible with correct styling
+        renderHeroBanner();
     }
 
     // Toggle stats-panel display based on active tab globally (home-only)

@@ -245,10 +245,10 @@ input, textarea {
 /* ==========================================
    BANNER COMPONENT (HERO COUNTDOWN)
    ========================================== */
-.banner-section {
+#next-up-banner.banner-section {
     background: linear-gradient(135deg, rgba(20, 26, 38, 0.8), rgba(10, 12, 20, 0.95));
     border: 1px solid rgba(0, 242, 254, 0.2);
-    border-radius: 16px;
+    border-radius: 16px !important;
     padding: 1.2rem 1.5rem;
     margin-top: 1rem;
     margin-bottom: 2.5rem;
@@ -1818,20 +1818,20 @@ body.light-theme .stars-bg {
 }
 
 /* Force light/white text inside banner components for readable contrast against the dark poster gradients */
-.banner-section .banner-title {
+#next-up-banner.banner-section .banner-title {
     color: #ffffff !important;
 }
-.banner-section .banner-meta,
-.banner-section .banner-meta span {
+#next-up-banner.banner-section .banner-meta,
+#next-up-banner.banner-section .banner-meta span {
     color: rgba(255, 255, 255, 0.7) !important;
 }
-.banner-section .countdown-box .num {
+#next-up-banner.banner-section .countdown-box .num {
     color: #ffffff !important;
 }
-.banner-section .countdown-box .label {
+#next-up-banner.banner-section .countdown-box .label {
     color: rgba(255, 255, 255, 0.6) !important;
 }
-.banner-section .banner-badge {
+#next-up-banner.banner-section .banner-badge {
     background: rgba(0, 242, 254, 0.15) !important;
     color: #00f2fe !important;
     border-color: rgba(0, 242, 254, 0.4) !important;
