@@ -1555,6 +1555,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         saveState();
         closeModal();
+        setTimeout(() => {
+            updateStats();
+            renderWeeklySchedule();
+            renderHeroBanner();
+            renderShowsGrid();
+        }, 1000);
         
         if (!newShowData.poster) {
             if (newShowData.watchUrl && newShowData.watchUrl.startsWith('https://donghuastream.org/')) {
