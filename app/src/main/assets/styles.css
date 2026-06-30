@@ -530,6 +530,7 @@ input, textarea {
     max-height: 360px;
     overflow-y: auto;
     padding-right: 0.4rem;
+    padding-bottom: 70px;
 }
 
 .schedule-item {
