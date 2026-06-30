@@ -452,6 +452,7 @@ input, textarea {
    WEEKLY SCHEDULE CALENDAR
    ========================================== */
 .schedule-container {
+    margin-top: 1rem;
 }
 
 .schedule-header {
