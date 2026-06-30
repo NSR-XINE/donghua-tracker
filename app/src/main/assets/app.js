@@ -292,27 +292,27 @@ function renderHeroBanner() {
     }
     
     const bannerGradient = getPosterGradient(show.title);
-    if (show.poster) {
-        bannerEl.style.background = `linear-gradient(135deg, rgba(10, 12, 20, 0.75), rgba(5, 6, 10, 0.95)), url(${show.poster}) center/cover no-repeat`;
-    } else {
-        bannerEl.style.background = `linear-gradient(135deg, rgba(20, 26, 38, 0.9), rgba(10, 12, 20, 0.98)), ${bannerGradient}`;
-    }
+    const imageStyle = `background-image: ${show.poster ? `url(${show.poster})` : bannerGradient}`;
     
+    bannerEl.style.background = 'none';
     bannerEl.setAttribute('data-id', show.id);
     bannerEl.innerHTML = `
-        <div class="banner-details">
-            <span class="banner-badge">
-                <i class="fa-solid ${isAiring ? 'fa-satellite-dish' : 'fa-clock'}"></i> 
-                ${isAiring ? 'Live Release' : 'Next Airing'}
-            </span>
-            <h2 class="banner-title">${show.title}</h2>
-            <div class="banner-meta">
-                <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
-                <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
-                <span><span onclick="openWatchScreen(window.getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
+        <div class="banner-image-wrap" style="${imageStyle}"></div>
+        <div class="banner-info-section">
+            <div class="banner-details">
+                <span class="banner-badge">
+                    <i class="fa-solid ${isAiring ? 'fa-satellite-dish' : 'fa-clock'}"></i> 
+                    ${isAiring ? 'Live Release' : 'Next Airing'}
+                </span>
+                <h2 class="banner-title">${show.title}</h2>
+                <div class="banner-meta">
+                    <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
+                    <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
+                    <span><span onclick="openWatchScreen(window.getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
+                </div>
             </div>
+            ${countdownHtml}
         </div>
-        ${countdownHtml}
     `;
 }
 
