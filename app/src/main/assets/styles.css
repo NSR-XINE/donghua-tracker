@@ -254,6 +254,7 @@ input, textarea {
     margin-bottom: 2.5rem;
     position: relative;
     overflow: hidden;
+    isolation: isolate;
     box-shadow: var(--shadow-neon-cyan);
     display: flex;
     justify-content: space-between;
@@ -265,11 +266,11 @@ input, textarea {
 .banner-section::after {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(0, 242, 254, 0.15) 0%, rgba(0,0,0,0) 70%);
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse 400px 400px at top right, rgba(0, 242, 254, 0.15) 0%, rgba(0,0,0,0) 70%);
     pointer-events: none;
 }
 
@@ -791,6 +792,12 @@ input, textarea {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    color: #f3f5f9;
+}
+
+body.light-theme .card-title,
+body.amoled .card-title {
+    color: #f3f5f9;
 }
 
 .card-title-zh {
