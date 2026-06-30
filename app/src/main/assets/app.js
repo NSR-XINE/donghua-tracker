@@ -47,43 +47,26 @@ shows.forEach(s => existingShowIds.add(s.id));
  */
 function getStatusDisplayName(status) {
     if (status === 'ongoing') return 'Airing';
-    if (status === 'upcoming') return 'Upcoming';
     if (status === 'completed') return 'Completed';
     if (status === 'stopped') return 'Hiatus';
     return status;
 }
 
 /**
- * Automatically checks and migrates status values for shows based on start dates
- * and watch progress (ongoing <-> completed).
+ * Automatically migrates status values based on watch progress.
  */
 function checkAndMigrateStatuses() {
     let changed = false;
     const now = new Date();
     shows.forEach(show => {
-        // 1. Upcoming -> Ongoing if seasonStartDate has arrived or passed
-        if (show.status === 'upcoming' && show.seasonStartDate) {
-            const startDate = new Date(show.seasonStartDate);
-            startDate.setHours(0, 0, 0, 0);
-            if (now >= startDate) {
-                show.status = 'ongoing';
-                show.lastUpdated = Date.now();
-                changed = true;
-            }
+        // Migrate legacy upcoming status to stopped
+        if (show.status === 'upcoming') {
+            show.status = 'stopped';
+            show.lastUpdated = Date.now();
+            changed = true;
         }
 
-        // 2. Ongoing -> Completed if seasonEndDate has passed
-        if (show.status === 'ongoing' && show.seasonEndDate) {
-            const endDate = new Date(show.seasonEndDate);
-            endDate.setHours(23, 59, 59, 999); // End of that day
-            if (now > endDate) {
-                show.status = 'completed';
-                show.lastUpdated = Date.now();
-                changed = true;
-            }
-        }
-
-        // 3. Ongoing -> Completed if totalEp is set and currentEp has reached it
+        // 1. Ongoing -> Completed if totalEp is set and currentEp has reached it
         if (show.status === 'ongoing' && show.totalEp && show.totalEp > 0 && show.currentEp >= show.totalEp) {
             show.status = 'completed';
             show.lastUpdated = Date.now();
@@ -227,15 +210,12 @@ function updateStats() {
     const total = shows.length;
     const ongoing = shows.filter(s => s.status === 'ongoing').length;
     const completed = shows.filter(s => s.status === 'completed').length;
-    const upcoming = shows.filter(s => s.status === 'upcoming').length;
     const totalEpisodes = shows.reduce((sum, s) => sum + (s.currentEp || 0), 0);
     
     document.getElementById('stat-total').innerText = total;
     document.getElementById('stat-watching').innerText = ongoing;
     document.getElementById('stat-completed').innerText = completed;
     document.getElementById('stat-episodes').innerText = totalEpisodes;
-    const upcomingStatEl = document.getElementById('stat-upcoming');
-    if (upcomingStatEl) upcomingStatEl.innerText = upcoming;
 }
 
 /**
@@ -452,25 +432,11 @@ function fetchPosterFromJikan(showId, title) {
  */
 function renderWeeklySchedule() {
     const listEl = document.getElementById('schedule-list');
-    // Include ongoing shows + upcoming shows that have a premiere this week (via seasonStartDate)
     const now = new Date();
     const ongoingShows = shows.filter(s => s.status === 'ongoing');
-    // Upcoming shows with a seasonStartDate in the next 7 days get a "Premiere" entry
-    const premiereShows = shows.filter(s => {
-        if (s.status !== 'upcoming' || !s.seasonStartDate) return false;
-        const startDate = new Date(s.seasonStartDate);
-        const daysDiff = Math.floor((startDate - now) / (1000 * 60 * 60 * 24));
-        return daysDiff >= 0 && daysDiff < 7;
-    }).map(s => ({
-        ...s,
-        releaseDay: DAYS_ARRAY[new Date(s.seasonStartDate).getDay()],
-        releaseTime: s.releaseTime || '00:00',
-        _isPremiere: true
-    }));
     const selectedDay = filters.scheduleDay;
     
-    // Merge ongoing + premieres for the schedule view
-    const allSchedulable = [...ongoingShows, ...premiereShows];
+    const allSchedulable = [...ongoingShows];
     const scheduledShows = allSchedulable.filter(s => {
         if (selectedDay === 'all') return true;
         return s.releaseDay === selectedDay;
@@ -514,14 +480,11 @@ function renderWeeklySchedule() {
         `;
         
         html += dayShows.map(show => {
-            const isPremiere = show._isPremiere === true;
             return `
-                <div class="schedule-item" onclick="window.openDetailsById('${show.id}')" style="cursor: pointer; ${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''} ${isPremiere ? 'border-color: rgba(0, 242, 254, 0.3); background: rgba(0,242,254,0.02);' : ''}">
+                <div class="schedule-item" onclick="window.openDetailsById('${show.id}')" style="cursor: pointer; ${isToday ? 'border-color: rgba(157, 78, 221, 0.3); background: rgba(157,78,221,0.02)' : ''}">
                     <div class="schedule-item-name">
-                        ${isToday && !isPremiere ? '<i class="fa-solid fa-circle-play" style="color: var(--accent-purple); font-size: 0.75rem; animation: pulse 1.5s infinite"></i>' : ''}
-                        ${isPremiere ? '<i class="fa-solid fa-star" style="color: var(--accent-cyan); font-size: 0.7rem;"></i>' : ''}
+                        ${isToday ? '<i class="fa-solid fa-circle-play" style="color: var(--accent-purple); font-size: 0.75rem; animation: pulse 1.5s infinite"></i>' : ''}
                         <span>${show.title}</span>
-                        ${isPremiere ? '<span style="font-size: 0.65rem; background: rgba(0,242,254,0.15); color: var(--accent-cyan); border-radius: 4px; padding: 0.05rem 0.3rem; margin-left: 0.2rem;">PREMIERE</span>' : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem">
                         <span class="schedule-item-time" style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="color: var(--accent-purple); margin-right: 0.2rem;"></i> ${show.releaseTime}</span>
@@ -552,7 +515,7 @@ function renderShowsGrid() {
     if (activeTab === 'airing') {
         statusFilters = ['ongoing'];
     } else if (activeTab === 'stopped') {
-        statusFilters = ['upcoming', 'stopped'];
+        statusFilters = ['stopped'];
     } else if (activeTab === 'complete') {
         statusFilters = ['completed'];
     } else {
@@ -577,10 +540,7 @@ function renderShowsGrid() {
         } else if (filters.sortBy === 'last-updated') {
             return (b.lastUpdated || 0) - (a.lastUpdated || 0);
         } else if (activeTab === 'stopped') {
-            // Default for upcoming: sort by start date ascending (soonest first)
-            const dateA = a.seasonStartDate ? new Date(a.seasonStartDate).getTime() : Infinity;
-            const dateB = b.seasonStartDate ? new Date(b.seasonStartDate).getTime() : Infinity;
-            return dateA - dateB;
+            return a.title.localeCompare(b.title);
         } else if (activeTab === 'airing') {
             // Default for airing: sort by next release countdown (soonest episode first)
             const schedA = getNextReleaseDate(a.releaseDay, a.releaseTime);
@@ -620,7 +580,6 @@ function renderShowsGrid() {
         if (filters.search === '') {
             const tabLabels = {
                 airing: 'Currently Airing',
-                upcoming: 'Upcoming',
                 complete: 'Completed',
                 stopped: 'Stopped / Hiatus'
             };
@@ -629,7 +588,7 @@ function renderShowsGrid() {
             msgText = activeTab === 'airing'
                 ? "You don't have any shows marked as Airing. Add a show or change its status to Airing!"
                 : activeTab === 'stopped'
-                    ? "No upcoming shows tracked. Add a show and set its status to Upcoming!"
+                    ? "No stopped shows tracked. Add a show and set its status to Stopped / Hiatus!"
                     : `You don't have any shows marked as ${tabLabel} in your watchlist.`;
         }
         
@@ -708,54 +667,6 @@ function renderShowsGrid() {
                         <i class="fa-solid fa-circle-check"></i> Series Completed
                     </div>
                 `;
-            } else if (show.status === 'upcoming') {
-                // If we know the premiere date, show a real countdown to it
-                if (show.seasonStartDate) {
-                    const premiereDate = new Date(show.seasonStartDate);
-                    premiereDate.setHours(
-                        show.releaseTime ? parseInt(show.releaseTime.split(':')[0]) : 0,
-                        show.releaseTime ? parseInt(show.releaseTime.split(':')[1]) : 0,
-                        0, 0
-                    );
-                    const now = new Date();
-                    if (now >= premiereDate) {
-                        clockHtml = `
-                            <div class="card-countdown" style="background: rgba(0, 242, 254, 0.1); border-color: rgba(0, 242, 254, 0.3)">
-                                <div class="c-item" style="width: 100%">
-                                    <div class="c-val" style="font-size: 0.95rem; animation: pulse 1s infinite">PREMIERING TODAY</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        const premTime = calculateTimeRemaining(premiereDate);
-                        clockHtml = `
-                            <div class="card-countdown" style="background: rgba(157, 78, 221, 0.06); border-color: rgba(157,78,221,0.25)">
-                                <div class="c-item">
-                                    <div class="c-val">${String(premTime.days).padStart(2, '0')}</div>
-                                    <div class="c-lbl">D</div>
-                                </div>
-                                <div class="c-item">
-                                    <div class="c-val">${String(premTime.hours).padStart(2, '0')}</div>
-                                    <div class="c-lbl">H</div>
-                                </div>
-                                <div class="c-item">
-                                    <div class="c-val">${String(premTime.minutes).padStart(2, '0')}</div>
-                                    <div class="c-lbl">M</div>
-                                </div>
-                                <div class="c-item">
-                                    <div class="c-val">${String(premTime.seconds).padStart(2, '0')}</div>
-                                    <div class="c-lbl">S</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                } else {
-                    clockHtml = `
-                        <div class="card-countdown upcoming-state">
-                            <i class="fa-solid fa-calendar-days"></i> Premiere Date TBA
-                        </div>
-                    `;
-                }
             } else {
                 // Ongoing
                 const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
@@ -818,15 +729,9 @@ function renderShowsGrid() {
                         <!-- Schedule Info -->
                         <div class="card-schedule-info">
                             <i class="fa-regular fa-calendar"></i>
-                            ${show.status === 'upcoming'
-                                ? (show.seasonStartDate
-                                    ? `<span>Premieres ${new Date(show.seasonStartDate).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}</span>`
-                                    : '<span style="color: var(--text-muted)">Premiere TBA</span>')
-                                : show.status === 'completed'
-                                    ? (show.seasonEndDate
-                                        ? `<span>Ended ${new Date(show.seasonEndDate).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}</span>`
-                                        : '<span>Series Complete</span>')
-                                    : `<span>${show.releaseDay}s at ${show.releaseTime}</span>`
+                            ${show.status === 'completed'
+                                ? '<span>Series Complete</span>'
+                                : `<span>${show.releaseDay}s at ${show.releaseTime}</span>`
                             }
                         </div>
                         
@@ -959,29 +864,6 @@ function updateTimers() {
                             </div>
                         `;
                     }
-                }
-            }
-        } else if (show.status === 'upcoming' && show.seasonStartDate) {
-            // Tick premiere countdown for upcoming shows
-            const premiereDate = new Date(show.seasonStartDate);
-            premiereDate.setHours(
-                show.releaseTime ? parseInt(show.releaseTime.split(':')[0]) : 0,
-                show.releaseTime ? parseInt(show.releaseTime.split(':')[1]) : 0,
-                0, 0
-            );
-            const now2 = new Date();
-            if (now2 >= premiereDate) {
-                // Premiere has passed — trigger auto-migration and re-render
-                checkAndMigrateStatuses();
-                renderShowsGrid();
-            } else {
-                const time = calculateTimeRemaining(premiereDate);
-                const valEls = cdEl.querySelectorAll('.c-val');
-                if (valEls.length === 4) {
-                    valEls[0].innerText = String(time.days).padStart(2, '0');
-                    valEls[1].innerText = String(time.hours).padStart(2, '0');
-                    valEls[2].innerText = String(time.minutes).padStart(2, '0');
-                    valEls[3].innerText = String(time.seconds).padStart(2, '0');
                 }
             }
         }
@@ -1240,15 +1122,9 @@ function openDetailsModal(show) {
             <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
                     <span class="status-badge ${statusClass}" style="padding: 0.2rem 0.5rem; font-size: 0.65rem; border-radius: 4px; text-transform: uppercase;">${statusText}</span>
-                    ${show.status === 'upcoming'
-                        ? (show.seasonStartDate
-                            ? `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-rocket" style="margin-right: 0.2rem; color: var(--accent-cyan);"></i> Premieres ${new Date(show.seasonStartDate).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'})}</span>`
-                            : '<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="margin-right: 0.2rem;"></i> Premiere TBA</span>')
-                        : show.status === 'completed'
-                            ? (show.seasonEndDate
-                                ? `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-circle-check" style="margin-right: 0.2rem; color: #4ade80;"></i> Ended ${new Date(show.seasonEndDate).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}</span>`
-                                : '<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-circle-check" style="margin-right: 0.2rem;"></i> Series Complete</span>')
-                            : `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="margin-right: 0.2rem;"></i> ${show.releaseDay}s at ${show.releaseTime}</span>`
+                    ${show.status === 'completed'
+                        ? '<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-circle-check" style="margin-right: 0.2rem;"></i> Series Complete</span>'
+                        : `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="margin-right: 0.2rem;"></i> ${show.releaseDay}s at ${show.releaseTime}</span>`
                     }
                     ${show.totalEp ? `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-film" style="margin-right: 0.2rem;"></i> ${show.totalEp} eps total</span>` : ''}
                 </div>
@@ -1267,7 +1143,6 @@ function openDetailsModal(show) {
             </p>
         </div>
 
-        ${show.status !== 'upcoming' ? `
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <h4 style="font-size: 0.8rem; color: #fff; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Episodes ${show.totalEp ? `<span style="font-weight:400; color: var(--text-muted);">(${show.currentEp}/${show.totalEp})</span>` : ''}</h4>
@@ -1277,12 +1152,6 @@ function openDetailsModal(show) {
                 ${epPills}
             </div>
         </div>
-        ` : `
-        <div style="text-align: center; padding: 0.75rem; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-clock" style="color: var(--accent-purple); margin-bottom: 0.3rem; font-size: 1.2rem;"></i>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Episode tracking begins when the show starts airing.</p>
-        </div>
-        `}
     `;
 
     // Add click listeners to the episode buttons inside details modal
@@ -1326,7 +1195,6 @@ function openModal(showData = null) {
     if (statusSelect) {
         statusSelect.innerHTML = `
             <option value="ongoing">Airing</option>
-            <option value="upcoming">Upcoming</option>
             <option value="completed">Completed</option>
             <option value="stopped">Stopped / Hiatus</option>
         `;
@@ -1348,8 +1216,6 @@ function openModal(showData = null) {
         document.getElementById('show-release-time').value = showData.releaseTime;
         document.getElementById('show-current-ep').value = showData.currentEp;
         if (document.getElementById('show-total-ep')) document.getElementById('show-total-ep').value = showData.totalEp || 0;
-        if (document.getElementById('show-season-start')) document.getElementById('show-season-start').value = showData.seasonStartDate || '';
-        if (document.getElementById('show-season-end')) document.getElementById('show-season-end').value = showData.seasonEndDate || '';
         document.getElementById('show-poster').value = showData.poster || '';
         document.getElementById('show-notes').value = showData.notes || '';
     } else {
@@ -1362,14 +1228,6 @@ function openModal(showData = null) {
         document.getElementById('show-release-time').value = '10:00';
         document.getElementById('show-current-ep').value = 0;
         if (document.getElementById('show-total-ep')) document.getElementById('show-total-ep').value = 0;
-        if (document.getElementById('show-season-start')) document.getElementById('show-season-start').value = '';
-        if (document.getElementById('show-season-end')) document.getElementById('show-season-end').value = '';
-    }
-    
-    // Update field visibility for the current status
-    if (typeof updateFormFieldVisibility === 'function') {
-        const currentStatus = document.getElementById('show-status')?.value || 'ongoing';
-        updateFormFieldVisibility(currentStatus);
     }
 
     modalEl.style.display = 'flex';
@@ -1565,7 +1423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (malStatus.includes('finished airing')) {
                         statusSelect.value = 'completed';
                     } else if (malStatus.includes('not yet aired')) {
-                        statusSelect.value = 'upcoming';
+                        statusSelect.value = 'stopped';
                     }
                 }
             }
@@ -1578,23 +1436,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Auto-fill Season Start Date from MAL aired.from
-            if (entry.aired && entry.aired.from) {
-                const startDateStr = entry.aired.from.split('T')[0]; // ISO date only
-                const seasonStartEl = document.getElementById('show-season-start');
-                if (seasonStartEl && !seasonStartEl.value) {
-                    seasonStartEl.value = startDateStr;
-                }
-            }
 
-            // Auto-fill Season End Date from MAL aired.to (finished shows)
-            if (entry.aired && entry.aired.to) {
-                const endDateStr = entry.aired.to.split('T')[0];
-                const seasonEndEl = document.getElementById('show-season-end');
-                if (seasonEndEl && !seasonEndEl.value) {
-                    seasonEndEl.value = endDateStr;
-                }
-            }
             
             if (!silent) alert('Auto-filled title, synopsis, poster, status, and dates from MyAnimeList!');
         };
@@ -1645,29 +1487,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Toggle form field visibility based on status selection
-    function updateFormFieldVisibility(status) {
-        const scheduleRow = document.querySelector('.schedule-inputs');
-        const seasonDateRow = document.querySelector('.season-date-inputs');
-        if (scheduleRow) {
-            // Ongoing and Completed shows have known/past release days; hide for upcoming (TBA)
-            scheduleRow.style.display = (status === 'upcoming') ? 'none' : '';
-        }
-        if (seasonDateRow) {
-            // Season dates matter for upcoming (start) and ongoing/completed (both); always show
-            seasonDateRow.style.display = '';
-        }
-    }
 
-    const showStatusSelect = document.getElementById('show-status');
-    if (showStatusSelect) {
-        showStatusSelect.addEventListener('change', (e) => {
-            updateFormFieldVisibility(e.target.value);
-        });
-        // Apply on modal open too (called from openModal via MutationObserver trick won't work,
-        // so we patch openModal itself to call this — but as a safety net also set on load)
-        updateFormFieldVisibility(showStatusSelect.value);
-    }
 
 
     
@@ -1684,8 +1504,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const showId = document.getElementById('show-id').value;
         const totalEpVal = parseInt(document.getElementById('show-total-ep')?.value) || 0;
-        const seasonStartVal = document.getElementById('show-season-start')?.value || '';
-        const seasonEndVal = document.getElementById('show-season-end')?.value || '';
         const newShowData = {
             title: document.getElementById('show-title').value.trim(),
             titleZh: document.getElementById('show-title-zh').value.trim(),
@@ -1696,8 +1514,6 @@ document.addEventListener('DOMContentLoaded', () => {
             releaseTime: document.getElementById('show-release-time').value,
             currentEp: parseInt(document.getElementById('show-current-ep').value) || 0,
             totalEp: totalEpVal,
-            seasonStartDate: seasonStartVal,
-            seasonEndDate: seasonEndVal,
             poster: document.getElementById('show-poster').value.trim(),
             notes: document.getElementById('show-notes').value.trim(),
             lastUpdated: Date.now()
@@ -1959,7 +1775,7 @@ function switchTab(tabName) {
                     emptyStateEl.style.setProperty('display', 'flex', 'important');
                 }
             }
-        } else if (tabName === 'airing' || tabName === 'upcoming' || tabName === 'complete' || tabName === 'stopped') {
+        } else if (tabName === 'airing' || tabName === 'complete' || tabName === 'stopped') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             renderShowsGrid();
