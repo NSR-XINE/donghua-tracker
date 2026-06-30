@@ -260,7 +260,7 @@ function renderHeroBanner() {
     let countdownHtml = '';
     if (isAiring) {
         countdownHtml = `
-            <div class="banner-countdown">
+            <div class="banner-countdown" id="hero-countdown-box">
                 <div class="countdown-box" style="border-color: var(--accent-cyan); min-width: 250px;">
                     <div class="num" style="font-size: 1.6rem; animation: pulse 1s infinite;">AIRING NOW</div>
                     <div class="label">Episode ${show.currentEp + 1} Released!</div>
@@ -270,7 +270,7 @@ function renderHeroBanner() {
     } else {
         const time = calculateTimeRemaining(nextUp.targetDate);
         countdownHtml = `
-            <div class="banner-countdown">
+            <div class="banner-countdown" id="hero-countdown-box">
                 <div class="countdown-box">
                     <div class="num">${String(time.days).padStart(2, '0')}</div>
                     <div class="label">Days</div>
