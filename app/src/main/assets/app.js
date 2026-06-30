@@ -1228,31 +1228,35 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 }
 
-function enableSwipeToClose(el, closeFn) {
-    if (!el) return;
-    let sx = 0, sy = 0, dx = 0, dragging = false;
-    el.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.modal-content')) return;
-        dragging = true;
-        sx = e.changedTouches[0].clientX;
-        sy = e.changedTouches[0].clientY;
-        dx = 0;
-    }, { passive: true });
-    el.addEventListener('touchmove', (e) => {
-        if (!dragging) return;
-        const t = e.changedTouches[0];
-        dx = t.clientX - sx;
-        if (Math.abs(t.clientY - sy) > Math.abs(dx)) { dragging = false; return; }
-        if (Math.abs(dx) > 10) e.preventDefault();
-        el.style.background = `rgba(0,0,0,${Math.max(0.4, 0.7 - Math.abs(dx) / window.innerWidth * 0.7)})`;
-    }, { passive: false });
-    el.addEventListener('touchend', () => {
-        if (!dragging) return;
-        dragging = false;
-        el.style.background = '';
-        if (Math.abs(dx) > window.innerWidth * 0.3) closeFn();
-    }, { passive: true });
+// Intercept system back gesture to close modals
+window.addEventListener('popstate', () => {
+    const settingsEl = document.getElementById('settings-modal');
+    const donghuaEl = document.getElementById('donghua-modal');
+    if (settingsEl?.style.display === 'flex') {
+        closeSettingsModal();
+    } else if (donghuaEl?.style.display === 'flex') {
+        closeModal();
+    }
+});
+
+const _origOpenSettings = window.openSettingsModal;
+window.openSettingsModal = function() { _origOpenSettings(); history.pushState({m:1}, ''); };
+
+const _origOpenModal = openModal;
+window.openModal = function(d) { _origOpenModal(d); history.pushState({m:1}, ''); };
+
+// Remove stale modal state when closing normally
+function popModalState() {
+    if (history.state?.m) history.replaceState({}, '');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Override close functions to clean up history state
+    const _closeModal = closeModal;
+    closeModal = function() { _closeModal(); popModalState(); };
+    const _closeSettings = closeSettingsModal;
+    closeSettingsModal = function() { _closeSettings(); popModalState(); };
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme Mode
@@ -1353,7 +1357,6 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal.addEventListener('click', (e) => {
             if (e.target.id === 'settings-modal') window.closeSettingsModal();
         });
-        enableSwipeToClose(settingsModal, closeSettingsModal);
     }
     
     if (btnSubmitImport && importTextarea) {
@@ -1514,7 +1517,6 @@ document.addEventListener('DOMContentLoaded', () => {
     donghuaModal.addEventListener('click', (e) => {
         if (e.target.id === 'donghua-modal') closeModal();
     });
-    enableSwipeToClose(donghuaModal, closeModal);
     
     // Form Submission
     document.getElementById('donghua-form').addEventListener('submit', (e) => {
@@ -1822,7 +1824,7 @@ function switchTab(tabName) {
 }
 
 function triggerAddModal() {
-    openModal();
+    window.openModal();
 }
 
 // Re-evaluate layouts on window size changes
