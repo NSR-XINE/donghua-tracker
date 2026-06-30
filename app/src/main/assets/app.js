@@ -1228,6 +1228,33 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 }
 
+function enableSwipeToClose(el, closeFn) {
+    if (!el) return;
+    let sx = 0, sy = 0, dx = 0, dragging = false;
+    const edge = 40;
+    el.addEventListener('touchstart', (e) => {
+        const t = e.changedTouches[0];
+        if (t.clientX > edge && t.clientX < window.innerWidth - edge) return;
+        if (e.target.closest('.modal-content')) return;
+        dragging = true;
+        sx = t.clientX; sy = t.clientY; dx = 0;
+        el.style.transition = 'none';
+    }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        const t = e.changedTouches[0];
+        dx = t.clientX - sx;
+        if (Math.abs(t.clientY - sy) > Math.abs(dx) * 1.5) { dragging = false; return; }
+        if (Math.abs(dx) > 0) e.preventDefault();
+    }, { passive: false });
+    el.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        el.style.transition = '';
+        if (Math.abs(dx) > window.innerWidth * 0.25) closeFn();
+    }, { passive: true });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme Mode
     const savedTheme = localStorage.getItem('app_theme') || 'dark';
@@ -1327,6 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal.addEventListener('click', (e) => {
             if (e.target.id === 'settings-modal') window.closeSettingsModal();
         });
+        enableSwipeToClose(settingsModal, closeSettingsModal);
     }
     
     if (btnSubmitImport && importTextarea) {
@@ -1483,9 +1511,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Close buttons
     document.getElementById('btn-close-modal').addEventListener('click', closeModal);
     document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
-    document.getElementById('donghua-modal').addEventListener('click', (e) => {
+    const donghuaModal = document.getElementById('donghua-modal');
+    donghuaModal.addEventListener('click', (e) => {
         if (e.target.id === 'donghua-modal') closeModal();
     });
+    enableSwipeToClose(donghuaModal, closeModal);
     
     // Form Submission
     document.getElementById('donghua-form').addEventListener('submit', (e) => {
