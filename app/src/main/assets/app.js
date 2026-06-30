@@ -256,7 +256,6 @@ function renderHeroBanner() {
     const isAiring = nextUp.airingNow;
     
     bannerEl.style.display = 'flex';
-    bannerEl.style.setProperty('border-radius', '16px', 'important');
     
     let countdownHtml = '';
     if (isAiring) {

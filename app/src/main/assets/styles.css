@@ -248,10 +248,7 @@ input, textarea {
 #next-up-banner.banner-section {
     background: linear-gradient(135deg, rgba(20, 26, 38, 0.8), rgba(10, 12, 20, 0.95));
     border: 1px solid rgba(0, 242, 254, 0.2);
-    border-top-left-radius: 18px !important;
-    border-top-right-radius: 18px !important;
-    border-bottom-left-radius: 18px !important;
-    border-bottom-right-radius: 18px !important;
+    border-radius: 20px;
     padding: 1.2rem 1.5rem;
     margin-top: 1rem;
     margin-bottom: 2.5rem;
