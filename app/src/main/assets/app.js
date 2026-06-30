@@ -1801,6 +1801,44 @@ window.addEventListener('resize', () => {
     switchTab(activeTab);
 });
 
+// Back gesture on modals (swipe from screen edge to close)
+(function initModalBackGesture() {
+    let startX = 0, startY = 0, dx = 0, swiping = false;
+    const edgeZone = 50;
+    const threshold = window.innerWidth * 0.25;
+
+    document.addEventListener('touchstart', (e) => {
+        const t = e.changedTouches[0];
+        const settingsOpen = document.getElementById('settings-modal')?.style.display === 'flex';
+        const addOpen = document.getElementById('donghua-modal')?.style.display === 'flex';
+        if (!settingsOpen && !addOpen) return;
+        if (t.clientX > edgeZone && t.clientX < window.innerWidth - edgeZone) return;
+        swiping = true;
+        startX = t.clientX;
+        startY = t.clientY;
+        dx = 0;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!swiping) return;
+        const t = e.changedTouches[0];
+        dx = t.clientX - startX;
+        const dy = Math.abs(t.clientY - startY);
+        if (dy > Math.abs(dx) * 1.5) { swiping = false; return; }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+        if (!swiping) return;
+        swiping = false;
+        if (Math.abs(dx) < threshold) return;
+        if (document.getElementById('settings-modal')?.style.display === 'flex') {
+            closeSettingsModal();
+        } else if (document.getElementById('donghua-modal')?.style.display === 'flex') {
+            closeModal();
+        }
+    }, { passive: true });
+})();
+
 // Exit Confirmation Modal Controllers
 function showExitModal() {
     const modal = document.getElementById('exit-modal');
