@@ -1228,6 +1228,50 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 }
 
+// Back gesture on modals (swipe right to dismiss)
+function initModalBackGesture(modalEl, closeFn) {
+    if (!modalEl) return;
+    let startX = 0, startY = 0, dx = 0, dragging = false;
+    const threshold = window.innerWidth * 0.3;
+    const edgeZone = 50;
+
+    const onStart = (e) => {
+        const t = e.changedTouches ? e.changedTouches[0] : e;
+        if (t.clientX > edgeZone) return;
+        if (e.target.closest('.modal-content')) {
+            dragging = true;
+            startX = t.clientX;
+            startY = t.clientY;
+            dx = 0;
+            modalEl.style.transition = 'none';
+        }
+    };
+
+    const onMove = (e) => {
+        if (!dragging) return;
+        const t = e.changedTouches ? e.changedTouches[0] : e;
+        dx = t.clientX - startX;
+        const dy = Math.abs(t.clientY - startY);
+        if (dy > Math.abs(dx) * 0.5) { dragging = false; return; }
+        if (dx > 0) {
+            e.preventDefault();
+            modalEl.style.background = `rgba(0,0,0,${Math.max(0, 0.6 - dx / window.innerWidth * 0.6)})`;
+        }
+    };
+
+    const onEnd = () => {
+        if (!dragging) return;
+        modalEl.style.transition = '';
+        modalEl.style.background = '';
+        if (dx > threshold) closeFn();
+        dragging = false;
+    };
+
+    modalEl.addEventListener('touchstart', onStart, { passive: true });
+    modalEl.addEventListener('touchmove', onMove, { passive: false });
+    modalEl.addEventListener('touchend', onEnd);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme Mode
     const savedTheme = localStorage.getItem('app_theme') || 'dark';
@@ -1705,6 +1749,20 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => loader.remove(), 600);
         }
     }, 1600);
+
+    // Setup back gesture on modals
+    initModalBackGesture(document.getElementById('donghua-modal'), () => {
+        document.getElementById('btn-close-modal')?.click();
+    });
+    initModalBackGesture(document.getElementById('import-modal'), () => {
+        document.getElementById('btn-close-import')?.click();
+    });
+    initModalBackGesture(document.getElementById('details-modal'), () => {
+        document.getElementById('btn-close-details')?.click();
+    });
+    initModalBackGesture(document.getElementById('settings-modal'), () => {
+        window.closeSettingsModal();
+    });
 });
 
 // Mobile Navigation View Controller
