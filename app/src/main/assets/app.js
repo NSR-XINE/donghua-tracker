@@ -1801,40 +1801,6 @@ window.addEventListener('resize', () => {
     switchTab(activeTab);
 });
 
-// Swipe gesture on floating buttons (settings gear, + add) to trigger exit
-(function initFloatingSwipe() {
-    const buttons = [
-        document.getElementById('btn-open-settings'),
-        document.getElementById('nav-btn-add'),
-    ].filter(Boolean);
-
-    buttons.forEach(btn => {
-        let startY = 0;
-        btn.addEventListener('touchstart', (e) => {
-            startY = e.changedTouches[0].clientY;
-            btn.dataset.swiped = '';
-        }, { passive: true });
-        btn.addEventListener('touchmove', (e) => {
-            if (!startY) return;
-            const dy = e.changedTouches[0].clientY - startY;
-            if (Math.abs(dy) > 30) btn.dataset.swiped = '1';
-        }, { passive: true });
-        btn.addEventListener('touchend', (e) => {
-            if (btn.dataset.swiped) {
-                e.preventDefault();
-                showExitModal();
-            }
-            startY = 0;
-        }, { passive: false });
-        btn.addEventListener('click', (e) => {
-            if (btn.dataset.swiped) {
-                e.stopImmediatePropagation();
-                delete btn.dataset.swiped;
-            }
-        }, true);
-    });
-})();
-
 // Exit Confirmation Modal Controllers
 function showExitModal() {
     const modal = document.getElementById('exit-modal');
