@@ -551,8 +551,8 @@ function renderShowsGrid() {
     let statusFilter = '';
     if (activeTab === 'airing') {
         statusFilter = 'ongoing';
-    } else if (activeTab === 'upcoming') {
-        statusFilter = 'upcoming';
+    } else if (activeTab === 'stopped') {
+        statusFilter = 'stopped';
     } else if (activeTab === 'complete') {
         statusFilter = 'completed';
     } else if (activeTab === 'stopped') {
@@ -578,7 +578,7 @@ function renderShowsGrid() {
             return b.currentEp - a.currentEp; // Descending order
         } else if (filters.sortBy === 'last-updated') {
             return (b.lastUpdated || 0) - (a.lastUpdated || 0);
-        } else if (activeTab === 'upcoming') {
+        } else if (activeTab === 'stopped') {
             // Default for upcoming: sort by start date ascending (soonest first)
             const dateA = a.seasonStartDate ? new Date(a.seasonStartDate).getTime() : Infinity;
             const dateB = b.seasonStartDate ? new Date(b.seasonStartDate).getTime() : Infinity;
@@ -630,7 +630,7 @@ function renderShowsGrid() {
             msgTitle = `No ${tabLabel} Donghuas`;
             msgText = activeTab === 'airing'
                 ? "You don't have any shows marked as Airing. Add a show or change its status to Airing!"
-                : activeTab === 'upcoming'
+                : activeTab === 'stopped'
                     ? "No upcoming shows tracked. Add a show and set its status to Upcoming!"
                     : `You don't have any shows marked as ${tabLabel} in your watchlist.`;
         }
@@ -662,7 +662,7 @@ function renderShowsGrid() {
     let sectionTitle = '';
     if (activeTab === 'airing') {
         sectionTitle = '📡 Currently Airing';
-    } else if (activeTab === 'upcoming') {
+    } else if (activeTab === 'stopped') {
         sectionTitle = '🚀 Upcoming Releases';
     } else if (activeTab === 'complete') {
         sectionTitle = '✅ Completed Series';
@@ -1910,7 +1910,7 @@ function switchTab(tabName) {
     activeTab = tabName;
     
     // Update body class for active tab
-    document.body.classList.remove('tab-home', 'tab-airing', 'tab-upcoming', 'tab-complete', 'tab-stopped');
+    document.body.classList.remove('tab-home', 'tab-airing', 'tab-stopped', 'tab-complete', 'tab-stopped');
     document.body.classList.add(`tab-${tabName}`);
     
     // Update nav items class states

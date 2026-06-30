@@ -324,7 +324,7 @@
                             <label for="show-status">Status *</label>
                             <select id="show-status" required>
                                 <option value="ongoing">Airing</option>
-                                <option value="upcoming">Upcoming</option>
+                                <option value="upcoming">Stopped</option>
                                 <option value="completed">Completed</option>
                                 <option value="stopped">Stopped / Hiatus</option>
                             </select>
@@ -427,9 +427,9 @@
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
         </button>
-        <button class="nav-item" id="nav-btn-upcoming" onclick="switchTab('upcoming')">
+        <button class="nav-item" id="nav-btn-upcoming" onclick="switchTab('stopped')">
             <i class="fa-solid fa-rocket"></i>
-            <span>Upcoming</span>
+            <span>Stopped</span>
         </button>
         <button class="nav-item nav-btn-add-shortcut" id="nav-btn-add" onclick="triggerAddModal()">
             <div class="nav-add-icon"><i class="fa-solid fa-plus"></i></div>
