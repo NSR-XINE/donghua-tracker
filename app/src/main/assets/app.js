@@ -217,13 +217,6 @@ function renderHeroBanner() {
     const ongoingShows = shows.filter(s => s.status === 'ongoing');
     const bannerEl = document.getElementById('next-up-banner');
     
-    // Check mobile viewport and active tab
-    const isMobile = window.innerWidth <= 1024;
-    if (isMobile && activeTab !== 'home') {
-        if (bannerEl) bannerEl.style.setProperty('display', 'none', 'important');
-        return;
-    }
-    
     if (ongoingShows.length === 0) {
         if (bannerEl) bannerEl.style.display = 'none';
         return;
@@ -1787,14 +1780,16 @@ function switchTab(tabName) {
         if (controlPanel) controlPanel.style.setProperty('display', 'none', 'important');
         if (contentArea) contentArea.style.setProperty('display', 'none', 'important');
         
-        // Show only the selected tab and its parent section
+        // Show hero banner on all tabs (clearing the !important override)
+        if (heroBanner) {
+            heroBanner.style.display = '';
+            renderHeroBanner();
+        }
+        
+        // Show only the selected tab content
         if (tabName === 'home') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
-            if (heroBanner) {
-                heroBanner.style.display = ''; // Clear important override
-                renderHeroBanner();
-            }
             if (emptyStateEl) {
                 const hasNoShows = typeof shows !== 'undefined' && shows.length === 0;
                 if (hasNoShows) {
