@@ -74,15 +74,7 @@ function checkAndMigrateStatuses() {
         }
     });
     if (changed) {
-        if (window.AndroidApp && window.AndroidApp.dbUpdateShow) {
-            shows.forEach(show => {
-                if (existingShowIds.has(show.id)) {
-                    window.AndroidApp.dbUpdateShow(JSON.stringify(show));
-                }
-            });
-        } else {
-            localStorage.setItem('donghua_shows', JSON.stringify(shows));
-        }
+        saveState();
     }
 }
 
@@ -367,24 +359,18 @@ function fetchShowBanner(showId, countdownUrl) {
                 imageUrl = itemImg ? itemImg.src : null;
             }
             
-            if (imageUrl) {
-                // Ensure image uses HTTPS
-                if (imageUrl.startsWith('//')) {
-                    imageUrl = 'https:' + imageUrl;
-                }
-                
-                const idx = shows.findIndex(s => s.id === showId);
-                if (idx !== -1 && shows[idx].poster !== imageUrl) {
-                    shows[idx].poster = imageUrl;
-                    localStorage.setItem('donghua_shows', JSON.stringify(shows));
+                if (imageUrl) {
+                    // Ensure image uses HTTPS
+                    if (imageUrl.startsWith('//')) {
+                        imageUrl = 'https:' + imageUrl;
+                    }
                     
-                    // Re-render display
-                    updateStats();
-                    renderWeeklySchedule();
-                    renderHeroBanner();
-                    renderShowsGrid();
+                    const idx = shows.findIndex(s => s.id === showId);
+                    if (idx !== -1 && shows[idx].poster !== imageUrl) {
+                        shows[idx].poster = imageUrl;
+                        saveState();
+                    }
                 }
-            }
         } catch (e) {
             console.error("Failed to parse banner HTML for ID: " + showId, e);
         }
@@ -414,11 +400,7 @@ function fetchPosterFromJikan(showId, title) {
             const idx = shows.findIndex(s => s.id === showId);
             if (idx !== -1 && shows[idx].poster !== imageUrl) {
                 shows[idx].poster = imageUrl;
-                localStorage.setItem('donghua_shows', JSON.stringify(shows));
-                updateStats();
-                renderWeeklySchedule();
-                renderHeroBanner();
-                renderShowsGrid();
+                saveState();
             }
         } catch(e) {
             console.error('Jikan parse error', e);
@@ -1045,19 +1027,26 @@ function syncAlarm(show) {
  * Saves the current shows list state to LocalStorage and triggers layout updates.
  */
 function saveState() {
+    let sqliteOk = true;
     if (window.AndroidApp && window.AndroidApp.dbInsertShow && window.AndroidApp.dbUpdateShow) {
         shows.forEach(show => {
             if (existingShowIds.has(show.id)) {
-                window.AndroidApp.dbUpdateShow(JSON.stringify(show));
+                const ok = window.AndroidApp.dbUpdateShow(JSON.stringify(show));
+                if (!ok) sqliteOk = false;
             } else {
-                window.AndroidApp.dbInsertShow(JSON.stringify(show));
-                existingShowIds.add(show.id);
+                const ok = window.AndroidApp.dbInsertShow(JSON.stringify(show));
+                if (ok) {
+                    existingShowIds.add(show.id);
+                } else {
+                    sqliteOk = false;
+                }
             }
         });
         if (window.AndroidApp.syncAllAlarms) {
             window.AndroidApp.syncAllAlarms();
         }
-    } else {
+    }
+    if (!sqliteOk || !(window.AndroidApp && window.AndroidApp.dbInsertShow)) {
         localStorage.setItem('donghua_shows', JSON.stringify(shows));
     }
     updateStats();
