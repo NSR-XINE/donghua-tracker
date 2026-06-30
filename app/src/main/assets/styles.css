@@ -530,7 +530,6 @@ input, textarea {
     max-height: 360px;
     overflow-y: auto;
     padding-right: 0.4rem;
-    padding-bottom: 70px;
 }
 
 .schedule-item {
@@ -1403,6 +1402,10 @@ body.modal-open {
     /* Home tab: header has 2 rows (logo + stats) */
     body.tab-home .app-container {
         padding-top: calc(var(--status-bar-height, 0px) + var(--header-height, 136px)) !important;
+    }
+
+    .schedule-container.schedule-container {
+        margin-top: 2.5rem !important;
     }
 
     .bottom-nav {
