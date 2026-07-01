@@ -371,12 +371,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             String like = "%" + query.replaceAll("[^a-zA-Z0-9\\u4e00-\\u9fff\\s]", "") + "%";
-            cursor = db.query(TABLE_SHOWS, null,
-                    COL_SHOW_TITLE + " LIKE ? OR " + COL_SHOW_TITLE_ZH + " LIKE ? OR " + COL_SHOW_NOTES + " LIKE ?",
-                    new String[]{like, like, like},
-                    null, null,
-                    "CASE WHEN " + COL_SHOW_TITLE + " LIKE ? THEN 0 WHEN " + COL_SHOW_TITLE + " LIKE ? THEN 1 ELSE 2 END",
-                    new String[]{query, query + "%"});
+            cursor = db.rawQuery(
+                    "SELECT * FROM " + TABLE_SHOWS +
+                    " WHERE " + COL_SHOW_TITLE + " LIKE ? OR " + COL_SHOW_TITLE_ZH + " LIKE ? OR " + COL_SHOW_NOTES + " LIKE ?" +
+                    " ORDER BY CASE WHEN " + COL_SHOW_TITLE + " = ? THEN 0 WHEN " + COL_SHOW_TITLE + " LIKE ? THEN 1 ELSE 2 END",
+                    new String[]{like, like, like, query, query + "%"});
             if (cursor.moveToFirst()) {
                 do {
                     JSONObject obj = new JSONObject();

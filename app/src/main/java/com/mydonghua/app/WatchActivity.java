@@ -158,7 +158,18 @@ public class WatchActivity extends AppCompatActivity {
                 @Override
                 public void handleOnBackPressed() {
                     if (customView != null) {
-                        onHideCustomView();
+                        if (fullscreenContainer != null) {
+                            fullscreenContainer.setVisibility(View.GONE);
+                            fullscreenContainer.removeAllViews();
+                            if (playerView != null) {
+                                playerView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        if (customViewCallback != null) {
+                            customViewCallback.onCustomViewHidden();
+                            customViewCallback = null;
+                        }
+                        customView = null;
                     } else if (playerView != null && playerView.canGoBack()) {
                         playerView.goBack();
                     } else {
