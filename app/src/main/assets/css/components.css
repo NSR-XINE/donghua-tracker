@@ -683,7 +683,7 @@ body.tab-home #next-up-banner {
     font-weight: 500;
     cursor: pointer;
     text-align: left;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.15s ease;
 }
 .drawer-item:hover {
     background: rgba(255,255,255,0.04);
@@ -697,6 +697,10 @@ body.tab-home #next-up-banner {
     border: none;
     border-top: 1px solid var(--border-color);
     margin: 0.3rem 0.8rem;
+}
+
+.btn:active, .ep-btn:active, .ctrl-btn:active, .dev-header-btn:active, .drawer-item:active, .tab-btn:active, .theme-btn:active, .nav-item:active, .modal-close:active, .watch-btn:active, .ep-pill-btn:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 576px) {
