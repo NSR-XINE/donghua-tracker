@@ -1741,6 +1741,12 @@ body.light-theme .stars-bg {
     opacity: 0 !important;
 }
 
+/* In light mode the card overlay must fade to a dark tone (not white) so the
+   poster image bottom and the overlapping card title stay visible */
+body.light-theme .card-overlay {
+    background: linear-gradient(to bottom, transparent 20%, rgba(15, 18, 30, 0.88) 100%);
+}
+
 /* Status Bar Blocker to cover transparent status bar area and hide scrolling content */
 .status-bar-blocker {
     position: fixed;
