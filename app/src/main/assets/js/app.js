@@ -332,6 +332,8 @@ function setupCardActions() {
         else if (isFavorite) {
             toggleFavorite(showId);
             renderShowsGrid();
+            const btn = document.querySelector(`.show-card[data-id="${showId}"] .favorite-btn`);
+            if (btn) { btn.classList.add('animate'); setTimeout(() => btn.classList.remove('animate'), 500); }
         }
         else if (isDelete) {
             if (confirm(`Are you sure you want to remove "${show.title}" from your list?`)) {

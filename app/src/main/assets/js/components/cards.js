@@ -134,7 +134,7 @@ function renderCard(show, todayName) {
                 </a>
                 <div class="card-ctrls">
                     <button class="ctrl-btn edit-btn" title="Edit show"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="ctrl-btn favorite-btn" title="${show.isFavorite ? 'Unfavorite' : 'Favorite'}"><i class="fa-solid ${show.isFavorite ? 'fa-heart' : 'fa-heart'}"></i></button>
+                    <button class="ctrl-btn favorite-btn" data-fav="${show.isFavorite}" title="${show.isFavorite ? 'Unfavorite' : 'Favorite'}"><i class="${show.isFavorite ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
                     <button class="ctrl-btn delete-btn" title="Delete show"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>

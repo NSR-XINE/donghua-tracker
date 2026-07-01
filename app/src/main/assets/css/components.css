@@ -428,6 +428,7 @@
 .ctrl-btn:hover { background: rgba(255, 255, 255, 0.05); }
 .ctrl-btn.edit-btn:hover { color: var(--accent-cyan); }
 .ctrl-btn.favorite-btn:hover { color: var(--accent-rose); }
+.favorite-btn.animate i { animation: heartBeat 0.4s ease; }
 .ctrl-btn.delete-btn:hover { color: var(--accent-rose); }
 
 .schedule-container { margin-top: 1rem; }
