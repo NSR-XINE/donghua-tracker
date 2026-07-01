@@ -2,9 +2,6 @@
    STATE MANAGEMENT & DEFAULT DATA
    ========================================================================== */
 
-/// Default mock data to populate local storage on first load (empty by default)
-const DEFAULT_DONGHUA = [];
-
 // Load shows from SQLite or fallback to localStorage
 let shows = [];
 try {
@@ -1577,63 +1574,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('search-input').addEventListener('input', (e) => {
         filters.search = e.target.value;
         renderShowsGrid();
-    });
-    
-    // Status filters chips (guarded if layout element exists)
-    const filterStatusEl = document.getElementById('filter-status');
-    if (filterStatusEl) {
-        filterStatusEl.addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-chip')) {
-                document.querySelectorAll('#filter-status .filter-chip').forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                filters.status = e.target.dataset.value;
-                renderShowsGrid();
-            }
-        });
-    }
-    
-    // Sort dropdown change (guarded if layout element exists)
-    const sortSelectEl = document.getElementById('sort-select');
-    if (sortSelectEl) {
-        sortSelectEl.addEventListener('change', (e) => {
-            filters.sortBy = e.target.value;
-            renderShowsGrid();
-        });
-    }
-    
-    // Reset filters button in Empty State (guarded if layout element exists)
-    const btnResetFiltersEl = document.getElementById('btn-reset-filters');
-    if (btnResetFiltersEl) {
-        btnResetFiltersEl.addEventListener('click', () => {
-            filters.search = '';
-            filters.status = 'all';
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) searchInput.value = '';
-            const chips = document.querySelectorAll('#filter-status .filter-chip');
-            if (chips) {
-                chips.forEach(c => {
-                    if (c.dataset.value === 'all') c.classList.add('active');
-                    else c.classList.remove('active');
-                });
-            }
-            renderShowsGrid();
-        });
-    }
-
-    // Intercept clicks on streaming source buttons to open natively in player activity
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.stream-source-btn');
-        if (btn) {
-            e.preventDefault();
-            const url = btn.getAttribute('data-watch-url');
-            if (url) {
-                if (window.AndroidApp && window.AndroidApp.openWatchScreen) {
-                    window.AndroidApp.openWatchScreen(url);
-                } else {
-                    window.location.href = url;
-                }
-            }
-        }
     });
     
     // Weekly Schedule Tab selection

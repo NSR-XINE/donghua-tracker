@@ -447,23 +447,6 @@ input, textarea {
     color: var(--text-muted);
 }
 
-.form-select {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 0.65rem 0.8rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    width: 100%;
-    outline: none;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-}
-
-.form-select:focus {
-    border-color: var(--accent-cyan);
-}
-
 /* ==========================================
    WEEKLY SCHEDULE CALENDAR
    ========================================== */
@@ -1283,15 +1266,6 @@ body.modal-open {
     margin-bottom: 0.5rem;
 }
 
-.app-footer {
-    margin-top: 4rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 /* Keyframes */
 @keyframes float {
     0% { transform: translateY(0px); }
@@ -1694,43 +1668,6 @@ body.amoled .app-header {
     background-color: #000000 !important;
 }
 
-/* Custom switch sliders */
-.switch-container input:checked + .slider {
-    background-color: var(--accent-cyan) !important;
-}
-.switch-container .slider:before {
-    position: absolute;
-    content: "";
-    height: 14px;
-    width: 14px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-.switch-container input:checked + .slider:before {
-    transform: translateX(16px);
-}
-
-/* Accent Color Variations */
-body.theme-accent-purple {
-    --accent-cyan: #b12fc3;
-    --accent-cyan-rgb: 177, 47, 195;
-}
-body.theme-accent-rose {
-    --accent-cyan: #ff0844;
-    --accent-cyan-rgb: 255, 8, 68;
-}
-body.theme-accent-emerald {
-    --accent-cyan: #11998e;
-    --accent-cyan-rgb: 17, 153, 142;
-}
-body.theme-accent-gold {
-    --accent-cyan: #fee140;
-    --accent-cyan-rgb: 254, 225, 64;
-}
-
 /* Episode grid button styling in Details modal */
 .ep-pill-btn {
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
@@ -1746,28 +1683,6 @@ body.theme-accent-gold {
 }
 .ep-pill-btn::-webkit-scrollbar {
     width: 4px;
-}
-
-/* ==========================================
-   SLIDER TOGGLE SWITCH COMPONENT
-   ========================================== */
-.switch input:checked + .slider {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-    border-color: transparent;
-}
-.switch .slider:before {
-    position: absolute;
-    content: "";
-    height: 12px;
-    width: 12px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .3s;
-    border-radius: 50%;
-}
-.switch input:checked + .slider:before {
-    transform: translateX(18px);
 }
 
 /* ==========================================

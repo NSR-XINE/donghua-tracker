@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.webkit.*;
 import androidx.appcompat.app.AppCompatActivity;
 import java.lang.ref.WeakReference;
