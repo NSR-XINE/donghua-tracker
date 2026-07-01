@@ -15,23 +15,18 @@ function updateTimers() {
         clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + getTodayName() + ')';
     }
 
-    const heroCountdownBox = document.getElementById('hero-countdown-box');
-    if (heroCountdownBox) {
-        const heroBanner = document.getElementById('next-up-banner');
-        const heroShowId = heroBanner ? heroBanner.dataset.id : null;
-        if (heroShowId) {
-            const show = getShowById(heroShowId);
-            if (show && show.status === 'ongoing') {
-                const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
-                const time = calculateTimeRemaining(schedule.targetDate);
-                if (time.elapsed) { renderHeroBanner(); return; }
-                const numEls = heroCountdownBox.querySelectorAll('.num');
-                if (numEls.length >= 4) {
-                    numEls[0].innerText = String(time.days).padStart(2, '0');
-                    numEls[1].innerText = String(time.hours).padStart(2, '0');
-                    numEls[2].innerText = String(time.minutes).padStart(2, '0');
-                    numEls[3].innerText = String(time.seconds).padStart(2, '0');
-                }
+    const heroCD = document.getElementById('hero-countdown-box');
+    if (heroCD) {
+        const nextUp = getNextUpShow();
+        if (nextUp && !nextUp.airingNow) {
+            const time = calculateTimeRemaining(nextUp.targetDate);
+            if (time.elapsed) { renderHeroBanner(); return; }
+            const nums = heroCD.querySelectorAll('.num');
+            if (nums.length >= 4) {
+                nums[0].innerText = String(time.days).padStart(2, '0');
+                nums[1].innerText = String(time.hours).padStart(2, '0');
+                nums[2].innerText = String(time.minutes).padStart(2, '0');
+                nums[3].innerText = String(time.seconds).padStart(2, '0');
             }
         }
     }
