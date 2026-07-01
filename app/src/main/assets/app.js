@@ -1389,8 +1389,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnTriggerImport && importModal) {
         btnTriggerImport.addEventListener('click', () => {
-            // Close settings modal first so import doesn't open underneath it
-            window.closeSettingsModal();
             // Reset state
             if (importFileInput) importFileInput.value = '';
             if (importFileName) importFileName.textContent = 'No file selected';
@@ -1408,6 +1406,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (importModal) {
             importModal.style.display = 'none';
             document.body.classList.remove('modal-open');
+            // If settings was open behind import, keep modal-open class active
+            const settingsModal = document.getElementById('settings-modal');
+            if (settingsModal && settingsModal.style.display === 'flex') {
+                document.body.classList.add('modal-open');
+            }
         }
     };
 
