@@ -429,18 +429,7 @@
 .ctrl-btn.edit-btn:hover { color: var(--accent-cyan); }
 .ctrl-btn.favorite-btn:hover { color: var(--accent-rose); }
 .favorite-btn.animate i { animation: heartBeat 0.4s ease; }
-.favorite-btn .fa-solid.fa-heart { color: var(--accent-rose); }
 .ctrl-btn.delete-btn:hover { color: var(--accent-rose); }
-
-.banner-ctrls {
-    display: flex;
-    gap: 0.3rem;
-    margin-top: 0.5rem;
-}
-.banner-ctrls .ctrl-btn {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.45rem;
-}
 
 .schedule-container { margin-top: 1rem; }
 

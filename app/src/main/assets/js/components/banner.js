@@ -59,11 +59,6 @@ function renderHeroBanner() {
                     <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
                     <span><span onclick="openWatchScreen(getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
                 </div>
-                <div class="banner-ctrls">
-                    <button class="ctrl-btn edit-btn" title="Edit show" data-id="${show.id}"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="ctrl-btn favorite-btn" title="${show.isFavorite ? 'Unfavorite' : 'Favorite'}" data-id="${show.id}"><i class="${show.isFavorite ? 'fa-solid' : 'fa-regular'} fa-heart"></i></button>
-                    <button class="ctrl-btn delete-btn" title="Delete show" data-id="${show.id}"><i class="fa-solid fa-trash"></i></button>
-                </div>
             </div>
             ${countdownHtml}
         </div>`;

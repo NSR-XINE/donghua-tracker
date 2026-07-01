@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSearch();
     setupScheduleTabs();
     setupCardActions();
-    setupBannerActions();
     setupPosterFetch();
 
     LOADING_MESSAGES.forEach((msg, idx) => {
@@ -349,33 +348,6 @@ function setupCardActions() {
         }
         else if (isStream || isCountdown) { return; }
         else { openDetailsModal(show); }
-    });
-}
-
-function setupBannerActions() {
-    document.getElementById('next-up-banner')?.addEventListener('click', (e) => {
-        const showId = e.target.closest('[data-id]')?.dataset.id;
-        if (!showId) return;
-        const show = getShowById(showId);
-        if (!show) return;
-
-        const isEdit = e.target.closest('.edit-btn');
-        const isFavorite = e.target.closest('.favorite-btn');
-        const isDelete = e.target.closest('.delete-btn');
-
-        if (isEdit) {
-            openModal(show);
-        } else if (isFavorite) {
-            toggleFavorite(showId);
-            renderHeroBanner();
-            renderShowsGrid();
-            const btn = document.querySelector(`#next-up-banner .favorite-btn`);
-            if (btn) { btn.classList.add('animate'); setTimeout(() => btn.classList.remove('animate'), 500); }
-        } else if (isDelete) {
-            if (confirm(`Are you sure you want to remove "${show.title}" from your list?`)) {
-                deleteShow(showId);
-            }
-        }
     });
 }
 
