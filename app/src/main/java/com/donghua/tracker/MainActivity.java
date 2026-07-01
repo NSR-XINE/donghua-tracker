@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         "https://animecountdown.com/",
         "https://api.jikan.moe/",
         "https://graphql.anilist.co/",
+        "https://anilist.co/",
         "https://donghuastream.org/",
         "https://www.donghuastream.org/",
         "https://luciferdonghua.org/",
