@@ -245,7 +245,7 @@
                         <div style="position: relative;">
                             <input type="checkbox" id="toggle-auto-rotate" style="display: none;">
                             <div class="toggle-track" style="width: 44px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 12px; transition: background 0.3s; position: relative;">
-                                <div class="toggle-thumb" style="width: 20px; height: 20px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>
+                                <div class="toggle-thumb" style="width: 20px; height: 20px; background: var(--text-primary); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>
                             </div>
                         </div>
                         <span style="font-size: 0.85rem; color: var(--text-secondary); user-select: none;">Auto-rotate screen</span>
@@ -513,6 +513,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Rotation Button (shown when auto-rotate is off and device is tilted) -->
+    <button id="btn-force-rotate" class="rotation-float-btn" style="display:none;" title="Rotate screen">
+        <i class="fa-solid fa-rotate"></i>
+    </button>
 
     <nav class="bottom-nav">
         <button class="nav-item active" id="nav-btn-home" onclick="switchTab('home')">

@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    setupRotationButton();
     setupResizeObservers();
     updateStats();
     renderWeeklySchedule();
@@ -148,6 +149,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => switchTab(activeTab));
 });
+
+function setupRotationButton() {
+    const btn = document.getElementById('btn-force-rotate');
+    if (!btn) return;
+
+    let isAutoRotateOn = false;
+    const toggle = document.getElementById('toggle-auto-rotate');
+    if (toggle) {
+        isAutoRotateOn = toggle.checked;
+        toggle.addEventListener('change', () => {
+            isAutoRotateOn = toggle.checked;
+            if (isAutoRotateOn) btn.style.display = 'none';
+        });
+    }
+
+    let tiltTimer = null;
+    let lastGamma = 0;
+
+    btn.addEventListener('click', () => {
+        if (DB._available) DB.forceRotate();
+    });
+
+    try {
+        window.addEventListener('deviceorientation', (e) => {
+            if (isAutoRotateOn) {
+                btn.style.display = 'none';
+                return;
+            }
+            const gamma = e.gamma || 0;
+            const beta = e.beta || 0;
+            const isTilted = Math.abs(gamma) > 25 || Math.abs(beta - 90) > 25;
+            if (isTilted) {
+                btn.style.display = 'flex';
+                btn.classList.add('show');
+                clearTimeout(tiltTimer);
+            } else {
+                tiltTimer = setTimeout(() => {
+                    btn.style.display = 'none';
+                    btn.classList.remove('show');
+                }, 1500);
+            }
+            lastGamma = gamma;
+        });
+    } catch (e) {
+        btn.style.display = 'none';
+    }
+}
 
 function setupResizeObservers() {
     const header = document.querySelector('.app-header');

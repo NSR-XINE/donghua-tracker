@@ -89,6 +89,10 @@ const DB = {
         return this._call('setAutoRotate', enabled);
     },
 
+    forceRotate() {
+        return this._call('forceRotate');
+    },
+
     setSystemThemeMode(mode) {
         return this._call('setSystemThemeMode', mode);
     },

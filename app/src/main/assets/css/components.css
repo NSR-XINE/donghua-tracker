@@ -573,6 +573,34 @@
 .toggle-track.active { background: var(--accent-cyan) !important; }
 .toggle-track.active .toggle-thumb { transform: translateX(20px); }
 
+.rotation-float-btn {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-height, 80px) + var(--navigation-bar-height, 0px) + 0.5rem);
+    left: calc(var(--safe-area-left, 0px) + 1rem);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--accent-cyan);
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.rotation-float-btn:active {
+    transform: scale(0.9);
+}
+.rotation-float-btn.show {
+    animation: scaleUp 0.25s ease forwards;
+}
+
 .stat-card-mini {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
