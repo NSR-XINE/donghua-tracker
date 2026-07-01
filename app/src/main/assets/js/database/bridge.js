@@ -85,14 +85,6 @@ const DB = {
         return this._call('exitApp');
     },
 
-    setAutoRotate(enabled) {
-        return this._call('setAutoRotate', enabled);
-    },
-
-    forceRotate() {
-        return this._call('forceRotate');
-    },
-
     setSystemThemeMode(mode) {
         return this._call('setSystemThemeMode', mode);
     },
@@ -125,6 +117,5 @@ const DB = {
 const LS_KEYS = {
     SHOWS: 'donghua_shows',
     THEME: 'app_theme',
-    SOURCE: 'pref_streaming_source',
-    AUTO_ROTATE: 'auto_rotate'
+    SOURCE: 'pref_streaming_source'
 };

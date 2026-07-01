@@ -521,38 +521,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void setAutoRotate(final boolean enabled) {
-            runOnUi(() -> {
-                try {
-                    MainActivity a = getActivity();
-                    if (a == null) return;
-                    a.setRequestedOrientation(enabled
-                        ? android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                        : android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-                } catch (Throwable t) { t.printStackTrace(); }
-            });
-        }
-
-        @JavascriptInterface
-        public void forceRotate() {
-            runOnUi(() -> {
-                try {
-                    MainActivity a = getActivity();
-                    if (a == null) return;
-                    android.view.WindowManager wm = (android.view.WindowManager) a.getSystemService(android.content.Context.WINDOW_SERVICE);
-                    if (wm == null) return;
-                    int rotation = wm.getDefaultDisplay().getRotation();
-                    a.setRequestedOrientation(rotation == android.view.Surface.ROTATION_0 || rotation == android.view.Surface.ROTATION_180
-                        ? android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                        : android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                        a.setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-                    }, 3000);
-                } catch (Throwable t) { t.printStackTrace(); }
-            });
-        }
-
-        @JavascriptInterface
         public void scheduleReminder(final String id, final String title, final String releaseDay, final String releaseTime, final int alarmCode) {
             runOnUi(() -> {
                 try {

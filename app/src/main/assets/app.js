@@ -1405,34 +1405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.updateSourceUI(source);
     
-    // Initialize Auto-Rotate toggle — read from SQLite first, fall back to localStorage
-    let autoRotate = false;
-    if (window.AndroidApp && window.AndroidApp.dbGetSetting) {
-        autoRotate = window.AndroidApp.dbGetSetting('auto_rotate', '') === 'true' || localStorage.getItem('auto_rotate') === 'true';
-    } else {
-        autoRotate = localStorage.getItem('auto_rotate') === 'true';
-    }
-    const toggle = document.getElementById('toggle-auto-rotate');
-    if (toggle) {
-        toggle.checked = autoRotate;
-        const track = toggle.nextElementSibling;
-        if (track) track.classList.toggle('active', autoRotate);
-        if (window.AndroidApp && window.AndroidApp.setAutoRotate) {
-            window.AndroidApp.setAutoRotate(autoRotate);
-        }
-        toggle.addEventListener('change', () => {
-            const on = toggle.checked;
-            if (track) track.classList.toggle('active', on);
-            if (window.AndroidApp && window.AndroidApp.dbSaveSetting) {
-                window.AndroidApp.dbSaveSetting('auto_rotate', on ? 'true' : 'false');
-            }
-            localStorage.setItem('auto_rotate', on ? 'true' : 'false');
-            if (window.AndroidApp && window.AndroidApp.setAutoRotate) {
-                window.AndroidApp.setAutoRotate(on);
-            }
-        });
-    }
-    
     // Setup ResizeObservers to dynamically calculate header and bottom navigation heights (no magic numbers!)
     const header = document.querySelector('.app-header');
     if (header && typeof ResizeObserver !== 'undefined') {

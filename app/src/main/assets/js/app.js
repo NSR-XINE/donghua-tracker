@@ -75,24 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     else source = DB.getLocal('pref_streaming_source') || 'donghuastream';
     updateSourceUI(source);
 
-    let autoRotate = (DB._available ? DB.getSetting('auto_rotate', '') : '') === 'true';
-    if (!autoRotate) autoRotate = DB.getLocal('auto_rotate') === 'true';
-    const toggle = document.getElementById('toggle-auto-rotate');
-    if (toggle) {
-        toggle.checked = autoRotate;
-        const track = toggle.nextElementSibling;
-        if (track) track.classList.toggle('active', autoRotate);
-        if (DB._available) DB.setAutoRotate(autoRotate);
-        toggle.addEventListener('change', () => {
-            const on = toggle.checked;
-            if (track) track.classList.toggle('active', on);
-            DB.saveSetting('auto_rotate', on ? 'true' : 'false');
-            DB.setLocal('auto_rotate', on ? 'true' : 'false');
-            if (DB._available) DB.setAutoRotate(on);
-        });
-    }
-
-    setupRotationButton();
     setupResizeObservers();
     updateStats();
     renderWeeklySchedule();
@@ -149,53 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => switchTab(activeTab));
 });
-
-function setupRotationButton() {
-    const btn = document.getElementById('btn-force-rotate');
-    if (!btn) return;
-
-    let isAutoRotateOn = false;
-    const toggle = document.getElementById('toggle-auto-rotate');
-    if (toggle) {
-        isAutoRotateOn = toggle.checked;
-        toggle.addEventListener('change', () => {
-            isAutoRotateOn = toggle.checked;
-            if (isAutoRotateOn) btn.style.display = 'none';
-        });
-    }
-
-    let tiltTimer = null;
-    let lastGamma = 0;
-
-    btn.addEventListener('click', () => {
-        if (DB._available) DB.forceRotate();
-    });
-
-    try {
-        window.addEventListener('deviceorientation', (e) => {
-            if (isAutoRotateOn) {
-                btn.style.display = 'none';
-                return;
-            }
-            const gamma = e.gamma || 0;
-            const beta = e.beta || 0;
-            const isTilted = Math.abs(gamma) > 25 || Math.abs(beta - 90) > 25;
-            if (isTilted) {
-                btn.style.display = 'flex';
-                btn.classList.add('show');
-                clearTimeout(tiltTimer);
-            } else {
-                tiltTimer = setTimeout(() => {
-                    btn.style.display = 'none';
-                    btn.classList.remove('show');
-                }, 1500);
-            }
-            lastGamma = gamma;
-        });
-    } catch (e) {
-        btn.style.display = 'none';
-    }
-}
 
 function setupResizeObservers() {
     const header = document.querySelector('.app-header');
