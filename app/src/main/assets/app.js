@@ -1340,7 +1340,8 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
 // Close whichever modal is open; called from Java onBackPressed
 function closeTopModal() {
     const modalIds = ['settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
-    for (const id of modalIds) {
+    for (let i = modalIds.length - 1; i >= 0; i--) {
+        const id = modalIds[i];
         const el = document.getElementById(id);
         if (el && el.style.display === 'flex') {
             if (id === 'settings-modal') closeSettingsModal();
@@ -1372,8 +1373,8 @@ function closeTopModal() {
 // Called from Android Java onBackPressed — closes modals first, otherwise shows exit
 function handleBackPress() {
     const modalIds = ['settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
-    for (const id of modalIds) {
-        const el = document.getElementById(id);
+    for (let i = modalIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(modalIds[i]);
         if (el && el.style.display === 'flex') {
             closeTopModal();
             return;
