@@ -268,7 +268,14 @@ input, textarea {
 }
 
 .banner-image-wrap::after {
-    display: none;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to bottom, transparent, var(--bg-darker));
+    pointer-events: none;
 }
 
 .banner-info-section {
