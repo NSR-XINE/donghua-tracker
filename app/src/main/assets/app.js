@@ -211,78 +211,100 @@ function updateStats() {
  * Finds the upcoming show that releases the soonest and displays the hero banner.
  */
 function renderHeroBanner() {
-    const ongoingShows = shows.filter(s => s.status === 'ongoing');
     const bannerEl = document.getElementById('next-up-banner');
     
-    // Check mobile viewport and active tab
-    const isMobile = window.innerWidth <= 1024;
-    if (isMobile && activeTab !== 'home') {
-        if (bannerEl) bannerEl.style.setProperty('display', 'none', 'important');
-        return;
+    // Pick shows matching the active tab
+    let tabShows = [];
+    if (activeTab === 'complete') {
+        tabShows = shows.filter(s => s.status === 'completed');
+    } else if (activeTab === 'stopped') {
+        tabShows = shows.filter(s => s.status === 'stopped');
+    } else {
+        tabShows = shows.filter(s => s.status === 'ongoing');
     }
     
-    if (ongoingShows.length === 0) {
+    if (tabShows.length === 0) {
         if (bannerEl) bannerEl.style.display = 'none';
         return;
     }
     
-    // Sort ongoing shows by soonest release time
-    const computedShows = ongoingShows.map(show => {
-        const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
-        return {
-            show,
-            targetDate: schedule.targetDate,
-            airingNow: schedule.airingNow,
-            timeDiff: schedule.targetDate - new Date()
-        };
-    });
+    // Sort shows: by soonest release for ongoing, by last updated for completed/stopped
+    let nextUp;
+    let isAiring = false;
+    const isOngoingTab = activeTab === 'home' || activeTab === 'airing';
     
-    // Prioritize shows that are airing right now, otherwise sort by soonest release.
-    // If multiple shows are airing concurrently, prioritize the one released most recently (less negative timeDiff).
-    computedShows.sort((a, b) => {
-        if (a.airingNow && !b.airingNow) return -1;
-        if (!a.airingNow && b.airingNow) return 1;
-        if (a.airingNow && b.airingNow) {
-            return b.timeDiff - a.timeDiff;
-        }
-        return a.timeDiff - b.timeDiff;
-    });
+    if (isOngoingTab) {
+        const computedShows = tabShows.map(show => {
+            const schedule = getNextReleaseDate(show.releaseDay, show.releaseTime);
+            return {
+                show,
+                targetDate: schedule.targetDate,
+                airingNow: schedule.airingNow,
+                timeDiff: schedule.targetDate - new Date()
+            };
+        });
+        
+        computedShows.sort((a, b) => {
+            if (a.airingNow && !b.airingNow) return -1;
+            if (!a.airingNow && b.airingNow) return 1;
+            if (a.airingNow && b.airingNow) {
+                return b.timeDiff - a.timeDiff;
+            }
+            return a.timeDiff - b.timeDiff;
+        });
+        
+        nextUp = computedShows[0];
+        isAiring = nextUp.airingNow;
+    } else {
+        tabShows.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+        nextUp = { show: tabShows[0], targetDate: null, airingNow: false };
+    }
     
-    const nextUp = computedShows[0];
     const show = nextUp.show;
-    const isAiring = nextUp.airingNow;
     
     bannerEl.style.display = 'flex';
     
     let countdownHtml = '';
-    if (isAiring) {
-        countdownHtml = `
-            <div class="banner-countdown" id="hero-countdown-box">
-                <div class="countdown-box" style="border-color: var(--accent-cyan); min-width: 250px;">
-                    <div class="num" style="font-size: 1.6rem; animation: pulse 1s infinite;">AIRING NOW</div>
-                    <div class="label">Episode ${show.currentEp + 1} Released!</div>
+    if (isOngoingTab) {
+        if (isAiring) {
+            countdownHtml = `
+                <div class="banner-countdown" id="hero-countdown-box">
+                    <div class="countdown-box" style="border-color: var(--accent-cyan); min-width: 250px;">
+                        <div class="num" style="font-size: 1.6rem; animation: pulse 1s infinite;">AIRING NOW</div>
+                        <div class="label">Episode ${show.currentEp + 1} Released!</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } else {
+            const time = calculateTimeRemaining(nextUp.targetDate);
+            countdownHtml = `
+                <div class="banner-countdown" id="hero-countdown-box">
+                    <div class="countdown-box">
+                        <div class="num">${String(time.days).padStart(2, '0')}</div>
+                        <div class="label">Days</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="num">${String(time.hours).padStart(2, '0')}</div>
+                        <div class="label">Hrs</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="num">${String(time.minutes).padStart(2, '0')}</div>
+                        <div class="label">Min</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="num">${String(time.seconds).padStart(2, '0')}</div>
+                        <div class="label">Sec</div>
+                    </div>
+                </div>
+            `;
+        }
     } else {
-        const time = calculateTimeRemaining(nextUp.targetDate);
+        const statusLabel = activeTab === 'complete' ? 'Completed' : 'Hiatus';
         countdownHtml = `
             <div class="banner-countdown" id="hero-countdown-box">
-                <div class="countdown-box">
-                    <div class="num">${String(time.days).padStart(2, '0')}</div>
-                    <div class="label">Days</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="num">${String(time.hours).padStart(2, '0')}</div>
-                    <div class="label">Hrs</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="num">${String(time.minutes).padStart(2, '0')}</div>
-                    <div class="label">Min</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="num">${String(time.seconds).padStart(2, '0')}</div>
-                    <div class="label">Sec</div>
+                <div class="countdown-box" style="border-color: var(--accent-purple); min-width: 160px;">
+                    <div class="num" style="font-size: 1.1rem; color: var(--accent-purple);">${statusLabel}</div>
+                    <div class="label">${show.currentEp} episodes watched</div>
                 </div>
             </div>
         `;
@@ -297,15 +319,19 @@ function renderHeroBanner() {
         <div class="banner-image-wrap" style="${imageStyle}"></div>
         <div class="banner-info-section">
             <div class="banner-details">
-                <span class="banner-badge">
-                    <i class="fa-solid ${isAiring ? 'fa-satellite-dish' : 'fa-clock'}"></i> 
-                    ${isAiring ? 'Live Release' : 'Next Airing'}
+                <span class="banner-badge" style="${isOngoingTab ? '' : 'border-color: var(--accent-purple); color: var(--accent-purple); background: rgba(157,78,221,0.12)'}">
+                    <i class="fa-solid ${isOngoingTab ? (isAiring ? 'fa-satellite-dish' : 'fa-clock') : (activeTab === 'complete' ? 'fa-circle-check' : 'fa-pause')}"></i> 
+                    ${isOngoingTab ? (isAiring ? 'Live Release' : 'Next Airing') : (activeTab === 'complete' ? 'Series Complete' : 'On Hiatus')}
                 </span>
                 <h2 class="banner-title">${show.title}</h2>
                 <div class="banner-meta">
-                    <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
-                    <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
-                    <span><span onclick="openWatchScreen(window.getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
+                    ${isOngoingTab
+                        ? `<span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
+                           <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
+                           <span><span onclick="openWatchScreen(window.getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>`
+                        : `<span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
+                           <span><i class="fa-solid fa-circle-check"></i> ${show.currentEp} / ${show.totalEp || '?'} episodes</span>`
+                    }
                 </div>
             </div>
             ${countdownHtml}
@@ -1743,6 +1769,10 @@ function switchTab(tabName) {
             }
         } else if (tabName === 'airing' || tabName === 'complete' || tabName === 'stopped') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
+            if (heroBanner) {
+                heroBanner.style.display = '';
+                renderHeroBanner();
+            }
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             renderShowsGrid();
         }
