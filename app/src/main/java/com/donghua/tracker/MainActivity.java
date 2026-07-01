@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String[] ALLOWED_PREFIXES = {
         "https://animecountdown.com/",
         "https://api.jikan.moe/",
+        "https://graphql.anilist.co/",
         "https://donghuastream.org/",
         "https://www.donghuastream.org/",
         "https://luciferdonghua.org/",
