@@ -58,6 +58,11 @@ function importData(jsonString) {
                 throw new Error("Missing 'title' or 'id' fields in backup item");
             }
         }
+        if (DB._available) {
+            const currentDbData = JSON.parse(DB.getAllShows() || '[]');
+            const importedIds = new Set(parsed.map(s => s.id));
+            currentDbData.forEach(s => { if (!importedIds.has(s.id)) DB.deleteShow(String(s.id)); });
+        }
         shows = parsed;
         existingShowIds.clear();
         shows.forEach(s => existingShowIds.add(s.id));

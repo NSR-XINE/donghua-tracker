@@ -82,7 +82,7 @@ function renderCard(show, todayName) {
 
     let posterHtml = '';
     if (safePoster) {
-        posterHtml = `<div class="card-poster-wrapper"><img class="card-poster" src="${safePoster}" alt="${show.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"></div>`;
+        posterHtml = `<div class="card-poster-wrapper"><img class="card-poster" src="${safePoster}" alt="${show.title}" loading="lazy" onerror="this.closest('.card-poster-wrapper').style.display='none'; this.closest('.card-header').querySelector('.poster-placeholder').style.display='flex'"></div>`;
     }
 
     const placeholderHtml = `<div class="poster-placeholder" style="background: ${gradientBg}">

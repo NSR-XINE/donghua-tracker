@@ -301,7 +301,7 @@ function updateSearchSuggestions(suggestions) {
         return;
     }
     container.style.display = 'block';
-    container.innerHTML = suggestions.map(s => `<div style="padding:0.5rem 0.8rem;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);border-bottom:1px solid var(--border-color);transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="document.getElementById('search-input').value='${escapeHtml(s.replace('🔍 ', ''))}'; document.getElementById('search-input').dispatchEvent(new Event('input')); this.parentElement.style.display='none'">${s}</div>`).join('');
+    container.innerHTML = suggestions.map(s => `<div style="padding:0.5rem 0.8rem;cursor:pointer;font-size:0.85rem;color:var(--text-secondary);border-bottom:1px solid var(--border-color);transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="document.getElementById('search-input').value='${escapeHtml(s.replace('🔍 ', '')).replace(/'/g, "\\'")}'; document.getElementById('search-input').dispatchEvent(new Event('input')); this.parentElement.style.display='none'">${s}</div>`).join('');
 }
 
 function setupScheduleTabs() {

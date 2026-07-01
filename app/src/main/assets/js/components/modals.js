@@ -225,7 +225,11 @@ function handleBackPress() {
     for (let i = modalIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(modalIds[i]);
         if (el && el.style.display === 'flex') {
-            closeTopModal();
+            if (modalIds[i] === 'exit-modal') {
+                confirmExitApp();
+            } else {
+                closeTopModal();
+            }
             return;
         }
     }

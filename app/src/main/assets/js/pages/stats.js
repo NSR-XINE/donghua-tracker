@@ -11,7 +11,7 @@ function renderDetailedStats() {
     const todayShows = ongoing.filter(s => s.releaseDay === weekDays[todayIndex]);
     const thisWeekShows = ongoing.filter(s => {
         const dayIndex = weekDays.indexOf(s.releaseDay);
-        return dayIndex >= todayIndex || dayIndex < todayIndex;
+        return dayIndex >= todayIndex;
     });
 
     let html = `
