@@ -501,7 +501,7 @@ public class MainActivity extends AppCompatActivity {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            webView.evaluateJavascript("showExitModal();", null);
+            webView.evaluateJavascript("handleBackPress();", null);
         }
     }
 

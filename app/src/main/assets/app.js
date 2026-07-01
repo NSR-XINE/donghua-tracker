@@ -1337,16 +1337,55 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
     }, { passive: true });
 }
 
-// Intercept system back gesture to close modals
-window.addEventListener('popstate', () => {
-    const settingsEl = document.getElementById('settings-modal');
-    const donghuaEl = document.getElementById('donghua-modal');
-    if (settingsEl?.style.display === 'flex') {
-        closeSettingsModal();
-    } else if (donghuaEl?.style.display === 'flex') {
-        closeModal();
+// Close whichever modal is open; called from both popstate and Java onBackPressed
+function closeTopModal() {
+    const modalIds = ['settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
+    for (const id of modalIds) {
+        const el = document.getElementById(id);
+        if (el && el.style.display === 'flex') {
+            if (id === 'settings-modal') closeSettingsModal();
+            else if (id === 'donghua-modal') closeModal();
+            else if (id === 'import-modal') {
+                const importModal = document.getElementById('import-modal');
+                if (importModal) {
+                    importModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    const settingsModal = document.getElementById('settings-modal');
+                    if (settingsModal && settingsModal.style.display === 'flex') {
+                        document.body.classList.add('modal-open');
+                    }
+                }
+            }
+            else if (id === 'details-modal') {
+                const detailsModal = document.getElementById('details-modal');
+                if (detailsModal) {
+                    detailsModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            }
+            else if (id === 'exit-modal') closeExitModal();
+            return;
+        }
     }
-});
+}
+
+// Called from Android Java onBackPressed — closes modals first, otherwise shows exit
+function handleBackPress() {
+    const modalIds = ['settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
+    for (const id of modalIds) {
+        const el = document.getElementById(id);
+        if (el && el.style.display === 'flex') {
+            closeTopModal();
+            return;
+        }
+    }
+    showExitModal();
+}
+
+window.closeTopModal = closeTopModal;
+window.handleBackPress = handleBackPress;
+
+window.addEventListener('popstate', closeTopModal);
 
 const _origOpenSettings = window.openSettingsModal;
 window.openSettingsModal = function() { _origOpenSettings(); history.pushState({m:1}, ''); };
