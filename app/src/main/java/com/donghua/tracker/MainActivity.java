@@ -301,6 +301,87 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
+            public void fetchUrlPost(final String url, final String jsonBody, final String callbackName) {
+                boolean allowed = false;
+                if (url != null) {
+                    for (String prefix : ALLOWED_PREFIXES) {
+                        if (url.startsWith(prefix)) {
+                            allowed = true;
+                            break;
+                        }
+                    }
+                }
+                if (!allowed) {
+                    webView.evaluateJavascript(callbackName + "(null);", null);
+                    return;
+                }
+
+                final WeakReference<MainActivity> weakActivity = new WeakReference<>(MainActivity.this);
+                new Thread(() -> {
+                    MainActivity activity = weakActivity.get();
+                    if (activity == null) return;
+                    java.net.HttpURLConnection conn = null;
+                    try {
+                        java.net.URL urlObj = new java.net.URL(url);
+                        conn = (java.net.HttpURLConnection) urlObj.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setConnectTimeout(10000);
+                        conn.setReadTimeout(10000);
+                        conn.setDoOutput(true);
+
+                        if (jsonBody != null) {
+                            java.io.OutputStream os = conn.getOutputStream();
+                            os.write(jsonBody.getBytes("UTF-8"));
+                            os.close();
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        java.io.InputStream inStream;
+                        if (responseCode >= 200 && responseCode < 300) {
+                            inStream = conn.getInputStream();
+                        } else {
+                            inStream = conn.getErrorStream();
+                        }
+
+                        if (inStream == null) {
+                            activity.runOnUiThread(() -> {
+                                MainActivity a = weakActivity.get();
+                                if (a == null) return;
+                                a.webView.evaluateJavascript(callbackName + "(null);", null);
+                            });
+                            return;
+                        }
+
+                        java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(inStream, "UTF-8"));
+                        StringBuilder response = new StringBuilder();
+                        String inputLine;
+                        while ((inputLine = in.readLine()) != null) {
+                            response.append(inputLine).append("\n");
+                        }
+                        in.close();
+
+                        final String body = response.toString();
+                        activity.runOnUiThread(() -> {
+                            MainActivity a = weakActivity.get();
+                            if (a == null) return;
+                            a.webView.evaluateJavascript(callbackName + "("
+                                + org.json.JSONObject.quote(body) + ");", null);
+                        });
+                    } catch (Throwable t) {
+                        activity.runOnUiThread(() -> {
+                            MainActivity a = weakActivity.get();
+                            if (a == null) return;
+                            a.webView.evaluateJavascript(callbackName + "(null);", null);
+                        });
+                    } finally {
+                        if (conn != null) conn.disconnect();
+                    }
+                }).start();
+            }
+
+            @JavascriptInterface
             public void openWatchScreen(final String url) {
                 runOnUiThread(() -> {
                     try {

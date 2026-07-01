@@ -1563,40 +1563,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
 
     /**
-     * Fetches details (Chinese Title, Synopsis, Status, Poster, Total Episodes) from MyAnimeList/Jikan API.
+     * Fetches details (Chinese Title, Synopsis, Status, Poster, Total Episodes) from MyAnimeList/Jikan API,
+     * falling back to AniList if no match is found.
      */
-    function fetchShowDetailsFromJikan(title, silent = true) {
+    function fetchShowDetails(title, silent = true) {
         if (!title) {
             if (!silent) alert('Please enter an English title first.');
             return;
         }
-        
-        const query = encodeURIComponent(title);
-        const url = 'https://api.jikan.moe/v4/anime?q=' + query + '&limit=1';
-        
-        const handleResponse = (data) => {
-            const entry = data && data.data && data.data[0];
-            if (!entry) {
-                if (!silent) alert('No matching show found on MyAnimeList.');
-                return;
-            }
-            
-            // Auto-fill Poster Image
+
+        function fillFormFromEntry(entry, source) {
             const imgUrl = entry.images && entry.images.jpg && entry.images.jpg.large_image_url;
             if (imgUrl) {
                 const posterInput = document.getElementById('show-poster');
                 if (posterInput) posterInput.value = imgUrl;
             }
-            
-            // Auto-fill Chinese Title
+
             if (entry.title_japanese) {
                 const titleZhEl = document.getElementById('show-title-zh');
                 if (titleZhEl && !titleZhEl.value.trim()) {
                     titleZhEl.value = entry.title_japanese;
                 }
             }
-            
-            // Auto-fill Synopsis
+
             if (entry.synopsis) {
                 const notesEl = document.getElementById('show-notes');
                 if (notesEl && !notesEl.value.trim()) {
@@ -1604,22 +1593,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Auto-fill Status based on MAL airing status
             if (entry.status) {
                 const statusSelect = document.getElementById('show-status');
                 if (statusSelect) {
-                    const malStatus = entry.status.toLowerCase();
-                    if (malStatus.includes('currently airing')) {
+                    const s = entry.status.toLowerCase();
+                    if (s.includes('currently airing')) {
                         statusSelect.value = 'ongoing';
-                    } else if (malStatus.includes('finished airing')) {
+                    } else if (s.includes('finished airing')) {
                         statusSelect.value = 'completed';
-                    } else if (malStatus.includes('not yet aired')) {
+                    } else if (s.includes('not yet aired') || s.includes('releasing')) {
+                        statusSelect.value = 'ongoing';
+                    } else if (s.includes('finished')) {
+                        statusSelect.value = 'completed';
+                    } else if (s.includes('cancelled')) {
                         statusSelect.value = 'stopped';
                     }
                 }
             }
 
-            // Auto-fill Total Episodes
             if (entry.episodes) {
                 const totalEpEl = document.getElementById('show-total-ep');
                 if (totalEpEl && (!totalEpEl.value || parseInt(totalEpEl.value) === 0)) {
@@ -1627,9 +1618,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            if (!silent) alert('Auto-filled from ' + source + '!');
+        }
 
-            
-            if (!silent) alert('Auto-filled title, synopsis, poster, status, and dates from MyAnimeList!');
+        function tryAnilistFallback() {
+            const query = `query ($search: String) { Page(page: 1, perPage: 1) { media(search: $search, type: ANIME) { id title { romaji english native } coverImage { large extraLarge } description(asHtml: false) episodes status } } }`;
+            const body = JSON.stringify({ query, variables: { search: title } });
+
+            if (window.AndroidApp && window.AndroidApp.fetchUrlPost) {
+                const cb = 'cb_anilist_' + Date.now();
+                window[cb] = function(json) {
+                    delete window[cb];
+                    if (!json) {
+                        if (!silent) alert('No matching show found on MyAnimeList or AniList.');
+                        return;
+                    }
+                    try {
+                        const data = JSON.parse(json);
+                        const media = data && data.data && data.data.Page && data.data.Page.media && data.data.Page.media[0];
+                        if (!media) {
+                            if (!silent) alert('No matching show found on MyAnimeList or AniList.');
+                            return;
+                        }
+                        const mapped = {
+                            title_japanese: media.title && (media.title.native || media.title.romaji),
+                            synopsis: media.description,
+                            status: media.status,
+                            episodes: media.episodes,
+                            images: { jpg: { large_image_url: media.coverImage && (media.coverImage.extraLarge || media.coverImage.large) } }
+                        };
+                        fillFormFromEntry(mapped, 'AniList');
+                    } catch(e) {
+                        if (!silent) alert('Error parsing AniList response.');
+                    }
+                };
+                window.AndroidApp.fetchUrlPost('https://graphql.anilist.co/', body, cb);
+            } else {
+                if (!silent) alert('No matching show found on MyAnimeList or AniList.');
+            }
+        }
+
+        const query = encodeURIComponent(title);
+        const url = 'https://api.jikan.moe/v4/anime?q=' + query + '&limit=1';
+
+        const handleResponse = (data) => {
+            const entry = data && data.data && data.data[0];
+            if (!entry) {
+                tryAnilistFallback();
+                return;
+            }
+            fillFormFromEntry(entry, 'MyAnimeList');
         };
 
         if (window.AndroidApp && window.AndroidApp.fetchUrl) {
@@ -1637,36 +1675,29 @@ document.addEventListener('DOMContentLoaded', () => {
             window[cbName] = function(json) {
                 delete window[cbName];
                 if (!json) {
-                    if (!silent) alert('Could not fetch data from MyAnimeList.');
+                    tryAnilistFallback();
                     return;
                 }
                 try {
                     const data = JSON.parse(json);
                     handleResponse(data);
                 } catch(e) {
-                    if (!silent) alert('Error parsing MAL response.');
+                    tryAnilistFallback();
                 }
             };
             window.AndroidApp.fetchUrl(url, cbName);
         } else {
-            // Web browser fallback
             fetch(url)
-                .then(r => {
-                    if (!r.ok) throw new Error('API response status ' + r.status);
-                    return r.json();
-                })
+                .then(r => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
                 .then(data => handleResponse(data))
-                .catch(err => {
-                    console.error(err);
-                    if (!silent) alert('Error fetching details from MyAnimeList API. Please check your network connection.');
-                });
+                .catch(() => tryAnilistFallback());
         }
     }
 
     // Manual Fetch trigger button
     document.getElementById('btn-fetch-poster').addEventListener('click', () => {
         const title = document.getElementById('show-title').value.trim();
-        fetchShowDetailsFromJikan(title, false);
+        fetchShowDetails(title, false);
     });
 
     // Auto-fetch trigger when typing or changing the English Title
@@ -1674,7 +1705,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (showTitleInput) {
         showTitleInput.addEventListener('change', (e) => {
             const title = e.target.value.trim();
-            fetchShowDetailsFromJikan(title, true);
+            fetchShowDetails(title, true);
         });
     }
 
