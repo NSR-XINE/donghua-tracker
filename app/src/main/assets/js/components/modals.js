@@ -253,16 +253,16 @@ function setupDrawerSwipe() {
     drawer.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         const dx = e.touches[0].clientX - startX;
-        if (dx > 0) { isDragging = false; drawer.style.transform = ''; drawer.style.transition = ''; return; }
-        drawer.style.transform = `translateX(${Math.max(dx, -drawer.offsetWidth)}px)`;
+        if (dx < 0) { isDragging = false; drawer.style.transform = ''; drawer.style.transition = ''; return; }
+        drawer.style.transform = `translateX(${Math.min(dx, drawer.offsetWidth)}px)`;
     }, { passive: true });
     drawer.addEventListener('touchend', (e) => {
         if (!isDragging) return;
         isDragging = false;
         const dx = e.changedTouches[0].clientX - startX;
         drawer.style.transition = 'transform 0.25s ease';
-        if (Math.abs(dx) > 50) {
-            drawer.style.transform = 'translateX(-100%)';
+        if (dx > 50) {
+            drawer.style.transform = 'translateX(100%)';
             setTimeout(closeDrawer, 220);
         } else {
             drawer.style.transform = '';
@@ -274,7 +274,10 @@ function setupDrawerSwipe() {
 function closeDrawer() {
     const drawer = document.getElementById('right-drawer');
     const overlay = document.getElementById('drawer-overlay');
-    if (drawer) drawer.classList.remove('open');
+    if (drawer) {
+        drawer.classList.remove('open');
+        setTimeout(() => { drawer.style.transform = ''; drawer.style.transition = ''; }, 300);
+    }
     if (overlay) {
         overlay.classList.remove('open');
         setTimeout(() => overlay.style.display = 'none', 300);
