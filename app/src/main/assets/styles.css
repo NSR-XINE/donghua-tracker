@@ -773,7 +773,7 @@ input, textarea {
     gap: 1rem;
     position: relative;
     z-index: 2;
-    margin-top: -30px; /* pull content up over poster gradient */
+    margin-top: 0; /* title sits below the poster, not overlapping the gradient */
 }
 
 .card-title-block {
@@ -790,7 +790,7 @@ input, textarea {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    color: #f3f5f9;
+    color: var(--text-primary);
 }
 
 body.amoled .card-title {
