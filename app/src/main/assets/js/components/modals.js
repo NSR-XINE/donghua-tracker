@@ -234,46 +234,41 @@ function handleBackPress() {
 function openDrawer() {
     const drawer = document.getElementById('right-drawer');
     const overlay = document.getElementById('drawer-overlay');
-    if (drawer) {
-        drawer.classList.add('open');
-        setupDrawerSwipe(drawer);
-    }
+    if (drawer) drawer.classList.add('open');
     if (overlay) { overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('open'), 10); }
     document.body.classList.add('modal-open');
+    setTimeout(setupDrawerSwipe, 50);
 }
 
-let drawerSwipeInitialized = false;
-function setupDrawerSwipe(drawer) {
-    if (drawerSwipeInitialized) return;
-    drawerSwipeInitialized = true;
+function setupDrawerSwipe() {
+    const drawer = document.getElementById('right-drawer');
+    if (!drawer || drawer.dataset.swipeAttached) return;
+    drawer.dataset.swipeAttached = '1';
     let startX = 0, isDragging = false;
-    const onStart = (e) => {
+    drawer.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         isDragging = true;
         drawer.style.transition = 'none';
-    };
-    const onMove = (e) => {
+    }, { passive: true });
+    drawer.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         const dx = e.touches[0].clientX - startX;
-        if (dx > 0) { isDragging = false; return; }
+        if (dx > 0) { isDragging = false; drawer.style.transform = ''; drawer.style.transition = ''; return; }
         drawer.style.transform = `translateX(${Math.max(dx, -drawer.offsetWidth)}px)`;
-    };
-    const onEnd = (e) => {
+    }, { passive: true });
+    drawer.addEventListener('touchend', (e) => {
         if (!isDragging) return;
         isDragging = false;
         const dx = e.changedTouches[0].clientX - startX;
         drawer.style.transition = 'transform 0.25s ease';
-        if (Math.abs(dx) > 60) {
-            drawer.style.transform = `translateX(-100%)`;
+        if (Math.abs(dx) > 50) {
+            drawer.style.transform = 'translateX(-100%)';
             setTimeout(closeDrawer, 220);
         } else {
             drawer.style.transform = '';
-            setTimeout(() => drawer.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 250);
+            setTimeout(() => { drawer.style.transition = ''; }, 250);
         }
-    };
-    drawer.addEventListener('touchstart', onStart, { passive: true });
-    drawer.addEventListener('touchmove', onMove, { passive: true });
-    drawer.addEventListener('touchend', onEnd, { passive: true });
+    }, { passive: true });
 }
 
 function closeDrawer() {
