@@ -12,7 +12,7 @@ function updateTimers() {
     const clockEl = document.getElementById('clock-display');
     if (clockEl) {
         const now = new Date();
-        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + getTodayName() + ')';
+        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }) + ' (' + getTodayName() + ')';
     }
 
     const heroCountdownBox = document.getElementById('hero-countdown-box');
@@ -122,10 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-open-drawer')?.addEventListener('click', openDrawer);
     document.getElementById('btn-close-drawer')?.addEventListener('click', closeDrawer);
     document.getElementById('drawer-overlay')?.addEventListener('click', closeDrawer);
-    addSwipeToDismiss('history-modal', closeHistoryModal);
-    addSwipeToDismiss('stats-modal', closeStatsModal);
-    addSwipeToDismiss('calendar-modal', closeCalendarModal);
-    addSwipeToDismiss('collections-modal', closeCollectionsModal);
 
     switchTab('home');
 
