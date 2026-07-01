@@ -5,7 +5,7 @@ function switchTab(tabName) {
     if (tabName === 'add') return;
     activeTab = tabName;
 
-    document.body.classList.remove('tab-home', 'tab-airing', 'tab-stopped', 'tab-complete', 'tab-favorites');
+    document.body.classList.remove('tab-home', 'tab-airing', 'tab-stopped', 'tab-complete');
     document.body.classList.add(`tab-${tabName}`);
 
     document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => btn.classList.remove('active'));
@@ -16,7 +16,6 @@ function switchTab(tabName) {
     const scheduleContainer = document.querySelector('.schedule-container');
     const heroBanner = document.getElementById('next-up-banner');
     const sectionsContainer = document.getElementById('shows-sections-container');
-    const statsPanel = document.querySelector('.stats-panel');
     const controlPanel = document.querySelector('.control-panel');
     const contentArea = document.querySelector('.content-area');
     const emptyStateEl = document.getElementById('empty-state');
@@ -34,7 +33,7 @@ function switchTab(tabName) {
             if (scheduleContainer) scheduleContainer.style.setProperty('display', 'block', 'important');
             if (heroBanner) { heroBanner.style.display = ''; renderHeroBanner(); }
             if (emptyStateEl && shows.length === 0) emptyStateEl.style.setProperty('display', 'flex', 'important');
-        } else if (tabName === 'favorites' || tabName === 'airing' || tabName === 'complete' || tabName === 'stopped') {
+        } else if (tabName === 'airing' || tabName === 'complete' || tabName === 'stopped') {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             renderShowsGrid();
@@ -44,10 +43,6 @@ function switchTab(tabName) {
             if (el) el.style.display = '';
         });
         renderHeroBanner();
-    }
-
-    if (statsPanel) {
-        statsPanel.style.setProperty('display', tabName === 'home' ? 'flex' : 'none', 'important');
     }
 
     window.scrollTo({ top: 0, behavior: 'instant' });

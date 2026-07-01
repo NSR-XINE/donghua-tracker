@@ -10,13 +10,5 @@ function computeStats() {
 }
 
 function updateStats() {
-    const stats = computeStats();
-    const el = (id) => document.getElementById(id);
-    if (el('stat-total')) el('stat-total').innerText = stats.total;
-    if (el('stat-watching')) el('stat-watching').innerText = stats.airing;
-    if (el('stat-completed')) el('stat-completed').innerText = stats.completed;
-    if (el('stat-episodes')) el('stat-episodes').innerText = stats.totalEpisodes;
-    if (el('stat-favorites')) el('stat-favorites').innerText = stats.favorites;
-    if (el('stat-hours')) el('stat-hours').innerText = stats.hoursWatched;
-    return stats;
+    return computeStats();
 }
