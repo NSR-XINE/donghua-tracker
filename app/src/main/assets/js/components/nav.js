@@ -5,7 +5,7 @@ function switchTab(tabName) {
     if (tabName === 'add') return;
     activeTab = tabName;
 
-    document.body.classList.remove('tab-home', 'tab-airing', 'tab-stopped', 'tab-complete');
+    document.body.classList.remove('tab-home', 'tab-airing', 'tab-stopped', 'tab-complete', 'tab-seasonal');
     document.body.classList.add(`tab-${tabName}`);
 
     document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => btn.classList.remove('active'));
@@ -37,12 +37,28 @@ function switchTab(tabName) {
             if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
             if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
             renderShowsGrid();
+        } else if (tabName === 'seasonal') {
+            if (contentArea) contentArea.style.setProperty('display', 'block', 'important');
+            if (sectionsContainer) sectionsContainer.style.setProperty('display', 'block', 'important');
+            renderSeasonalView();
+        }
+        const showGenreBar = tabName === 'airing' || tabName === 'complete' || tabName === 'stopped' || tabName === 'seasonal';
+        const genreBar = document.getElementById('genre-filter-bar');
+        if (genreBar) {
+            genreBar.style.setProperty('display', showGenreBar ? 'flex' : 'none', 'important');
+            if (showGenreBar) populateGenreFilter();
         }
     } else {
         [searchPanel, scheduleContainer, sectionsContainer, controlPanel, contentArea].forEach(el => {
             if (el) el.style.display = '';
         });
         renderHeroBanner();
+        const showGenreBar = tabName === 'airing' || tabName === 'complete' || tabName === 'stopped' || tabName === 'seasonal';
+        const genreBar = document.getElementById('genre-filter-bar');
+        if (genreBar) {
+            genreBar.style.display = showGenreBar ? 'flex' : 'none';
+            if (showGenreBar) populateGenreFilter();
+        }
     }
 
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -115,4 +131,32 @@ function closeDrawer() {
         setTimeout(() => overlay.style.display = 'none', 300);
     }
     document.body.classList.remove('modal-open');
+}
+
+let _genreList = [];
+
+function populateGenreFilter() {
+    const bar = document.getElementById('genre-filter-bar');
+    if (!bar) return;
+    const allGenres = new Set();
+    shows.forEach(s => {
+        if (s.genre) s.genre.split(',').map(g => g.trim().toLowerCase()).filter(Boolean).forEach(g => allGenres.add(g));
+    });
+    const sorted = Array.from(allGenres).sort();
+    if (JSON.stringify(sorted) === JSON.stringify(_genreList) && bar.children.length > 0) return;
+    _genreList = sorted;
+    let html = `<button class="genre-filter-btn ${!filters.genre ? 'active' : ''}" data-genre="">All</button>`;
+    sorted.forEach(g => {
+        html += `<button class="genre-filter-btn ${filters.genre === g ? 'active' : ''}" data-genre="${g}">${escapeHtml(g.charAt(0).toUpperCase() + g.slice(1))}</button>`;
+    });
+    bar.innerHTML = html;
+    Array.from(bar.children).forEach(btn => {
+        btn.addEventListener('click', () => {
+            filters.genre = btn.dataset.genre;
+            Array.from(bar.children).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (activeTab === 'seasonal') renderSeasonalView();
+            else renderShowsGrid();
+        });
+    });
 }

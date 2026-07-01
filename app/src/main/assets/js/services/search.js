@@ -16,6 +16,7 @@ function getSearchSuggestions(query) {
     shows.forEach(show => {
         if (show.title.toLowerCase().includes(q)) matches.add(show.title);
         if (show.titleZh && show.titleZh.toLowerCase().includes(q)) matches.add(show.titleZh);
+        if (show.notes && show.notes.toLowerCase().includes(q)) matches.add(show.title);
     });
     recentSearches.forEach(s => {
         if (s.includes(q)) matches.add('🔍 ' + s);

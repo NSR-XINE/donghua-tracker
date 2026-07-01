@@ -1,6 +1,6 @@
 let shows = [];
 const existingShowIds = new Set();
-const filters = { search: '', status: 'all', scheduleDay: 'all', sortBy: 'countdown' };
+const filters = { search: '', genre: '', status: 'all', scheduleDay: 'all', sortBy: 'countdown' };
 Object.defineProperty(window, 'shows', { get() { return shows; }, set(v) { shows = v; } });
 Object.defineProperty(window, 'existingShowIds', { get() { return existingShowIds; } });
 Object.defineProperty(window, 'filters', { get() { return filters; } });
@@ -114,10 +114,10 @@ function deleteShow(showId) {
     return true;
 }
 
-function incrementEpisode(showId) {
+function incrementEpisode(showId, count = 1) {
     const show = getShowById(showId);
     if (!show) return null;
-    show.currentEp++;
+    show.currentEp += count;
     show.lastUpdated = Date.now();
     if (DB._available) {
         DB.addWatchHistory(showId, show.currentEp);

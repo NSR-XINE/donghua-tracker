@@ -10,6 +10,8 @@ function renderShowsGrid() {
     else if (activeTab === 'favorites') { containerEl.innerHTML = ''; renderFavoritesGrid(); return; }
     else { containerEl.innerHTML = ''; return; }
 
+    const genreFilter = filters.genre ? filters.genre.toLowerCase() : '';
+
     let filteredShows = shows.filter(show => {
         const matchesSearch = (() => {
             if (!filters.search) return true;
@@ -18,7 +20,8 @@ function renderShowsGrid() {
                    fuzzyMatch(show.titleZh, q) ||
                    fuzzyMatch(show.notes, q);
         })();
-        return matchesSearch && statusFilters.includes(show.status);
+        const matchesGenre = !genreFilter || (show.genre && show.genre.toLowerCase().includes(genreFilter));
+        return matchesSearch && matchesGenre && statusFilters.includes(show.status);
     });
 
     filteredShows.sort((a, b) => {
@@ -91,6 +94,8 @@ function renderCard(show, todayName) {
         ${firstChineseChar ? `<div class="placeholder-zh">${firstChineseChar}</div>` : ''}
     </div>`;
 
+    const genreTags = show.genre ? show.genre.split(',').map(g => `<span class="genre-tag">${escapeHtml(g.trim())}</span>`).join('') : '';
+
     return `<article class="show-card ${isReleasingToday ? 'releasing-today' : ''}" data-id="${show.id}">
         <div class="card-header">
             <div class="card-badges">
@@ -98,6 +103,7 @@ function renderCard(show, todayName) {
                 ${show.isFavorite ? '<span class="status-badge" style="background:rgba(255,42,95,0.2);color:var(--accent-rose);border:1px solid rgba(255,42,95,0.4)"><i class="fa-solid fa-heart"></i></span>' : ''}
                 ${isReleasingToday ? '<span class="status-badge releasing-today-badge">Airs Today</span>' : ''}
             </div>
+            ${genreTags ? `<div class="card-genres">${genreTags}</div>` : ''}
             ${safePoster ? posterHtml : ''}
             ${placeholderHtml}
             <div class="card-overlay"></div>
@@ -147,7 +153,13 @@ function renderFavoritesGrid() {
     const emptyStateEl = document.getElementById('empty-state');
     if (!containerEl) return;
 
-    const filteredShows = shows.filter(s => s.isFavorite && (!filters.search || fuzzyMatch(s.title, filters.search) || fuzzyMatch(s.titleZh, filters.search)));
+    const genreFilter = filters.genre ? filters.genre.toLowerCase() : '';
+    const filteredShows = shows.filter(s => {
+        if (!s.isFavorite) return false;
+        if (filters.search && !fuzzyMatch(s.title, filters.search) && !fuzzyMatch(s.titleZh, filters.search)) return false;
+        if (genreFilter && !(s.genre && s.genre.toLowerCase().includes(genreFilter))) return false;
+        return true;
+    });
     filteredShows.sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
 
     if (filteredShows.length === 0) {
@@ -183,6 +195,7 @@ function showEmptyState(el, title, text, showReset) {
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
             filters.search = '';
+            filters.genre = '';
             const searchInput = document.getElementById('search-input');
             if (searchInput) searchInput.value = '';
             renderShowsGrid();
@@ -190,8 +203,37 @@ function showEmptyState(el, title, text, showReset) {
     }
 }
 
+let _plusLongPress = false;
+
 function setupCardActions() {
-    document.getElementById('shows-sections-container')?.addEventListener('click', (e) => {
+    const container = document.getElementById('shows-sections-container');
+
+    let longPressTimer = null;
+    container?.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.btn-plus')) return;
+        const card = e.target.closest('.show-card');
+        if (!card) return;
+        longPressTimer = setTimeout(() => {
+            _plusLongPress = true;
+            incrementEpisode(card.dataset.id, 5);
+            const btn = e.target.closest('.btn-plus');
+            if (btn) {
+                btn.style.transition = 'transform 0.1s';
+                btn.style.transform = 'scale(1.4)';
+                setTimeout(() => btn.style.transform = '', 200);
+            }
+        }, 500);
+    }, { passive: true });
+
+    container?.addEventListener('touchend', () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }, { passive: true });
+
+    container?.addEventListener('touchcancel', () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }, { passive: true });
+
+    container?.addEventListener('click', (e) => {
         const card = e.target.closest('.show-card');
         if (!card) return;
 
@@ -207,7 +249,7 @@ function setupCardActions() {
         const show = getShowById(showId);
         if (!show) return;
 
-        if (isPlus) { incrementEpisode(showId); }
+        if (isPlus && !_plusLongPress) { incrementEpisode(showId); }
         else if (isMinus) { decrementEpisode(showId); }
         else if (isEdit) { openModal(show); }
         else if (isFavorite) {
@@ -223,5 +265,6 @@ function setupCardActions() {
         }
         else if (isStream || isCountdown) { return; }
         else { openDetailsModal(show); }
+        _plusLongPress = false;
     });
 }

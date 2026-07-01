@@ -85,6 +85,10 @@ const DB = {
         return this._call('exitApp');
     },
 
+    getDynamicColors() {
+        return this._call('getDynamicColors');
+    },
+
     setSystemThemeMode(mode) {
         return this._call('setSystemThemeMode', mode);
     },

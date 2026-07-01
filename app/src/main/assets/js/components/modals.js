@@ -383,6 +383,7 @@ function setupFormSubmission() {
             totalEp: parseInt(document.getElementById('show-total-ep')?.value) || 0,
             poster: document.getElementById('show-poster')?.value?.trim() || '',
             collection: document.getElementById('show-collection')?.value?.trim() || '',
+            genre: document.getElementById('show-genre')?.value?.trim() || '',
             notes: document.getElementById('show-notes')?.value?.trim() || '',
             lastUpdated: Date.now()
         };

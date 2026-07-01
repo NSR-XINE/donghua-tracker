@@ -98,6 +98,7 @@
                         <input type="text" id="search-input" placeholder="Search donghua...">
                     </div>
                 </div>
+                <div class="genre-filter-bar" id="genre-filter-bar" style="display:none;margin-top:0.5rem;padding:0 0.5rem;flex-wrap:wrap;gap:0.3rem;"></div>
             </section>
 
 
@@ -455,6 +456,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="show-genre">Genre Tags (Optional)</label>
+                        <input type="text" id="show-genre" placeholder="e.g., Action, Fantasy, Romance, Cultivation">
+                        <small class="form-help">Comma-separated genres. Used for filtering in the app.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="show-notes">Synopsis & Personal Notes (Optional)</label>
                         <textarea id="show-notes" rows="3" placeholder="Add details, season info, characters, or viewing notes..."></textarea>
                     </div>
@@ -502,6 +509,10 @@
             <i class="fa-solid fa-rocket"></i>
             <span>Stopped</span>
         </button>
+        <button class="nav-item" id="nav-btn-seasonal" onclick="switchTab('seasonal')">
+            <i class="fa-regular fa-calendar"></i>
+            <span>Seasonal</span>
+        </button>
     </nav>
 
     <!-- Custom Scripts -->
@@ -525,6 +536,7 @@
     <script src="js/pages/stats.js?v=6.6"></script>
     <script src="js/pages/calendar.js?v=6.6"></script>
     <script src="js/pages/collections.js?v=6.6"></script>
+    <script src="js/pages/seasonal.js?v=6.6"></script>
     <script src="js/app.js?v=6.6"></script>
 </body>
 </html>
