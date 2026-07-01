@@ -51,6 +51,7 @@ function renderWatchHistory() {
 }
 
 function openHistoryModal() {
+    closeDrawer();
     const modal = document.getElementById('history-modal');
     if (!modal) return;
     renderWatchHistory();

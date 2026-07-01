@@ -139,6 +139,7 @@ function closeModal() {
 }
 
 function openSettingsModal() {
+    closeDrawer();
     const modal = document.getElementById('settings-modal');
     if (modal) {
         modal.style.setProperty('display', 'flex', 'important');

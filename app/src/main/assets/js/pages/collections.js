@@ -53,6 +53,7 @@ function renderCollectionsView() {
 }
 
 function openCollectionsModal() {
+    closeDrawer();
     const modal = document.getElementById('collections-modal');
     if (!modal) return;
     renderCollectionsView();

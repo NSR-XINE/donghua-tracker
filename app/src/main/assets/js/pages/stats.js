@@ -49,6 +49,7 @@ function renderDetailedStats() {
 }
 
 function openStatsModal() {
+    closeDrawer();
     const modal = document.getElementById('stats-modal');
     if (!modal) return;
     renderDetailedStats();

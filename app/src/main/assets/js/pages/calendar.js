@@ -87,6 +87,7 @@ function filterScheduleByDay(dayName) {
 }
 
 function openCalendarModal() {
+    closeDrawer();
     const modal = document.getElementById('calendar-modal');
     if (!modal) return;
     renderCalendarView();
