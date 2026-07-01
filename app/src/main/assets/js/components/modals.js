@@ -179,6 +179,8 @@ function confirmExitApp() {
 }
 
 function closeTopModal() {
+    const drawer = document.getElementById('right-drawer');
+    if (drawer && drawer.classList.contains('open')) { closeDrawer(); return; }
     const modalIds = ['history-modal', 'stats-modal', 'calendar-modal', 'collections-modal', 'settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
     for (let i = modalIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(modalIds[i]);
@@ -227,6 +229,25 @@ function handleBackPress() {
         }
     }
     showExitModal();
+}
+
+function openDrawer() {
+    const drawer = document.getElementById('right-drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    if (drawer) drawer.classList.add('open');
+    if (overlay) { overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('open'), 10); }
+    document.body.classList.add('modal-open');
+}
+
+function closeDrawer() {
+    const drawer = document.getElementById('right-drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    if (drawer) drawer.classList.remove('open');
+    if (overlay) {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+    document.body.classList.remove('modal-open');
 }
 
 function addSwipeToDismiss(modalOverlayId, closeFn) {

@@ -119,6 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
     addSwipeToDismiss('calendar-modal', closeCalendarModal);
     addSwipeToDismiss('collections-modal', closeCollectionsModal);
 
+    document.getElementById('btn-open-drawer')?.addEventListener('click', openDrawer);
+    document.getElementById('btn-close-drawer')?.addEventListener('click', closeDrawer);
+    document.getElementById('drawer-overlay')?.addEventListener('click', closeDrawer);
+    addSwipeToDismiss('history-modal', closeHistoryModal);
+    addSwipeToDismiss('stats-modal', closeStatsModal);
+    addSwipeToDismiss('calendar-modal', closeCalendarModal);
+    addSwipeToDismiss('collections-modal', closeCollectionsModal);
+
     switchTab('home');
 
     document.getElementById('btn-close-modal')?.addEventListener('click', closeModal);
@@ -204,6 +212,7 @@ function setupDetailsModal() {
 function setupSettingsModal() {
     const settingsModal = document.getElementById('settings-modal');
     if (settingsModal) settingsModal.addEventListener('click', (e) => { if (e.target.id === 'settings-modal') closeSettingsModal(); });
+    document.getElementById('btn-open-settings')?.addEventListener('click', openSettingsModal);
 }
 
 function setupFormSubmission() {
@@ -359,6 +368,8 @@ window.openWatchScreen = openWatchScreen;
 window.exportData = exportData;
 window.importData = importData;
 window.syncAlarm = syncAlarm;
+window.openDrawer = openDrawer;
+window.closeDrawer = closeDrawer;
 window.hashCode = hashCode;
 window.openDetailsModal = openDetailsModal;
 window.openModal = openModal;
