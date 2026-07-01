@@ -1297,44 +1297,58 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
-    const THRESHOLD = 80; // px needed to dismiss
+    let isEdgeSwipe = false;
+    const EDGE_THRESHOLD = 40;
+    const SWIPE_THRESHOLD = 80;
 
-    panel.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
+    const checkEdge = (x) => x < EDGE_THRESHOLD || x > window.innerWidth - EDGE_THRESHOLD;
+
+    overlay.addEventListener('touchstart', (e) => {
+        const tx = e.touches[0].clientX;
+        const ty = e.touches[0].clientY;
+        const target = e.target;
+
+        isEdgeSwipe = checkEdge(tx);
+        const isOnPanel = panel.contains(target);
+
+        if (!isEdgeSwipe && !isOnPanel) return;
+
+        startX = tx;
+        startY = ty;
         isDragging = true;
         panel.style.transition = 'none';
+        panel.style.transform = '';
+        panel.style.opacity = '';
     }, { passive: true });
 
-    panel.addEventListener('touchmove', (e) => {
+    overlay.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         const dx = e.touches[0].clientX - startX;
         const dy = e.touches[0].clientY - startY;
-        // Only track horizontal swipes; ignore if vertical scroll is dominant
         if (Math.abs(dy) > Math.abs(dx)) return;
+
+        if (isEdgeSwipe && dx < 0) return;
+
         panel.style.transform = `translateX(${dx}px)`;
         panel.style.opacity = `${1 - Math.min(Math.abs(dx) / 250, 0.5)}`;
     }, { passive: true });
 
-    panel.addEventListener('touchend', (e) => {
+    overlay.addEventListener('touchend', (e) => {
         if (!isDragging) return;
         isDragging = false;
         const dx = e.changedTouches[0].clientX - startX;
         panel.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
 
-        if (Math.abs(dx) >= THRESHOLD) {
-            // Swipe far enough — fly out and close
+        if (Math.abs(dx) >= SWIPE_THRESHOLD) {
             panel.style.transform = `translateX(${dx > 0 ? '110%' : '-110%'})`;
             panel.style.opacity = '0';
             setTimeout(() => {
                 closeFn();
-                // Reset after close so it animates in cleanly next time
                 panel.style.transition = 'none';
                 panel.style.transform = '';
                 panel.style.opacity = '';
             }, 220);
         } else {
-            // Not far enough — snap back
             panel.style.transform = '';
             panel.style.opacity = '';
         }
