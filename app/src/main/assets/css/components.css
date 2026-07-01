@@ -433,6 +433,29 @@
 
 .schedule-container { margin-top: 1rem; }
 
+.day-schedule-group {
+    margin-bottom: 0.8rem;
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0 0.2rem;
+    min-height: 1.5rem;
+}
+
+.day-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+body.tab-home #next-up-banner {
+    margin-top: 2.5rem;
+}
+
 .schedule-header {
     display: flex;
     justify-content: space-between;
