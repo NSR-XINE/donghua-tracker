@@ -610,7 +610,7 @@
 .right-drawer {
     position: fixed;
     top: 0; right: 0;
-    width: 220px;
+    width: 220px !important;
     height: 100%;
     background: var(--bg-darker);
     border-left: 1px solid var(--border-color);
