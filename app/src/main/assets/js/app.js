@@ -12,7 +12,7 @@ function updateTimers() {
     const clockEl = document.getElementById('clock-display');
     if (clockEl) {
         const now = new Date();
-        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }) + ' (' + getTodayName() + ')';
+        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + getTodayName() + ')';
     }
 
     const heroCountdownBox = document.getElementById('hero-countdown-box');
