@@ -1297,53 +1297,31 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
-    let isEdgeSwipe = false;
-    const EDGE_THRESHOLD = 40;
-    const SWIPE_THRESHOLD = 80;
+    const THRESHOLD = 80;
 
-    const checkEdge = (x) => x < EDGE_THRESHOLD || x > window.innerWidth - EDGE_THRESHOLD;
-
-    overlay.addEventListener('touchstart', (e) => {
-        const tx = e.touches[0].clientX;
-        const ty = e.touches[0].clientY;
-        const target = e.target;
-
-        isEdgeSwipe = checkEdge(tx);
-        const isOnPanel = panel.contains(target);
-
-        if (!isEdgeSwipe && !isOnPanel) return;
-
-        startX = tx;
-        startY = ty;
+    panel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
         isDragging = true;
         panel.style.transition = 'none';
-        panel.style.transform = '';
-        panel.style.opacity = '';
     }, { passive: true });
 
-    overlay.addEventListener('touchmove', (e) => {
+    panel.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         const dx = e.touches[0].clientX - startX;
         const dy = e.touches[0].clientY - startY;
         if (Math.abs(dy) > Math.abs(dx)) return;
-
-        if (isEdgeSwipe) {
-            const onLeftEdge = startX < EDGE_THRESHOLD;
-            if (onLeftEdge && dx < 0) return;
-            if (!onLeftEdge && dx > 0) return;
-        }
-
         panel.style.transform = `translateX(${dx}px)`;
         panel.style.opacity = `${1 - Math.min(Math.abs(dx) / 250, 0.5)}`;
     }, { passive: true });
 
-    overlay.addEventListener('touchend', (e) => {
+    panel.addEventListener('touchend', (e) => {
         if (!isDragging) return;
         isDragging = false;
         const dx = e.changedTouches[0].clientX - startX;
         panel.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
 
-        if (Math.abs(dx) >= SWIPE_THRESHOLD) {
+        if (Math.abs(dx) >= THRESHOLD) {
             panel.style.transform = `translateX(${dx > 0 ? '110%' : '-110%'})`;
             panel.style.opacity = '0';
             setTimeout(() => {
