@@ -979,29 +979,30 @@ function exportData() {
         json = localStorage.getItem('donghua_shows');
     }
     if (!json || json === '[]') { alert('No data to export.'); return; }
-    
-    // File download trigger (creates a local .json file download)
+
+    // On Android: use the native share sheet so the user can save/send the .json file
+    if (window.AndroidApp && window.AndroidApp.shareText) {
+        window.AndroidApp.shareText(json);
+        return;
+    }
+
+    // Web browser fallback: trigger a real .json file download
     try {
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'donghua_backup.json';
+        a.download = 'donghua_backup_' + new Date().toISOString().slice(0, 10) + '.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } catch (e) {
-        console.error("Blob download failed", e);
-    }
-
-    if (window.AndroidApp && window.AndroidApp.shareText) {
-        window.AndroidApp.shareText(json);
-    } else {
+        // Last resort: copy to clipboard
         navigator.clipboard.writeText(json).then(() => {
             alert('Backup JSON copied to clipboard.');
-        }).catch(err => {
-            console.error("Clipboard write failed", err);
+        }).catch(() => {
+            alert('Export failed. Please try again.');
         });
     }
 }
@@ -1368,23 +1369,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseImport = document.getElementById('btn-close-import');
     const btnCancelImport = document.getElementById('btn-cancel-import');
     const btnSubmitImport = document.getElementById('btn-submit-import');
-    const importTextarea = document.getElementById('import-json-textarea');
-    
+    const importFileInput = document.getElementById('import-file-input');
+    const importFileName = document.getElementById('import-file-name');
+
+    // When a file is selected, read it and enable the Import button
+    if (importFileInput) {
+        importFileInput.addEventListener('change', () => {
+            const file = importFileInput.files[0];
+            if (!file) return;
+            if (importFileName) importFileName.textContent = file.name;
+            // Enable the submit button
+            if (btnSubmitImport) {
+                btnSubmitImport.disabled = false;
+                btnSubmitImport.style.opacity = '1';
+                btnSubmitImport.style.cursor = 'pointer';
+            }
+        });
+    }
+
     if (btnTriggerImport && importModal) {
         btnTriggerImport.addEventListener('click', () => {
-            if (importTextarea) importTextarea.value = '';
+            // Reset state
+            if (importFileInput) importFileInput.value = '';
+            if (importFileName) importFileName.textContent = 'No file selected';
+            if (btnSubmitImport) {
+                btnSubmitImport.disabled = true;
+                btnSubmitImport.style.opacity = '0.5';
+                btnSubmitImport.style.cursor = 'not-allowed';
+            }
             importModal.style.display = 'flex';
             document.body.classList.add('modal-open');
         });
     }
-    
+
     const closeImportModal = () => {
         if (importModal) {
             importModal.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
     };
-    
+
     if (btnCloseImport) btnCloseImport.addEventListener('click', closeImportModal);
     if (btnCancelImport) btnCancelImport.addEventListener('click', closeImportModal);
     if (importModal) {
@@ -1419,17 +1443,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    if (btnSubmitImport && importTextarea) {
+    if (btnSubmitImport && importFileInput) {
         btnSubmitImport.addEventListener('click', () => {
-            const rawJson = importTextarea.value.trim();
-            if (!rawJson) {
-                alert("Please paste your JSON backup data first.");
+            const file = importFileInput.files[0];
+            if (!file) {
+                alert('Please select a .json backup file first.');
                 return;
             }
-            const success = importData(rawJson);
-            if (success) {
-                closeImportModal();
-            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const rawJson = e.target.result;
+                const success = importData(rawJson);
+                if (success) {
+                    closeImportModal();
+                }
+            };
+            reader.onerror = () => alert('Failed to read file. Please try again.');
+            reader.readAsText(file);
         });
     }
     
