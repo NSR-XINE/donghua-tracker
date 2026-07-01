@@ -1,0 +1,53 @@
+body.light-theme {
+    --bg-dark: #f0f2f5;
+    --bg-darker: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-hover: rgba(255, 255, 255, 0.98);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.15);
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --accent-cyan: #009aa6;
+    --accent-cyan-rgb: 0, 154, 166;
+    --accent-purple: #7b2cbf;
+    --accent-purple-rgb: 123, 44, 191;
+    --accent-rose: #d90429;
+    --bg-overlay: rgba(240, 244, 248, 0.85);
+    --bg-header-day: rgba(0, 0, 0, 0.03);
+    --bg-input: rgba(0, 0, 0, 0.04);
+    --shadow-neon-cyan: 0 0 15px rgba(0, 154, 166, 0.15);
+    --shadow-neon-purple: 0 0 15px rgba(123, 44, 191, 0.15);
+    --shadow-neon-rose: 0 0 15px rgba(217, 4, 41, 0.15);
+}
+
+body.light-theme .stars-bg { opacity: 0 !important; }
+body.light-theme .theme-btn.active { background: rgba(0, 153, 168, 0.1) !important; border-color: var(--accent-cyan) !important; color: var(--accent-cyan) !important; box-shadow: none; }
+body.light-theme .toggle-track.active { background: var(--accent-cyan) !important; }
+
+body.amoled {
+    --bg-darker: #000000;
+    --bg-dark: #000000;
+    background-color: #000000 !important;
+}
+
+body.amoled .glass-card { background: rgba(0, 0, 0, 0.85); border-color: rgba(255, 255, 255, 0.08); }
+body.amoled .show-card { background: #080808; border-color: rgba(255, 255, 255, 0.05); }
+body.amoled .app-header { background-color: #000000 !important; }
+body.amoled .card-title { color: #f3f5f9; }
+
+.day-schedule-group { margin-bottom: 1.2rem; }
+
+.day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0 0.2rem;
+}
+
+.day-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}

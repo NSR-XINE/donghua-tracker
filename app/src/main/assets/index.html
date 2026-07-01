@@ -11,7 +11,14 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css?v=4.8">
+    <link rel="stylesheet" href="css/base.css?v=6.5">
+    <link rel="stylesheet" href="css/layout.css?v=6.5">
+    <link rel="stylesheet" href="css/components.css?v=6.5">
+    <link rel="stylesheet" href="css/themes.css?v=6.5">
+    <link rel="stylesheet" href="css/navigation.css?v=6.5">
+    <link rel="stylesheet" href="css/banner.css?v=6.5">
+    <link rel="stylesheet" href="css/modals.css?v=6.5">
+    <link rel="stylesheet" href="css/animations.css?v=6.5">
 </head>
 <body class="loading-active">
     <script>try{var t=localStorage.getItem('app_theme');if(t==='light'||t==='amoled')document.body.classList.add(t)}catch(e){}</script>
@@ -40,9 +47,23 @@
                 </div>
             </div>
             
-            <button id="btn-open-settings" onclick="window.openSettingsModal()" class="dev-header-btn" title="Settings">
-                <i class="fa-solid fa-gear"></i>
-            </button>
+            <div class="header-actions">
+                <button id="btn-open-stats" class="dev-header-btn" title="Statistics">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </button>
+                <button id="btn-open-calendar" class="dev-header-btn" title="Calendar">
+                    <i class="fa-solid fa-calendar-alt"></i>
+                </button>
+                <button id="btn-open-collections" class="dev-header-btn" title="Collections">
+                    <i class="fa-solid fa-layer-group"></i>
+                </button>
+                <button id="btn-open-history" class="dev-header-btn" title="Watch History">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button id="btn-open-settings" onclick="window.openSettingsModal()" class="dev-header-btn" title="Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
             
             <!-- Quick Stats -->
             <div class="stats-panel">
@@ -61,6 +82,14 @@
                 <div class="stat-card">
                     <span class="stat-val" id="stat-episodes">0</span>
                     <span class="stat-lbl">Episodes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" id="stat-favorites">0</span>
+                    <span class="stat-lbl">Favorites</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-val" id="stat-hours">0</span>
+                    <span class="stat-lbl">Hours</span>
                 </div>
             </div>
         </div>
@@ -314,6 +343,58 @@
         </div>
     </div>
 
+    <!-- Watch History Modal -->
+    <div class="modal-overlay" id="history-modal" style="display: none;">
+        <div class="modal-content glass-card animate-scale" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-cyan);"></i> Watch History</h2>
+                <button id="btn-close-history" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="history-content" style="max-height: 60vh; overflow-y: auto; padding-right: 0.3rem;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal-overlay" id="stats-modal" style="display: none;">
+        <div class="modal-content glass-card animate-scale" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-chart-simple" style="color: var(--accent-cyan);"></i> Statistics</h2>
+                <button id="btn-close-stats" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="detailed-stats-content">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal-overlay" id="calendar-modal" style="display: none;">
+        <div class="modal-content glass-card animate-scale" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2><i class="fa-regular fa-calendar" style="color: var(--accent-cyan);"></i> Calendar</h2>
+                <button id="btn-close-calendar" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="calendar-content" style="max-height: 65vh; overflow-y: auto;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Collections Modal -->
+    <div class="modal-overlay" id="collections-modal" style="display: none;">
+        <div class="modal-content glass-card animate-scale" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-layer-group" style="color: var(--accent-cyan);"></i> Collections</h2>
+                <button id="btn-close-collections" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="collections-content">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Add/Edit Modal Overlay -->
     <div class="modal-overlay" id="donghua-modal" style="display: none;">
         <div class="modal-content glass-card animate-scale">
@@ -400,6 +481,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="show-collection">Collection / Group (Optional)</label>
+                        <input type="text" id="show-collection" placeholder="e.g., Season 5, Movies, Favorites...">
+                        <small class="form-help">Group related shows together by collection name.</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="show-notes">Synopsis & Personal Notes (Optional)</label>
                         <textarea id="show-notes" rows="3" placeholder="Add details, season info, characters, or viewing notes..."></textarea>
                     </div>
@@ -447,9 +534,32 @@
             <i class="fa-solid fa-rocket"></i>
             <span>Stopped</span>
         </button>
+        <button class="nav-item" id="nav-btn-favorites" onclick="switchTab('favorites')">
+            <i class="fa-solid fa-heart"></i>
+            <span>Favorites</span>
+        </button>
     </nav>
 
-    <!-- Custom Script -->
-    <script src="app.js?v=4.8"></script>
+    <!-- Custom Scripts -->
+    <script src="js/utils/constants.js?v=6.5"></script>
+    <script src="js/utils/helpers.js?v=6.5"></script>
+    <script src="js/database/bridge.js?v=6.5"></script>
+    <script src="js/services/state.js?v=6.5"></script>
+    <script src="js/services/countdown.js?v=6.5"></script>
+    <script src="js/services/theme.js?v=6.5"></script>
+    <script src="js/services/search.js?v=6.5"></script>
+    <script src="js/services/poster.js?v=6.5"></script>
+    <script src="js/services/notifications.js?v=6.5"></script>
+    <script src="js/services/stats.js?v=6.5"></script>
+    <script src="js/components/cards.js?v=6.5"></script>
+    <script src="js/components/banner.js?v=6.5"></script>
+    <script src="js/components/schedule.js?v=6.5"></script>
+    <script src="js/components/modals.js?v=6.5"></script>
+    <script src="js/components/nav.js?v=6.5"></script>
+    <script src="js/pages/history.js?v=6.5"></script>
+    <script src="js/pages/stats.js?v=6.5"></script>
+    <script src="js/pages/calendar.js?v=6.5"></script>
+    <script src="js/pages/collections.js?v=6.5"></script>
+    <script src="js/app.js?v=6.5"></script>
 </body>
 </html>

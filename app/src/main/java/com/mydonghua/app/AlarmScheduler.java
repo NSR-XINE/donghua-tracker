@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class AlarmScheduler {
 
@@ -20,12 +21,11 @@ public class AlarmScheduler {
         intent.putExtra("release_time", releaseTime);
         intent.putExtra("alarm_code", alarmCode);
 
-        PendingIntent pi = PendingIntent.getBroadcast(
-                context,
-                alarmCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
-        );
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+        PendingIntent pi = PendingIntent.getBroadcast(context, alarmCode, intent, flags);
 
         long triggerTime = calculateNextReleaseTime(releaseDay, releaseTime);
         if (triggerTime == 0) return;
@@ -37,7 +37,6 @@ public class AlarmScheduler {
                 am.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pi);
             }
         } catch (SecurityException se) {
-            // Fallback to inexact alarm if system denies exact scheduling privilege
             am.set(AlarmManager.RTC_WAKEUP, triggerTime, pi);
         }
     }
@@ -47,17 +46,18 @@ public class AlarmScheduler {
         if (am == null) return;
 
         Intent intent = new Intent(context, NotificationReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(
-                context,
-                alarmCode,
-                intent,
-                PendingIntent.FLAG_NO_CREATE | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
-        );
+        int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0;
+        PendingIntent pi = PendingIntent.getBroadcast(context, alarmCode, intent,
+                PendingIntent.FLAG_NO_CREATE | flags);
 
         if (pi != null) {
             am.cancel(pi);
             pi.cancel();
         }
+    }
+
+    public static void rescheduleAllAfterBoot(Context context) {
+        BootReceiver.rescheduleAlarms(context);
     }
 
     private static long calculateNextReleaseTime(String releaseDay, String releaseTime) {
@@ -69,6 +69,7 @@ public class AlarmScheduler {
             int dayOfWeek = getDayOfWeekValue(releaseDay);
             if (dayOfWeek == -1) return 0;
 
+            Calendar now = Calendar.getInstance();
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.HOUR_OF_DAY, hour);
             cal.set(Calendar.MINUTE, minute);
@@ -78,13 +79,35 @@ public class AlarmScheduler {
             int currentDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
             int daysUntil = (dayOfWeek - currentDayOfWeek + 7) % 7;
 
-            // If release is today but target time has already elapsed, schedule for next week
-            if (daysUntil == 0 && cal.getTimeInMillis() < System.currentTimeMillis()) {
-                daysUntil = 7;
+            boolean isDstTransition = false;
+            TimeZone tz = TimeZone.getDefault();
+            long currentMillis = now.getTimeInMillis();
+            long targetMillis = cal.getTimeInMillis();
+
+            if (tz.useDaylightTime() && daysUntil == 0) {
+                int dstOffset = tz.getOffset(targetMillis) - tz.getOffset(currentMillis);
+                if (dstOffset != 0) {
+                    targetMillis += dstOffset;
+                    cal.setTimeInMillis(targetMillis);
+                    isDstTransition = true;
+                }
+            }
+
+            if (daysUntil == 0 && (cal.getTimeInMillis() < currentMillis || isDstTransition)) {
+                if (!isDstTransition || cal.getTimeInMillis() < currentMillis) {
+                    daysUntil = 7;
+                }
             }
 
             cal.add(Calendar.DAY_OF_YEAR, daysUntil);
-            return cal.getTimeInMillis();
+
+            long finalTrigger = cal.getTimeInMillis();
+            if (finalTrigger <= currentMillis) {
+                cal.add(Calendar.DAY_OF_YEAR, 7);
+                finalTrigger = cal.getTimeInMillis();
+            }
+
+            return finalTrigger;
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

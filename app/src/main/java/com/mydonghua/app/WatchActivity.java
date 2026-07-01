@@ -18,13 +18,13 @@ public class WatchActivity extends AppCompatActivity {
     private WebView playerView;
     private FrameLayout fullscreenContainer;
     private WebChromeClient.CustomViewCallback customViewCallback;
+    private View customView;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            // Support both portrait and landscape orientations dynamically based on user device sensors
             try {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
             } catch (Throwable t) {
@@ -37,7 +37,6 @@ public class WatchActivity extends AppCompatActivity {
                     FrameLayout.LayoutParams.MATCH_PARENT));
 
             playerView = new WebView(this);
-            // Force hardware acceleration layer on the WebView for video rendering stability
             playerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             playerView.setLayoutParams(new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -55,14 +54,13 @@ public class WatchActivity extends AppCompatActivity {
 
             setContentView(rootLayout);
 
-            // Apply immersive mode after setContentView to ensure the Window/DecorView is initialized
             applyImmersiveMode();
 
             WebSettings s = playerView.getSettings();
             s.setJavaScriptEnabled(true);
             s.setDomStorageEnabled(true);
             s.setDatabaseEnabled(true);
-            s.setJavaScriptCanOpenWindowsAutomatically(false); // Disable popups/redirects
+            s.setJavaScriptCanOpenWindowsAutomatically(false);
             s.setMediaPlaybackRequiresUserGesture(false);
             s.setAllowFileAccess(false);
             s.setSupportZoom(true);
@@ -74,10 +72,6 @@ public class WatchActivity extends AppCompatActivity {
                 + "AppleWebkit/537.36 (KHTML, like Gecko) "
                 + "Chrome/120.0.0.0 Mobile Safari/537.36");
 
-            // MIXED_CONTENT_ALWAYS_ALLOW: many donghua streaming sites serve video assets (m3u8,
-            // mp4 CDN links) over HTTP even when the page itself is loaded via HTTPS. Blocking
-            // mixed content would prevent those videos from playing. This is an intentional
-            // trade-off accepted for the player screen; the main app WebView does NOT use this flag.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                 try {
@@ -97,25 +91,30 @@ public class WatchActivity extends AppCompatActivity {
                         if (request != null && request.getUrl() != null) {
                             String url = request.getUrl().toString();
                             if (url.startsWith("http://") || url.startsWith("https://")) {
-                                return false; // Allow standard web links to load natively
+                                return false;
                             }
                         }
                     }
-                    return true; // Block malicious redirects / custom schemes
+                    return true;
                 }
 
                 @SuppressWarnings("deprecation")
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
-                        return false; // Allow standard web links to load natively
+                        return false;
                     }
-                    return true; // Block malicious redirects / custom schemes
+                    return true;
                 }
             });
+
             playerView.setWebChromeClient(new WebChromeClient() {
                 @Override
                 public void onShowCustomView(View view, CustomViewCallback callback) {
+                    if (customView != null) {
+                        onHideCustomView();
+                    }
+                    customView = view;
                     customViewCallback = callback;
                     if (fullscreenContainer != null) {
                         fullscreenContainer.addView(view);
@@ -125,6 +124,7 @@ public class WatchActivity extends AppCompatActivity {
                         }
                     }
                 }
+
                 @Override
                 public void onHideCustomView() {
                     if (fullscreenContainer != null) {
@@ -138,6 +138,7 @@ public class WatchActivity extends AppCompatActivity {
                         customViewCallback.onCustomViewHidden();
                         customViewCallback = null;
                     }
+                    customView = null;
                 }
             });
 
@@ -150,12 +151,15 @@ public class WatchActivity extends AppCompatActivity {
                 playerView.loadUrl(url);
             } else {
                 finish();
+                return;
             }
 
             getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
                 @Override
                 public void handleOnBackPressed() {
-                    if (playerView != null && playerView.canGoBack()) {
+                    if (customView != null) {
+                        onHideCustomView();
+                    } else if (playerView != null && playerView.canGoBack()) {
                         playerView.goBack();
                     } else {
                         finish();

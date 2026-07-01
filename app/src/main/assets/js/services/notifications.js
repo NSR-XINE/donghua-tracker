@@ -1,0 +1,87 @@
+function syncAlarm(show) {
+    if (!DB._available) return;
+    const alarmCode = show.alarmRequestCode || Math.abs(hashCode(show.id));
+    if (show.status === 'ongoing') {
+        DB.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime, alarmCode);
+    } else {
+        DB.cancelReminder(show.id, alarmCode);
+    }
+}
+
+function syncAllAlarms() {
+    if (!DB._available) return;
+    DB.syncAllAlarms();
+}
+
+function exportData() {
+    let json = null;
+    if (DB._available) {
+        json = DB.getAllShows();
+    } else {
+        json = DB.getLocal('donghua_shows');
+    }
+    if (!json || json === '[]') { alert('No data to export.'); return; }
+    if (DB._available && DB.shareJsonFile) {
+        DB.shareJsonFile(json);
+        return;
+    }
+    try {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mydonghua_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        navigator.clipboard.writeText(json).then(() => {
+            alert('Backup JSON copied to clipboard.');
+        }).catch(() => {
+            alert('Export failed. Please try again.');
+        });
+    }
+}
+
+function importData(jsonString) {
+    let json = jsonString;
+    if (!json) {
+        json = prompt('Paste your backup JSON here:');
+    }
+    if (!json) return false;
+    try {
+        const parsed = JSON.parse(json);
+        if (!Array.isArray(parsed)) throw new Error('Invalid format: root must be a JSON array');
+        for (const item of parsed) {
+            if (!item.title || !item.id) {
+                throw new Error("Missing 'title' or 'id' fields in backup item");
+            }
+        }
+        shows = parsed;
+        existingShowIds.clear();
+        shows.forEach(s => existingShowIds.add(s.id));
+        DB.setLocal('donghua_shows', JSON.stringify(shows));
+        persistState();
+        alert('Import successful! ' + shows.length + ' shows loaded.');
+        return true;
+    } catch(e) {
+        alert('Failed to import backup: ' + e.message);
+        return false;
+    }
+}
+
+function openWatchScreen(url) {
+    if (!url) return;
+    if (DB._available && typeof AndroidApp.openWatchScreen === 'function') {
+        AndroidApp.openWatchScreen(url);
+    } else {
+        window.location.href = url;
+    }
+}
+
+function getWatchUrlById(id) {
+    const show = getShowById(id);
+    if (!show) return '';
+    return getWatchUrl(show);
+}
