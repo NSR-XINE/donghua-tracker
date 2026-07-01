@@ -16,26 +16,43 @@ function updateTimers() {
     }
 
     const heroCD = document.getElementById('hero-countdown-box');
+    const dbg = document.getElementById('dbg-hero');
     if (heroCD) {
+        if (dbg) dbg.textContent = 'found heroCD';
         const heroBanner = document.getElementById('next-up-banner');
-        const heroShowId = heroBanner ? heroBanner.dataset.id : null;
-        if (heroShowId) {
-            const show = getShowById(heroShowId);
-            if (show && show.status === 'ongoing') {
-                const sched = getNextReleaseDate(show.releaseDay, show.releaseTime);
-                if (!sched.airingNow) {
-                    const time = calculateTimeRemaining(sched.targetDate);
-                    if (time.elapsed) { renderHeroBanner(); return; }
-                    const nums = heroCD.querySelectorAll('.num');
-                    if (nums.length >= 4) {
-                        nums[0].innerText = String(time.days).padStart(2, '0');
-                        nums[1].innerText = String(time.hours).padStart(2, '0');
-                        nums[2].innerText = String(time.minutes).padStart(2, '0');
-                        nums[3].innerText = String(time.seconds).padStart(2, '0');
+        if (!heroBanner) { if (dbg) dbg.textContent += ' NO BANNER'; }
+        else {
+            const heroShowId = heroBanner.dataset.id;
+            if (!heroShowId) { if (dbg) dbg.textContent += ' no dataset.id'; }
+            else {
+                if (dbg) dbg.textContent = 'id=' + heroShowId;
+                const show = getShowById(heroShowId);
+                if (!show) { if (dbg) dbg.textContent += ' show NOT found'; }
+                else {
+                    if (dbg) dbg.textContent += ' show=' + show.title + ' status=' + show.status;
+                    if (show.status === 'ongoing') {
+                        const sched = getNextReleaseDate(show.releaseDay, show.releaseTime);
+                        if (sched.airingNow) {
+                            if (dbg) dbg.textContent += ' AIRING NOW';
+                        } else {
+                            const time = calculateTimeRemaining(sched.targetDate);
+                            if (time.elapsed) { renderHeroBanner(); return; }
+                            const nums = heroCD.querySelectorAll('.num');
+                            if (dbg) dbg.textContent += ' nums=' + nums.length;
+                            if (nums.length >= 4) {
+                                nums[0].innerText = String(time.days).padStart(2, '0');
+                                nums[1].innerText = String(time.hours).padStart(2, '0');
+                                nums[2].innerText = String(time.minutes).padStart(2, '0');
+                                nums[3].innerText = String(time.seconds).padStart(2, '0');
+                                if (dbg) dbg.textContent += ' UPDATED d=' + time.days + ' h=' + time.hours;
+                            }
+                        }
                     }
                 }
             }
         }
+    } else {
+        if (dbg) dbg.textContent = 'heroCD not found';
     }
 
     shows.forEach(show => {
