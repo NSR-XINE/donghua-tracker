@@ -147,7 +147,7 @@ public class WatchActivity extends AppCompatActivity {
             if (intent != null) {
                 url = intent.getStringExtra("watch_url");
             }
-            if (url != null && !url.isEmpty()) {
+            if (url != null && !url.isEmpty() && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
                 playerView.loadUrl(url);
             } else {
                 finish();

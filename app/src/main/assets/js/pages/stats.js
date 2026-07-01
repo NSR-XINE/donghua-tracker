@@ -37,7 +37,7 @@ function renderDetailedStats() {
                     const isToday = s.releaseDay === weekDays[todayIndex];
                     return `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.4rem;border-radius:4px;background:${isToday ? 'rgba(157,78,221,0.08)' : 'transparent'};font-size:0.75rem;">
                         <span style="width:60px;font-size:0.65rem;color:var(--text-muted);font-weight:600;">${s.releaseDay.slice(0,3)}</span>
-                        <span style="flex:1;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title}</span>
+                        <span style="flex:1;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.title)}</span>
                         <span style="color:var(--accent-cyan);font-weight:600;font-size:0.7rem;">${s.releaseTime}</span>
                     </div>`;
                 }).join('')}

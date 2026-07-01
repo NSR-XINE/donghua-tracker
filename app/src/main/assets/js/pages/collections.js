@@ -39,9 +39,9 @@ function renderCollectionsView() {
                 ${colShows.map(s => `
                     <div style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.4rem;border-radius:4px;cursor:pointer;transition:background 0.2s;" onclick="openDetailsById('${s.id}')" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
                         <div style="width:28px;height:28px;border-radius:4px;background:${getPosterGradient(s.title)};display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;">
-                            ${s.poster ? `<img src="${s.poster}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : getInitials(s.title)}
+                            ${(() => { const p = safePosterUrl(s.poster); return p ? `<img src="${p}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : getInitials(s.title); })()}
                         </div>
-                        <span style="flex:1;font-size:0.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title}</span>
+                        <span style="flex:1;font-size:0.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.title)}</span>
                         <span class="status-badge ${s.status}" style="font-size:0.55rem;padding:0.1rem 0.3rem;">${getStatusDisplayName(s.status)}</span>
                     </div>
                 `).join('')}

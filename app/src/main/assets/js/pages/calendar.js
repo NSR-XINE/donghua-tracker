@@ -65,7 +65,7 @@ function renderCalendarView() {
                     <div style="font-size:0.7rem;font-weight:600;color:${date.toDateString() === now.toDateString() ? 'var(--accent-purple)' : 'var(--text-secondary)'};margin-bottom:0.2rem;">${dayName} ${date.toDateString() === now.toDateString() ? '(Today)' : ''}</div>
                     ${shows.map(s => `<div style="font-size:0.75rem;color:var(--text-primary);padding:0.15rem 0.4rem;display:flex;align-items:center;gap:0.4rem;">
                         <span style="width:45px;font-size:0.65rem;color:var(--accent-cyan);font-weight:600;">${s.releaseTime}</span>
-                        <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title}</span>
+                        <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.title)}</span>
                     </div>`).join('')}
                 </div>
             `).join('')}

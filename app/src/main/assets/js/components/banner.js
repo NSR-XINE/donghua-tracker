@@ -53,7 +53,7 @@ function renderHeroBanner() {
                     <i class="fa-solid ${isAiring ? 'fa-satellite-dish' : 'fa-clock'}"></i> 
                     ${isAiring ? 'Live Release' : 'Next Airing'}
                 </span>
-                <h2 class="banner-title">${show.title}</h2>
+                <h2 class="banner-title">${escapeHtml(show.title)}</h2>
                 <div class="banner-meta">
                     <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
                     <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>

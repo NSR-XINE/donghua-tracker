@@ -35,7 +35,7 @@ function renderWatchHistory() {
             const time = new Date(entry.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
             html += `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.5rem;border-radius:6px;background:rgba(255,255,255,0.02);margin-bottom:0.2rem;cursor:pointer;" onclick="openDetailsById('${entry.showId}')">
                 <div style="width:32px;height:32px;border-radius:4px;background:var(--bg-card);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--text-secondary);">
-                    ${entry.poster ? `<img src="${entry.poster}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<i class="fa-solid fa-film"></i>`}
+                    ${(() => { const p = safePosterUrl(entry.poster); return p ? `<img src="${p}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<i class="fa-solid fa-film"></i>`; })()}
                 </div>
                 <div style="flex:1;min-width:0;">
                     <div style="font-size:0.8rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(entry.title || 'Unknown')}</div>

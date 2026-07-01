@@ -78,6 +78,7 @@ function importData(jsonString) {
 
 function openWatchScreen(url) {
     if (!url) return;
+    if (!/^https?:\/\//i.test(url)) return;
     if (DB._available && typeof AndroidApp.openWatchScreen === 'function') {
         AndroidApp.openWatchScreen(url);
     } else {

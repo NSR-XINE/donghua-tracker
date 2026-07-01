@@ -129,7 +129,7 @@ function renderCard(show, todayName) {
                 <button class="watch-link watch-btn" data-watch-url="${watchUrl}" onclick="openWatchScreen(this.getAttribute('data-watch-url'))">
                     <i class="fa-solid fa-circle-play"></i> Stream
                 </button>
-                <a class="countdown-link" href="${show.countdownUrl || 'https://www.google.com/search?q=site:animecountdown.com+' + encodeURIComponent(show.title)}" target="_blank" rel="noopener noreferrer">
+                <a class="countdown-link" href="${/^https?:\/\//i.test(show.countdownUrl || '') ? show.countdownUrl : 'https://www.google.com/search?q=site:animecountdown.com+' + encodeURIComponent(show.title)}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-hourglass-half"></i> Countdown
                 </a>
                 <div class="card-ctrls">
