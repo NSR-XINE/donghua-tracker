@@ -50,8 +50,9 @@ function setupSearch() {
     }, 200);
 
     searchInput.addEventListener('input', debouncedSearch);
-    searchInput.addEventListener('input', () => {
+    const debouncedSuggestions = debounce(() => {
         const suggestions = getSearchSuggestions(searchInput.value);
         updateSearchSuggestions(suggestions);
-    });
+    }, 150);
+    searchInput.addEventListener('input', debouncedSuggestions);
 }

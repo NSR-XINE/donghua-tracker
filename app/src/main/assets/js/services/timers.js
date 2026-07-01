@@ -8,6 +8,11 @@ function resumeTimers() {
     if (!timerInterval) { timerInterval = setInterval(updateTimers, 1000); }
 }
 
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseTimers();
+    else resumeTimers();
+});
+
 function updateTimers() {
     const clockEl = document.getElementById('clock-display');
     if (clockEl) {
