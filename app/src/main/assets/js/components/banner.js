@@ -45,9 +45,8 @@ function renderHeroBanner() {
         ? `background-image: url(${safePoster}); background-size: cover; background-position: center; background-repeat: no-repeat;`
         : `background: ${bannerGradient};`;
 
-    const posterClass = safePoster ? ' class="banner-image-wrap has-poster"' : ' class="banner-image-wrap"';
     bannerEl.innerHTML = `
-        <div${posterClass} style="${imageStyle}"></div>
+        <div class="banner-image-wrap" style="${imageStyle}"></div>
         <div class="banner-info-section">
             <div class="banner-details">
                 <span class="banner-badge">
