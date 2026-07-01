@@ -245,15 +245,32 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(() -> {
                     MainActivity activity = weakActivity.get();
                     if (activity == null) return;
+                    java.net.HttpURLConnection conn = null;
                     try {
                         java.net.URL urlObj = new java.net.URL(url);
-                        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) urlObj.openConnection();
+                        conn = (java.net.HttpURLConnection) urlObj.openConnection();
                         conn.setRequestMethod("GET");
                         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
                         conn.setConnectTimeout(10000);
                         conn.setReadTimeout(10000);
 
-                        java.io.InputStream inStream = conn.getInputStream();
+                        int responseCode = conn.getResponseCode();
+                        java.io.InputStream inStream;
+                        if (responseCode >= 200 && responseCode < 300) {
+                            inStream = conn.getInputStream();
+                        } else {
+                            inStream = conn.getErrorStream();
+                        }
+
+                        if (inStream == null) {
+                            activity.runOnUiThread(() -> {
+                                MainActivity a = weakActivity.get();
+                                if (a == null) return;
+                                a.webView.evaluateJavascript(callbackName + "(null);", null);
+                            });
+                            return;
+                        }
+
                         java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(inStream, "UTF-8"));
                         StringBuilder response = new StringBuilder();
                         String inputLine;
@@ -262,12 +279,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                         in.close();
 
-                        final String html = response.toString();
+                        final String body = response.toString();
                         activity.runOnUiThread(() -> {
                             MainActivity a = weakActivity.get();
                             if (a == null) return;
                             a.webView.evaluateJavascript(callbackName + "("
-                                + org.json.JSONObject.quote(html) + ");", null);
+                                + org.json.JSONObject.quote(body) + ");", null);
                         });
                     } catch (Throwable t) {
                         activity.runOnUiThread(() -> {
@@ -275,6 +292,8 @@ public class MainActivity extends AppCompatActivity {
                             if (a == null) return;
                             a.webView.evaluateJavascript(callbackName + "(null);", null);
                         });
+                    } finally {
+                        if (conn != null) conn.disconnect();
                     }
                 }).start();
             }
