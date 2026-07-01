@@ -50,19 +50,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void enableMaxRefreshRate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            android.view.Window window = getWindow();
-            if (window != null) {
-                try {
-                    android.view.Display display = window.getWindowManager().getDefaultDisplay();
-                    if (display != null) {
-                        android.view.Display.Mode mode = display.getMode();
-                        window.setPreferredRefreshRate(mode.getRefreshRate());
+        android.view.Window window = getWindow();
+        if (window == null) return;
+        try {
+            android.view.WindowManager.LayoutParams lp = window.getAttributes();
+            android.view.Display display = window.getWindowManager().getDefaultDisplay();
+            float maxRefresh = 60f;
+            if (display != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        maxRefresh = display.getMode().getRefreshRate();
+                    } catch (Exception ignored) {}
+                } else {
+                    float[] rates = display.getSupportedRefreshRates();
+                    if (rates != null && rates.length > 0) {
+                        maxRefresh = rates[rates.length - 1];
                     }
-                } catch (Exception ignored) {}
+                }
             }
-        }
+            lp.preferredRefreshRate = maxRefresh;
+            window.setAttributes(lp);
+        } catch (Exception ignored) {}
     }
 
     @SuppressLint("SetJavaScriptEnabled")
