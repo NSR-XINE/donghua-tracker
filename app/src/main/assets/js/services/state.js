@@ -147,9 +147,7 @@ function deleteShow(showId) {
     existingShowIds.delete(showId);
     if (DB._available) {
         DB.deleteShow(showId);
-        const show = shows.find(s => s.id === showId);
-        const code = show ? (show.alarmRequestCode || hashCode(showId)) : hashCode(showId);
-        DB.cancelReminder(showId, code);
+        DB.cancelReminder(showId, hashCode(showId));
     }
     persistState();
     return true;

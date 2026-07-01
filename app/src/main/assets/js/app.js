@@ -252,7 +252,6 @@ function setupFormSubmission() {
             newShowData.id = 'dh-' + Date.now();
             newShowData.dateAdded = Date.now();
             shows.push(newShowData);
-            existingShowIds.add(newShowData.id);
         }
 
         persistState();
