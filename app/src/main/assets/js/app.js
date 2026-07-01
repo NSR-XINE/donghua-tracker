@@ -17,16 +17,23 @@ function updateTimers() {
 
     const heroCD = document.getElementById('hero-countdown-box');
     if (heroCD) {
-        const nextUp = getNextUpShow();
-        if (nextUp && !nextUp.airingNow) {
-            const time = calculateTimeRemaining(nextUp.targetDate);
-            if (time.elapsed) { renderHeroBanner(); return; }
-            const nums = heroCD.querySelectorAll('.num');
-            if (nums.length >= 4) {
-                nums[0].innerText = String(time.days).padStart(2, '0');
-                nums[1].innerText = String(time.hours).padStart(2, '0');
-                nums[2].innerText = String(time.minutes).padStart(2, '0');
-                nums[3].innerText = String(time.seconds).padStart(2, '0');
+        const heroBanner = document.getElementById('next-up-banner');
+        const heroShowId = heroBanner ? heroBanner.dataset.id : null;
+        if (heroShowId) {
+            const show = getShowById(heroShowId);
+            if (show && show.status === 'ongoing') {
+                const sched = getNextReleaseDate(show.releaseDay, show.releaseTime);
+                if (!sched.airingNow) {
+                    const time = calculateTimeRemaining(sched.targetDate);
+                    if (time.elapsed) { renderHeroBanner(); return; }
+                    const nums = heroCD.querySelectorAll('.num');
+                    if (nums.length >= 4) {
+                        nums[0].innerText = String(time.days).padStart(2, '0');
+                        nums[1].innerText = String(time.hours).padStart(2, '0');
+                        nums[2].innerText = String(time.minutes).padStart(2, '0');
+                        nums[3].innerText = String(time.seconds).padStart(2, '0');
+                    }
+                }
             }
         }
     }
