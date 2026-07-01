@@ -77,7 +77,6 @@ window.updateSourceUI = updateSourceUI;
 window.openWatchScreen = openWatchScreen;
 window.exportData = exportData;
 window.importData = importData;
-window.syncAlarm = syncAlarm;
 window.openDrawer = openDrawer;
 window.closeDrawer = closeDrawer;
 window.hashCode = hashCode;

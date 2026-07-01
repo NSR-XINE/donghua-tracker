@@ -90,14 +90,4 @@ function getNextUpShow() {
     return computed[0] || null;
 }
 
-function getSortedOngoingByCountdown() {
-    const ongoing = getOngoingShows();
-    return ongoing.map(show => {
-        const sched = getNextReleaseDate(show.releaseDay, show.releaseTime);
-        return { show, targetDate: sched.targetDate, airingNow: sched.airingNow };
-    }).sort((a, b) => {
-        if (a.airingNow && !b.airingNow) return -1;
-        if (!a.airingNow && b.airingNow) return 1;
-        return a.targetDate - b.targetDate;
-    }).map(item => item.show);
-}
+

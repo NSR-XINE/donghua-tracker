@@ -27,24 +27,6 @@
 .search-box input::placeholder { color: var(--text-muted); }
 .search-box i { color: var(--text-muted); }
 
-.stats-panel {
-    display: flex;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-}
-
-.stat-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border-color);
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 75px;
-}
-
 .stat-val {
     font-family: var(--font-heading);
     font-size: 1.1rem;
@@ -593,9 +575,6 @@ body.tab-home #next-up-banner {
 
 .theme-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.06); }
 .theme-btn.active { background: rgba(0, 242, 254, 0.12) !important; border-color: var(--accent-cyan) !important; color: var(--accent-cyan) !important; box-shadow: 0 0 10px rgba(0, 242, 254, 0.15); }
-
-.toggle-track.active { background: var(--accent-cyan) !important; }
-.toggle-track.active .toggle-thumb { transform: translateX(20px); }
 
 .stat-card-mini {
     background: var(--bg-card);

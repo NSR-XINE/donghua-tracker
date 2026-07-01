@@ -5,8 +5,6 @@ const DAYS_MAP = {
 
 const DAYS_ARRAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const DAYS_SHORT = { "Sunday": "Sun", "Monday": "Mon", "Tuesday": "Tue", "Wednesday": "Wed", "Thursday": "Thu", "Friday": "Fri", "Saturday": "Sat" };
-
 const STATUS_MAP = { 'ongoing': 'Airing', 'completed': 'Completed', 'stopped': 'Hiatus' };
 
 const GRADIENTS = [
@@ -31,4 +29,3 @@ const LOADING_MESSAGES = [
 ];
 
 const VALID_STATUSES = new Set(['ongoing', 'completed', 'stopped']);
-const APP_VERSION = 'v6.5 (Build 55)';

@@ -1,18 +1,3 @@
-function syncAlarm(show) {
-    if (!DB._available) return;
-    const alarmCode = show.alarmRequestCode || Math.abs(hashCode(show.id));
-    if (show.status === 'ongoing') {
-        DB.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime, alarmCode);
-    } else {
-        DB.cancelReminder(show.id, alarmCode);
-    }
-}
-
-function syncAllAlarms() {
-    if (!DB._available) return;
-    DB.syncAllAlarms();
-}
-
 function exportData() {
     let json = null;
     if (DB._available) {

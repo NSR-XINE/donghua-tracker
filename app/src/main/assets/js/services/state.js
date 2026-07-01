@@ -96,48 +96,8 @@ function getShowById(id) {
     return shows.find(s => s.id === id || String(s.id) === String(id));
 }
 
-function getShowsByStatus(status) {
-    return shows.filter(s => s.status === status);
-}
-
 function getOngoingShows() {
     return shows.filter(s => s.status === 'ongoing');
-}
-
-function getCompletedShows() {
-    return shows.filter(s => s.status === 'completed');
-}
-
-function getStoppedShows() {
-    return shows.filter(s => s.status === 'stopped');
-}
-
-function getFavoriteShows() {
-    return shows.filter(s => s.isFavorite);
-}
-
-function getRecentlyUpdated(limit) {
-    return [...shows].sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0)).slice(0, limit || 10);
-}
-
-function addShow(showData) {
-    if (!showData.id) showData.id = 'dh-' + Date.now();
-    if (!showData.dateAdded) showData.dateAdded = Date.now();
-    if (!showData.lastUpdated) showData.lastUpdated = Date.now();
-    showData.currentEp = showData.currentEp || 0;
-    showData.totalEp = showData.totalEp || 0;
-    shows.push(showData);
-    existingShowIds.add(showData.id);
-    persistState();
-    return showData;
-}
-
-function updateShow(showId, updates) {
-    const idx = shows.findIndex(s => s.id === showId);
-    if (idx === -1) return null;
-    shows[idx] = { ...shows[idx], ...updates, lastUpdated: Date.now() };
-    persistState();
-    return shows[idx];
 }
 
 function deleteShow(showId) {

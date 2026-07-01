@@ -30,10 +30,6 @@ function updateThemeMeta() {
     else el.content = '#05060a';
 }
 
-function getCurrentTheme() {
-    return currentTheme;
-}
-
 function initTheme() {
     let savedTheme = 'dark';
     if (DB._available) {
