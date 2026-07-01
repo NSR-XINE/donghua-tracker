@@ -50,6 +50,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void enableMaxRefreshRate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            android.view.Window window = getWindow();
+            if (window != null) {
+                try {
+                    android.view.Display display = window.getWindowManager().getDefaultDisplay();
+                    if (display != null) {
+                        android.view.Display.Mode mode = display.getMode();
+                        window.setPreferredRefreshRate(mode.getRefreshRate());
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(android.graphics.Color.parseColor("#05060a"));
             getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#05060a"));
         }
+
+        enableMaxRefreshRate();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             getWindow().getDecorView().setOnApplyWindowInsetsListener((view, insets) -> {
