@@ -2,12 +2,6 @@ plugins {
     id 'com.android.application'
 }
 
-def keystorePropsFile = rootProject.file('keystore.properties')
-def keystoreProps = new Properties()
-if (keystorePropsFile.exists()) {
-    keystoreProps.load(new FileInputStream(keystorePropsFile))
-}
-
 android {
     namespace 'com.mydonghua.app'
     compileSdk 34
@@ -18,25 +12,13 @@ android {
         targetSdk 34
         versionCode 55
         versionName "6.5"
-    }
 
-    signingConfigs {
-        release {
-            storeFile file(keystoreProps.getProperty('storeFile', System.getenv('KEYSTORE_FILE') ?: 'release.keystore'))
-            storePassword keystoreProps.getProperty('storePassword', System.getenv('KEYSTORE_PASSWORD') ?: '')
-            keyAlias keystoreProps.getProperty('keyAlias', System.getenv('KEYSTORE_ALIAS') ?: '')
-            keyPassword keystoreProps.getProperty('keyPassword', System.getenv('KEYSTORE_KEY_PASSWORD') ?: '')
-        }
     }
 
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
     compileOptions {
