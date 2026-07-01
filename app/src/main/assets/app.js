@@ -981,8 +981,8 @@ function exportData() {
     if (!json || json === '[]') { alert('No data to export.'); return; }
 
     // On Android: use the native share sheet so the user can save/send the .json file
-    if (window.AndroidApp && window.AndroidApp.shareText) {
-        window.AndroidApp.shareText(json);
+    if (window.AndroidApp && window.AndroidApp.shareJsonFile) {
+        window.AndroidApp.shareJsonFile(json);
         return;
     }
 
@@ -1389,6 +1389,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnTriggerImport && importModal) {
         btnTriggerImport.addEventListener('click', () => {
+            // Close settings modal first so import doesn't open underneath it
+            window.closeSettingsModal();
             // Reset state
             if (importFileInput) importFileInput.value = '';
             if (importFileName) importFileName.textContent = 'No file selected';

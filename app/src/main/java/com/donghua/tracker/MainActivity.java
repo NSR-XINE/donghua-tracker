@@ -294,16 +294,40 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
-            public void shareText(final String text) {
+            @JavascriptInterface
+            public void shareJsonFile(final String jsonContent) {
                 runOnUiThread(() -> {
                     try {
+                        // Write JSON to a named file in the app's cache/backups directory
+                        java.io.File backupDir = new java.io.File(getCacheDir(), "backups");
+                        if (!backupDir.exists()) backupDir.mkdirs();
+
+                        String fileName = "donghua_backup_" +
+                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                                .format(new java.util.Date()) + ".json";
+                        java.io.File backupFile = new java.io.File(backupDir, fileName);
+
+                        java.io.FileWriter writer = new java.io.FileWriter(backupFile, false);
+                        writer.write(jsonContent);
+                        writer.close();
+
+                        // Get a content:// URI via FileProvider so other apps can read the file
+                        android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(
+                            MainActivity.this,
+                            "com.donghua.tracker.fileprovider",
+                            backupFile
+                        );
+
                         Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_TEXT, text);
+                        intent.setType("application/json");
+                        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Donghua Tracker Backup");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(intent, "Export Backup"));
                     } catch (Throwable t) {
-                        android.util.Log.e("DonghuaTracker", "Share failed", t);
+                        android.util.Log.e("DonghuaTracker", "Share file failed", t);
+                        android.widget.Toast.makeText(MainActivity.this,
+                            "Export failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                     }
                 });
             }
