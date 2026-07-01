@@ -1747,6 +1747,11 @@ body.light-theme .card-overlay {
     background: linear-gradient(to bottom, transparent 20%, rgba(15, 18, 30, 0.88) 100%);
 }
 
+/* Same fix for the hero banner bottom fade in light mode */
+body.light-theme .banner-image-wrap::after {
+    background: linear-gradient(to bottom, transparent, rgba(15, 18, 30, 0.85));
+}
+
 /* Status Bar Blocker to cover transparent status bar area and hide scrolling content */
 .status-bar-blocker {
     position: fixed;
