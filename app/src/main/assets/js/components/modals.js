@@ -40,8 +40,8 @@ function openDetailsModal(show) {
                     : `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>`}
                     ${show.totalEp ? `<span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-film"></i> ${show.totalEp} eps total</span>` : ''}
                 </div>
-                <h3 style="font-size: 1rem; color: #fff; margin: 0.2rem 0 0 0; font-family: var(--font-heading); font-weight: 700;">${show.title}</h3>
-                ${show.titleZh ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">${show.titleZh}</div>` : ''}
+                <h3 style="font-size: 1rem; color: #fff; margin: 0.2rem 0 0 0; font-family: var(--font-heading); font-weight: 700;">${escapeHtml(show.title)}</h3>
+                ${show.titleZh ? `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">${escapeHtml(show.titleZh)}</div>` : ''}
                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem;">
                     Watched: <strong style="color: var(--accent-cyan);">${show.currentEp}</strong> episodes
                 </div>
@@ -50,7 +50,7 @@ function openDetailsModal(show) {
         <div>
             <h4 style="font-size: 0.8rem; color: #fff; margin: 0 0 0.4rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Synopsis</h4>
             <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
-                ${show.notes ? show.notes : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
+                ${show.notes ? escapeHtml(show.notes) : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
             </p>
         </div>
         <div>

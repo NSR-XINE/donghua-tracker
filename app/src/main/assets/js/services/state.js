@@ -143,11 +143,12 @@ function updateShow(showId, updates) {
 function deleteShow(showId) {
     const idx = shows.findIndex(s => s.id === showId);
     if (idx === -1) return false;
+    const show = shows[idx];
     shows.splice(idx, 1);
     existingShowIds.delete(showId);
     if (DB._available) {
         DB.deleteShow(showId);
-        DB.cancelReminder(showId, hashCode(showId));
+        DB.cancelReminder(showId, show.alarmRequestCode || hashCode(showId));
     }
     persistState();
     return true;

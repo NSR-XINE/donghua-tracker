@@ -57,7 +57,7 @@ function renderHeroBanner() {
                 <div class="banner-meta">
                     <span><i class="fa-solid fa-calendar"></i> ${show.releaseDay}s at ${show.releaseTime}</span>
                     <span><i class="fa-solid fa-play"></i> Episode ${show.currentEp + 1} next</span>
-                    <span><span onclick="openWatchScreen(getWatchUrlById('${show.id}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
+                    <span><span onclick="openWatchScreen(getWatchUrlById('${String(show.id).replace(/'/g, "\\'")}'))" style="color: var(--accent-cyan); cursor: pointer;"><i class="fa-solid fa-up-right-from-square"></i> Stream Link</span></span>
                 </div>
             </div>
             ${countdownHtml}

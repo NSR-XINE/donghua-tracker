@@ -84,7 +84,7 @@ public class AlarmScheduler {
             long currentMillis = now.getTimeInMillis();
             long targetMillis = cal.getTimeInMillis();
 
-            if (tz.useDaylightTime() && daysUntil == 0) {
+            if (tz.useDaylightTime()) {
                 int dstOffset = tz.getOffset(targetMillis) - tz.getOffset(currentMillis);
                 if (dstOffset != 0) {
                     targetMillis += dstOffset;

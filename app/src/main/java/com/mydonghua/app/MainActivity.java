@@ -220,6 +220,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (webView == null) {
+            finish();
+            return;
+        }
         if (webView.canGoBack()) {
             webView.goBack();
         } else {

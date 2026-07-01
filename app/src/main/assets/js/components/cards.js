@@ -82,7 +82,7 @@ function renderCard(show, todayName) {
 
     let posterHtml = '';
     if (safePoster) {
-        posterHtml = `<div class="card-poster-wrapper"><img class="card-poster" src="${safePoster}" alt="${show.title}" loading="lazy" onerror="this.closest('.card-poster-wrapper').style.display='none'; this.closest('.card-header').querySelector('.poster-placeholder').style.display='flex'"></div>`;
+        posterHtml = `<div class="card-poster-wrapper"><img class="card-poster" src="${safePoster}" alt="${show.title}" loading="lazy" onerror="var w=this.closest('.card-poster-wrapper');var h=this.closest('.card-header');if(w&&h){w.style.display='none';h.querySelector('.poster-placeholder').style.display='flex'}"></div>`;
     }
 
     const placeholderHtml = `<div class="poster-placeholder" style="background: ${gradientBg}">
@@ -104,8 +104,8 @@ function renderCard(show, todayName) {
         </div>
         <div class="card-body">
             <div class="card-title-block">
-                <h3 class="card-title" title="${show.title}">${show.title}</h3>
-                ${show.titleZh ? `<div class="card-title-zh">${show.titleZh}</div>` : ''}
+                <h3 class="card-title" title="${escapeHtml(show.title)}">${escapeHtml(show.title)}</h3>
+                ${show.titleZh ? `<div class="card-title-zh">${escapeHtml(show.titleZh)}</div>` : ''}
             </div>
             ${countdownHtml}
             <div class="card-schedule-info">
@@ -122,8 +122,8 @@ function renderCard(show, todayName) {
                 </div>
                 ${show.totalEp > 0 ? `<div class="progress-bar-container"><div class="progress-bar-fill" style="width:${Math.min(100, (show.currentEp / show.totalEp) * 100)}%"></div></div>` : ''}
             </div>
-            <p class="card-notes" title="${show.notes || ''}">
-                ${show.notes ? show.notes : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
+            <p class="card-notes" title="${escapeHtml(show.notes || '')}">
+                ${show.notes ? escapeHtml(show.notes) : '<span style="color: var(--text-muted); font-style: italic;">No synopsis added.</span>'}
             </p>
             <div class="card-actions">
                 <button class="watch-link watch-btn" data-watch-url="${watchUrl}" onclick="openWatchScreen(this.getAttribute('data-watch-url'))">
