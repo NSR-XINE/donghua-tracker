@@ -36,7 +36,12 @@ public class MainActivity extends AppCompatActivity {
         setIntent(intent);
         String targetShowId = intent.getStringExtra("target_show_id");
         if (targetShowId != null && webView != null) {
-            webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 500);", null);
+            // Sanitize: show IDs are alphanumeric + hyphens only; reject anything else to prevent JS injection
+            if (targetShowId.matches("[a-zA-Z0-9\\-]+")) {
+                webView.evaluateJavascript(
+                    "setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById(" +
+                    org.json.JSONObject.quote(targetShowId) + "); } }, 500);", null);
+            }
             getIntent().removeExtra("target_show_id");
         }
     }
@@ -108,7 +113,12 @@ public class MainActivity extends AppCompatActivity {
                 updateWebViewInsets();
                 String targetShowId = getIntent().getStringExtra("target_show_id");
                 if (targetShowId != null) {
-                    webView.evaluateJavascript("setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById('" + targetShowId + "'); } }, 800);", null);
+                    // Sanitize: reject IDs with characters outside alphanumeric + hyphen to prevent JS injection
+                    if (targetShowId.matches("[a-zA-Z0-9\\-]+")) {
+                        webView.evaluateJavascript(
+                            "setTimeout(function() { if (typeof openDetailsById === 'function') { openDetailsById(" +
+                            org.json.JSONObject.quote(targetShowId) + "); } }, 800);", null);
+                    }
                     getIntent().removeExtra("target_show_id");
                 }
             }
@@ -410,7 +420,9 @@ public class MainActivity extends AppCompatActivity {
 
             @JavascriptInterface
             public void syncAllAlarms() {
-                runOnUiThread(() -> {
+                // Read the database on a background thread to avoid blocking the UI thread,
+                // then dispatch each AlarmScheduler call back onto the main thread.
+                new Thread(() -> {
                     try {
                         String showsJson = dbHelper.getAllShows();
                         org.json.JSONArray arr = new org.json.JSONArray(showsJson);
@@ -421,18 +433,25 @@ public class MainActivity extends AppCompatActivity {
                             String status = show.optString("status", "ongoing");
                             int alarmCode = show.optInt("alarmRequestCode", Math.abs(id.hashCode()));
 
-                            if ("ongoing".equals(status)) {
-                                AlarmScheduler.schedule(MainActivity.this, id, title,
-                                    show.optString("releaseDay", "Sunday"),
-                                    show.optString("releaseTime", "10:00"), alarmCode);
-                            } else {
-                                AlarmScheduler.cancel(MainActivity.this, id, alarmCode);
-                            }
+                            final String fId = id;
+                            final String fTitle = title;
+                            final String fStatus = status;
+                            final int fAlarmCode = alarmCode;
+                            final String fDay = show.optString("releaseDay", "Sunday");
+                            final String fTime = show.optString("releaseTime", "10:00");
+
+                            runOnUiThread(() -> {
+                                if ("ongoing".equals(fStatus)) {
+                                    AlarmScheduler.schedule(MainActivity.this, fId, fTitle, fDay, fTime, fAlarmCode);
+                                } else {
+                                    AlarmScheduler.cancel(MainActivity.this, fId, fAlarmCode);
+                                }
+                            });
                         }
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
-                });
+                }).start();
             }
         }, "AndroidApp");
 

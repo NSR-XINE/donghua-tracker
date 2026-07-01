@@ -188,6 +188,22 @@ function getPosterGradient(title) {
     return GRADIENTS[index];
 }
 
+/**
+ * Validates a poster URL so it is safe to inject into a CSS style attribute.
+ * Accepts only http/https URLs with no CSS-breaking characters.
+ * Returns null if the URL is unsafe.
+ * @param {string} url
+ * @returns {string|null}
+ */
+function safePosterUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    const trimmed = url.trim();
+    // Must be http/https and must not contain characters that could break a CSS context
+    if (!/^https?:\/\//i.test(trimmed)) return null;
+    if (/['"()\\<>\s]/.test(trimmed)) return null;
+    return trimmed;
+}
+
 /* ==========================================================================
    UI RENDERING FUNCTIONS
    ========================================================================== */
@@ -289,7 +305,8 @@ function renderHeroBanner() {
     }
     
     const bannerGradient = getPosterGradient(show.title);
-    const imageStyle = `background-image: ${show.poster ? `url(${show.poster})` : bannerGradient}`;
+    const safePoster = safePosterUrl(show.poster);
+    const imageStyle = `background-image: ${safePoster ? `url(${safePoster})` : bannerGradient}`;
     
     bannerEl.style.background = 'none';
     bannerEl.setAttribute('data-id', show.id);
@@ -321,8 +338,9 @@ function fetchShowBanner(showId, countdownUrl) {
     if (!window.AndroidApp || !window.AndroidApp.fetchUrl) return;
     if (!countdownUrl || !countdownUrl.startsWith('http')) return;
     
-    // Generate unique callback
-    const callbackName = "cb_banner_" + showId.replace(/[^a-zA-Z0-9]/g, '') + "_" + Math.floor(Math.random() * 1000000);
+    // Generate unique callback — use Date.now() (monotonic) rather than Math.random()
+    // to avoid the rare case where two concurrent fetches for the same show collide on the same name.
+    const callbackName = "cb_banner_" + showId.replace(/[^a-zA-Z0-9]/g, '') + "_" + Date.now();
     
     // Safety timeout to clean up callback if native call fails completely
     const timeoutId = setTimeout(() => {
@@ -485,7 +503,6 @@ function renderWeeklySchedule() {
  * Renders the main grid of shows based on searches, filters, and sorting.
  */
 function renderShowsGrid() {
-    checkAndMigrateStatuses();
     const containerEl = document.getElementById('shows-sections-container');
     const emptyStateEl = document.getElementById('empty-state');
     
@@ -622,7 +639,10 @@ function renderShowsGrid() {
             // Poster Image or Gradient Placeholder
             let posterHtml = '';
             if (show.poster) {
-                posterHtml = `<img class="card-poster" src="${show.poster}" alt="${show.title} Poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`;
+                const safePoster = safePosterUrl(show.poster);
+                if (safePoster) {
+                    posterHtml = `<img class="card-poster" src="${safePoster}" alt="${show.title} Poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`;
+                }
             }
             
             // Text watermark for gradient poster
@@ -877,7 +897,13 @@ window.getWatchUrl = function(show) {
     if (show.watchUrl && show.watchUrl.trim() !== '') {
         return show.watchUrl;
     }
-    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    // Read from SQLite settings first, fall back to localStorage for backwards compatibility
+    let source = 'donghuastream';
+    if (window.AndroidApp && window.AndroidApp.dbGetSetting) {
+        source = window.AndroidApp.dbGetSetting('pref_streaming_source', '') || localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    } else {
+        source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    }
     if (source === 'luciferdonghua') {
         return 'https://luciferdonghua.org/?s=' + encodeURIComponent(show.title);
     } else {
@@ -892,6 +918,10 @@ window.getWatchUrlById = function(id) {
 };
 
 window.selectPreferredSource = function(source) {
+    // Persist to SQLite; keep localStorage in sync for backwards compatibility
+    if (window.AndroidApp && window.AndroidApp.dbSaveSetting) {
+        window.AndroidApp.dbSaveSetting('pref_streaming_source', source);
+    }
     localStorage.setItem('pref_streaming_source', source);
     window.updateSourceUI(source);
     
@@ -992,7 +1022,18 @@ function importData(jsonString) {
                 throw new Error("Missing 'title' or 'id' fields in backup item");
             }
         }
-        
+
+        // Delete any shows currently in SQLite that are NOT present in the imported backup,
+        // so the database doesn't drift out of sync with the in-memory state.
+        if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
+            const importedIds = new Set(parsed.map(s => s.id));
+            existingShowIds.forEach(existingId => {
+                if (!importedIds.has(existingId)) {
+                    window.AndroidApp.dbDeleteShow(existingId);
+                }
+            });
+        }
+
         shows = parsed;
         existingShowIds.clear();
         shows.forEach(s => existingShowIds.add(s.id));
@@ -1012,12 +1053,24 @@ function importData(jsonString) {
  */
 function syncAlarm(show) {
     if (window.AndroidApp && window.AndroidApp.scheduleReminder) {
+        // Use stored alarmRequestCode; fall back to a hash of the show ID so each show
+        // gets a unique code and never collides on the reserved value 0.
+        const alarmCode = show.alarmRequestCode || Math.abs(hashCode(show.id));
         if (show.status === 'ongoing') {
-            window.AndroidApp.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime, show.alarmRequestCode || 0);
+            window.AndroidApp.scheduleReminder(show.id, show.title, show.releaseDay, show.releaseTime, alarmCode);
         } else {
-            window.AndroidApp.cancelReminder(show.id, show.alarmRequestCode || 0);
+            window.AndroidApp.cancelReminder(show.id, alarmCode);
         }
     }
+}
+
+/** Simple djb2-style string hash returning a positive integer. */
+function hashCode(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+    }
+    return hash >>> 0; // convert to unsigned 32-bit so Math.abs is always > 0
 }
 
 /**
@@ -1256,12 +1309,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Theme Mode
-    const savedTheme = localStorage.getItem('app_theme') || 'dark';
+    // Initialize Theme Mode — read from SQLite first, fall back to localStorage
+    let savedTheme = 'dark';
+    if (window.AndroidApp && window.AndroidApp.dbGetSetting) {
+        savedTheme = window.AndroidApp.dbGetSetting('app_theme', '') || localStorage.getItem('app_theme') || 'dark';
+    } else {
+        savedTheme = localStorage.getItem('app_theme') || 'dark';
+    }
     window.setThemeMode(savedTheme);
     
-    // Initialize Preferred Source Card Selection UI state
-    const source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    // Initialize Preferred Source Card Selection UI state — read from SQLite first, fall back to localStorage
+    let source = 'donghuastream';
+    if (window.AndroidApp && window.AndroidApp.dbGetSetting) {
+        source = window.AndroidApp.dbGetSetting('pref_streaming_source', '') || localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    } else {
+        source = localStorage.getItem('pref_streaming_source') || 'donghuastream';
+    }
     window.updateSourceUI(source);
     
     // Setup ResizeObservers to dynamically calculate header and bottom navigation heights (no magic numbers!)
@@ -1552,12 +1615,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         saveState();
         closeModal();
-        setTimeout(() => {
-            updateStats();
-            renderWeeklySchedule();
-            renderHeroBanner();
-            renderShowsGrid();
-        }, 1000);
         
         if (!newShowData.poster) {
             if (newShowData.watchUrl && newShowData.watchUrl.startsWith('https://donghuastream.org/')) {
@@ -1637,7 +1694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 existingShowIds.delete(showId);
                 if (window.AndroidApp && window.AndroidApp.dbDeleteShow) {
                     window.AndroidApp.dbDeleteShow(showId);
-                    window.AndroidApp.cancelReminder(showId, show.alarmRequestCode || 0);
+                    window.AndroidApp.cancelReminder(showId, show.alarmRequestCode || hashCode(showId));
                 }
                 saveState();
             }
@@ -1787,6 +1844,8 @@ function showExitModal() {
         document.body.classList.add('modal-open');
     }
 }
+// Exposed on window so the Java layer can call: evaluateJavascript("showExitModal();", null)
+window.showExitModal = showExitModal;
 
 function closeExitModal() {
     const modal = document.getElementById('exit-modal');
@@ -1795,6 +1854,7 @@ function closeExitModal() {
         document.body.classList.remove('modal-open');
     }
 }
+window.closeExitModal = closeExitModal;
 
 function confirmExitApp() {
     if (window.AndroidApp && window.AndroidApp.exitApp) {
@@ -1805,12 +1865,23 @@ function confirmExitApp() {
         console.log("App Exited");
     }
 }
+window.confirmExitApp = confirmExitApp;
 
 // Global target launcher called from native intents (e.g. notifications)
 function openDetailsById(showId) {
     const show = shows.find(s => s.id === showId);
     if (show) {
-        switchTab('home');
+        // Navigate to the tab that matches the show's current status so the user
+        // lands in context rather than always being dropped on the Home screen.
+        if (show.status === 'ongoing') {
+            switchTab('airing');
+        } else if (show.status === 'completed') {
+            switchTab('complete');
+        } else if (show.status === 'stopped') {
+            switchTab('stopped');
+        } else {
+            switchTab('home');
+        }
         openDetailsModal(show);
     }
 }
@@ -1845,6 +1916,10 @@ function setThemeMode(mode) {
         document.body.classList.add('amoled');
     }
     
+    // Persist to SQLite; keep localStorage in sync for backwards compatibility
+    if (window.AndroidApp && window.AndroidApp.dbSaveSetting) {
+        window.AndroidApp.dbSaveSetting('app_theme', mode);
+    }
     localStorage.setItem('app_theme', mode);
     
     document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));

@@ -74,7 +74,10 @@ public class WatchActivity extends AppCompatActivity {
                 + "AppleWebkit/537.36 (KHTML, like Gecko) "
                 + "Chrome/120.0.0.0 Mobile Safari/537.36");
 
-            // Allow mixed content so HTTP video links can load properly on HTTPS sites
+            // MIXED_CONTENT_ALWAYS_ALLOW: many donghua streaming sites serve video assets (m3u8,
+            // mp4 CDN links) over HTTP even when the page itself is loaded via HTTPS. Blocking
+            // mixed content would prevent those videos from playing. This is an intentional
+            // trade-off accepted for the player screen; the main app WebView does NOT use this flag.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                 try {

@@ -13,8 +13,8 @@ public class BootReceiver extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             // Run alarm rescheduling asynchronously to prevent ANRs on main thread
             new Thread(() -> {
+                DatabaseHelper db = new DatabaseHelper(context);
                 try {
-                    DatabaseHelper db = new DatabaseHelper(context);
                     String showsJsonStr = db.getAllShows();
                     JSONArray showsArray = new JSONArray(showsJsonStr);
                     for (int i = 0; i < showsArray.length(); i++) {
@@ -34,6 +34,8 @@ public class BootReceiver extends BroadcastReceiver {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    db.close();
                 }
             }).start();
         }

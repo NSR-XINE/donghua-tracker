@@ -84,6 +84,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ")";
         db.execSQL(createHistoryTable);
 
+        // Index on show_id to speed up per-show history lookups and the prune query
+        db.execSQL("CREATE INDEX idx_history_show_id ON " + TABLE_HISTORY + " (" + COL_HIST_SHOW_ID + ")");
+
         // Create Settings Table
         String createSettingsTable = "CREATE TABLE " + TABLE_SETTINGS + " (" +
                 COL_SET_KEY + " TEXT PRIMARY KEY, " +
@@ -94,6 +97,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Incremental migrations — add a new `case` block for every DATABASE_VERSION bump.
+        // Never drop tables; use ALTER TABLE to add columns so existing user data is preserved.
+        // Example for a future v2 migration:
+        //
+        //   case 1:
+        //       db.execSQL("ALTER TABLE " + TABLE_SHOWS + " ADD COLUMN new_column TEXT DEFAULT ''");
+        //       // fall through to apply subsequent migrations in order
+        //
+        for (int version = oldVersion; version < newVersion; version++) {
+            switch (version) {
+                // case 1: migrate from v1 → v2
+                //     db.execSQL("ALTER TABLE ...");
+                //     break;
+                default:
+                    break;
+            }
+        }
     }
 
     // ==========================================
