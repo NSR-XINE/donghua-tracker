@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
-            @JavascriptInterface
             public void shareJsonFile(final String jsonContent) {
                 runOnUiThread(() -> {
                     try {
