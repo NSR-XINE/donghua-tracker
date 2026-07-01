@@ -1,4 +1,4 @@
-package com.donghua.tracker;
+package com.mydonghua.app;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

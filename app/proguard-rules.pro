@@ -1,9 +1,9 @@
--keepclassmembers class com.donghua.tracker.MainActivity$* {
+-keepclassmembers class com.mydonghua.app.MainActivity$* {
     @android.webkit.JavascriptInterface <methods>;
 }
--keep class com.donghua.tracker.WatchActivity { *; }
--keep class com.donghua.tracker.MainActivity { *; }
--keep class com.donghua.tracker.DatabaseHelper { *; }
--keep class com.donghua.tracker.AlarmScheduler { *; }
--keep class com.donghua.tracker.NotificationReceiver { *; }
--keep class com.donghua.tracker.BootReceiver { *; }
+-keep class com.mydonghua.app.WatchActivity { *; }
+-keep class com.mydonghua.app.MainActivity { *; }
+-keep class com.mydonghua.app.DatabaseHelper { *; }
+-keep class com.mydonghua.app.AlarmScheduler { *; }
+-keep class com.mydonghua.app.NotificationReceiver { *; }
+-keep class com.mydonghua.app.BootReceiver { *; }

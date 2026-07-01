@@ -1,4 +1,4 @@
-package com.donghua.tracker;
+package com.mydonghua.app;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "donghua_tracker.db";
+    private static final String DATABASE_NAME = "mydonghua.db";
     private static final int DATABASE_VERSION = 1;
 
     // Table names

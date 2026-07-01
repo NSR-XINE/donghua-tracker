@@ -1,4 +1,4 @@
-package com.donghua.tracker;
+package com.mydonghua.app;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

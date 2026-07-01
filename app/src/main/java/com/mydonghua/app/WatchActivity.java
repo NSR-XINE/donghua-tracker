@@ -1,4 +1,4 @@
-package com.donghua.tracker;
+package com.mydonghua.app;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

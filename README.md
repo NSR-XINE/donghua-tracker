@@ -1,4 +1,4 @@
-# 东画 Donghua Tracker (Android App)
+# 东画 My Donghua (Android App)
 
 A sleek, high-aesthetic dark-themed native Android application designed for Chinese anime (Donghua) fans to track watched episodes, view release schedules, follow live countdown clocks, and receive native push notifications.
 
@@ -13,7 +13,7 @@ donghua-tracker-repo/
 │   ├── proguard-rules.pro
 │   └── src/main/
 │       ├── AndroidManifest.xml
-│       ├── java/com/donghua/tracker/
+│       ├── java/com/mydonghua/app/
 │       │   ├── MainActivity.java         # WebView settings, lifecycle, JS Bridge, back gesture
 │       │   ├── WatchActivity.java        # YouTube-style player with fullscreen
 │       │   ├── AlarmScheduler.java       # Alarm scheduling and permission handling
@@ -47,7 +47,7 @@ donghua-tracker-repo/
 
 ## SQLite Database Schema
 
-LocalStorage is replaced by a native SQLite database (`donghua_tracker.db`) containing three core tables:
+LocalStorage is replaced by a native SQLite database (`mydonghua.db`) containing three core tables:
 
 ### 1. `shows`
 * `id` (TEXT PRIMARY KEY)

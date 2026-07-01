@@ -1,4 +1,4 @@
-package com.donghua.tracker;
+package com.mydonghua.app;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
                         java.io.File backupDir = new java.io.File(getCacheDir(), "backups");
                         if (!backupDir.exists()) backupDir.mkdirs();
 
-                        String fileName = "donghua_backup_" +
+                        String fileName = "mydonghua_backup_" +
                             new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
                                 .format(new java.util.Date()) + ".json";
                         java.io.File backupFile = new java.io.File(backupDir, fileName);
@@ -415,14 +415,14 @@ public class MainActivity extends AppCompatActivity {
                         // Get a content:// URI via FileProvider so other apps can read the file
                         android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(
                             MainActivity.this,
-                            "com.donghua.tracker.fileprovider",
+                            "com.mydonghua.app.fileprovider",
                             backupFile
                         );
 
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("application/json");
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Donghua Tracker Backup");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "My Donghua Backup");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(intent, "Export Backup"));
                     } catch (Throwable t) {
