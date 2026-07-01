@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             );
-            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#05060a"));
+            getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#05060a"));
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
@@ -186,6 +186,20 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     try {
                         boolean isLight = "light".equalsIgnoreCase(themeMode);
+                        boolean isAmoled = "amoled".equalsIgnoreCase(themeMode);
+
+                        // Set bar background colors per theme
+                        String barColor;
+                        if (isAmoled) {
+                            barColor = "#000000";
+                        } else if (isLight) {
+                            barColor = "#ffffff";
+                        } else {
+                            barColor = "#05060a";
+                        }
+                        getWindow().setStatusBarColor(android.graphics.Color.parseColor(barColor));
+                        getWindow().setNavigationBarColor(android.graphics.Color.parseColor(barColor));
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             android.view.Window w = getWindow();
                             android.view.WindowInsetsController controller = w.getInsetsController();
