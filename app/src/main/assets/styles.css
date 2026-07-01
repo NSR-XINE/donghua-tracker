@@ -1692,6 +1692,17 @@ body.light-theme .stars-bg {
     opacity: 0 !important;
 }
 
+/* Custom Toggle Switch */
+.toggle-track.active {
+    background: var(--accent-cyan) !important;
+}
+.toggle-track.active .toggle-thumb {
+    transform: translateX(20px);
+}
+body.light-theme .toggle-track.active {
+    background: var(--accent-cyan) !important;
+}
+
 /* Status Bar Blocker to cover transparent status bar area and hide scrolling content */
 .status-bar-blocker {
     position: fixed;

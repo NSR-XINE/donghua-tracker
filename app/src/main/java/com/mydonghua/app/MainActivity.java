@@ -532,6 +532,26 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // ==========================================
+            // ==========================================
+            // AUTO-ROTATE CONTROL
+            // ==========================================
+
+            @JavascriptInterface
+            public void setAutoRotate(final boolean enabled) {
+                runOnUiThread(() -> {
+                    try {
+                        if (enabled) {
+                            setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                        } else {
+                            setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+                        }
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            // ==========================================
             // ALARM REMINDER CONTROLS
             // ==========================================
 
