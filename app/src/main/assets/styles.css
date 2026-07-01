@@ -274,7 +274,7 @@ input, textarea {
     left: 0;
     right: 0;
     height: 60%;
-    background: linear-gradient(to bottom, transparent, var(--bg-darker));
+    background: linear-gradient(to bottom, transparent, var(--banner-fade-color, var(--bg-darker)));
     pointer-events: none;
 }
 
@@ -1740,6 +1740,39 @@ body.light-theme .theme-btn.active {
 }
 body.light-theme .stars-bg {
     opacity: 0 !important;
+}
+
+/* Light theme banner fixes:
+   - Replace the white gradient fade with a dark semi-transparent one so poster images
+     aren't washed out and the title remains readable regardless of poster color.
+   - Override banner-title to always be white (it sits on top of the image / dark overlay).
+   - Soften the neon cyan border/shadow so it doesn't clash with the light background.
+*/
+body.light-theme {
+    --banner-fade-color: rgba(0, 0, 0, 0.72);
+}
+
+body.light-theme #next-up-banner.banner-section {
+    border-color: rgba(0, 153, 168, 0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+}
+
+body.light-theme .banner-info-section {
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.light-theme .banner-title {
+    color: #1a202c;
+}
+
+body.light-theme .banner-meta {
+    color: var(--text-secondary);
+}
+
+body.light-theme .countdown-box {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.10);
 }
 
 /* Status Bar Blocker to cover transparent status bar area and hide scrolling content */
