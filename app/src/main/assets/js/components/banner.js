@@ -15,6 +15,7 @@ function renderHeroBanner() {
     }
 
     bannerEl.style.display = 'flex';
+    bannerEl.dataset.id = nextUp.show.id;
     const show = nextUp.show;
     const isAiring = nextUp.airingNow;
 
