@@ -189,3 +189,39 @@ function showEmptyState(el, title, text, showReset) {
         });
     }
 }
+
+function setupCardActions() {
+    document.getElementById('shows-sections-container')?.addEventListener('click', (e) => {
+        const card = e.target.closest('.show-card');
+        if (!card) return;
+
+        const isPlus = e.target.closest('.btn-plus');
+        const isMinus = e.target.closest('.btn-minus');
+        const isEdit = e.target.closest('.edit-btn');
+        const isDelete = e.target.closest('.delete-btn');
+        const isFavorite = e.target.closest('.favorite-btn');
+        const isStream = e.target.closest('.watch-btn');
+        const isCountdown = e.target.closest('.countdown-link');
+
+        const showId = card.dataset.id;
+        const show = getShowById(showId);
+        if (!show) return;
+
+        if (isPlus) { incrementEpisode(showId); }
+        else if (isMinus) { decrementEpisode(showId); }
+        else if (isEdit) { openModal(show); }
+        else if (isFavorite) {
+            toggleFavorite(showId);
+            renderShowsGrid();
+            const btn = document.querySelector(`.show-card[data-id="${showId}"] .favorite-btn`);
+            if (btn) { btn.classList.add('animate'); setTimeout(() => btn.classList.remove('animate'), 500); }
+        }
+        else if (isDelete) {
+            if (confirm(`Are you sure you want to remove "${show.title}" from your list?`)) {
+                deleteShow(showId);
+            }
+        }
+        else if (isStream || isCountdown) { return; }
+        else { openDetailsModal(show); }
+    });
+}

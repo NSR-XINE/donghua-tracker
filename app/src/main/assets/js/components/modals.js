@@ -236,60 +236,6 @@ function handleBackPress() {
     showExitModal();
 }
 
-function openDrawer() {
-    const drawer = document.getElementById('right-drawer');
-    const overlay = document.getElementById('drawer-overlay');
-    if (drawer) drawer.classList.add('open');
-    if (overlay) { overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('open'), 10); }
-    document.body.classList.add('modal-open');
-    setTimeout(setupDrawerSwipe, 50);
-}
-
-function setupDrawerSwipe() {
-    const drawer = document.getElementById('right-drawer');
-    if (!drawer || drawer.dataset.swipeAttached) return;
-    drawer.dataset.swipeAttached = '1';
-    let startX = 0, isDragging = false;
-    drawer.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        isDragging = true;
-        drawer.style.transition = 'none';
-    }, { passive: true });
-    drawer.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const dx = e.touches[0].clientX - startX;
-        if (dx < 0) { isDragging = false; drawer.style.transform = ''; drawer.style.transition = ''; return; }
-        drawer.style.transform = `translateX(${Math.min(dx, drawer.offsetWidth)}px)`;
-    }, { passive: true });
-    drawer.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        const dx = e.changedTouches[0].clientX - startX;
-        drawer.style.transition = 'transform 0.25s ease';
-        if (dx > 50) {
-            drawer.style.transform = 'translateX(100%)';
-            setTimeout(closeDrawer, 220);
-        } else {
-            drawer.style.transform = '';
-            setTimeout(() => { drawer.style.transition = ''; }, 250);
-        }
-    }, { passive: true });
-}
-
-function closeDrawer() {
-    const drawer = document.getElementById('right-drawer');
-    const overlay = document.getElementById('drawer-overlay');
-    if (drawer) {
-        drawer.classList.remove('open');
-        setTimeout(() => { drawer.style.transform = ''; drawer.style.transition = ''; }, 300);
-    }
-    if (overlay) {
-        overlay.classList.remove('open');
-        setTimeout(() => overlay.style.display = 'none', 300);
-    }
-    document.body.classList.remove('modal-open');
-}
-
 function addSwipeToDismiss(modalOverlayId, closeFn) {
     const overlay = document.getElementById(modalOverlayId);
     if (!overlay) return;
@@ -334,4 +280,137 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
             panel.style.opacity = '';
         }
     }, { passive: true });
+}
+
+function setupResizeObservers() {
+    const header = document.querySelector('.app-header');
+    if (header && typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => {
+            document.documentElement.style.setProperty('--header-height', header.getBoundingClientRect().height + 'px');
+        }).observe(header);
+    }
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav && typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => {
+            const rect = bottomNav.getBoundingClientRect();
+            document.documentElement.style.setProperty('--bottom-nav-height', (window.innerHeight - rect.top) + 'px');
+        }).observe(bottomNav);
+    }
+}
+
+function setupImportModal() {
+    const importModal = document.getElementById('import-modal');
+    const btnTriggerImport = document.getElementById('btn-trigger-import');
+    const btnCloseImport = document.getElementById('btn-close-import');
+    const btnCancelImport = document.getElementById('btn-cancel-import');
+    const btnSubmitImport = document.getElementById('btn-submit-import');
+    const importFileInput = document.getElementById('import-file-input');
+    const importFileName = document.getElementById('import-file-name');
+
+    importFileInput?.addEventListener('change', () => {
+        const file = importFileInput.files[0];
+        if (!file) return;
+        if (importFileName) importFileName.textContent = file.name;
+        if (btnSubmitImport) {
+            btnSubmitImport.disabled = false;
+            btnSubmitImport.style.opacity = '1';
+            btnSubmitImport.style.cursor = 'pointer';
+        }
+    });
+
+    btnTriggerImport?.addEventListener('click', () => {
+        if (importFileInput) importFileInput.value = '';
+        if (importFileName) importFileName.textContent = 'No file selected';
+        if (btnSubmitImport) {
+            btnSubmitImport.disabled = true;
+            btnSubmitImport.style.opacity = '0.5';
+            btnSubmitImport.style.cursor = 'not-allowed';
+        }
+        if (importModal) { importModal.style.display = 'flex'; document.body.classList.add('modal-open'); }
+    });
+
+    if (btnCloseImport) btnCloseImport.addEventListener('click', closeImportModal);
+    if (btnCancelImport) btnCancelImport.addEventListener('click', closeImportModal);
+    if (importModal) importModal.addEventListener('click', (e) => { if (e.target.id === 'import-modal') closeImportModal(); });
+
+    btnSubmitImport?.addEventListener('click', () => {
+        const file = importFileInput?.files[0];
+        if (!file) { alert('Please select a .json backup file first.'); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => { if (importData(e.target.result)) closeImportModal(); };
+        reader.onerror = () => alert('Failed to read file. Please try again.');
+        reader.readAsText(file);
+    });
+}
+
+function setupDetailsModal() {
+    const detailsModal = document.getElementById('details-modal');
+    const btnCloseDetails = document.getElementById('btn-close-details');
+
+    btnCloseDetails?.addEventListener('click', closeDetailsModal);
+    if (detailsModal) detailsModal.addEventListener('click', (e) => { if (e.target.id === 'details-modal') closeDetailsModal(); });
+}
+
+function setupSettingsModal() {
+    const settingsModal = document.getElementById('settings-modal');
+    if (settingsModal) settingsModal.addEventListener('click', (e) => { if (e.target.id === 'settings-modal') closeSettingsModal(); });
+    document.getElementById('btn-open-settings')?.addEventListener('click', openSettingsModal);
+}
+
+function setupFormSubmission() {
+    document.getElementById('btn-fetch-poster')?.addEventListener('click', () => {
+        const title = document.getElementById('show-title')?.value.trim();
+        fetchShowDetails(title, false);
+    });
+
+    document.getElementById('show-title')?.addEventListener('change', (e) => {
+        const title = e.target.value.trim();
+        fetchShowDetails(title, true);
+    });
+
+    document.getElementById('donghua-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const showId = document.getElementById('show-id')?.value;
+        const newShowData = {
+            title: document.getElementById('show-title')?.value?.trim() || '',
+            titleZh: document.getElementById('show-title-zh')?.value?.trim() || '',
+            status: document.getElementById('show-status')?.value || 'ongoing',
+            watchUrl: document.getElementById('show-watch-url')?.value?.trim() || '',
+            countdownUrl: document.getElementById('show-countdown-url')?.value?.trim() || '',
+            releaseDay: document.getElementById('show-release-day')?.value || 'Sunday',
+            releaseTime: document.getElementById('show-release-time')?.value || '10:00',
+            currentEp: parseInt(document.getElementById('show-current-ep')?.value) || 0,
+            totalEp: parseInt(document.getElementById('show-total-ep')?.value) || 0,
+            poster: document.getElementById('show-poster')?.value?.trim() || '',
+            collection: document.getElementById('show-collection')?.value?.trim() || '',
+            notes: document.getElementById('show-notes')?.value?.trim() || '',
+            lastUpdated: Date.now()
+        };
+
+        if (showId) {
+            const idx = shows.findIndex(s => s.id === showId);
+            if (idx !== -1) {
+                newShowData.id = showId;
+                newShowData.dateAdded = shows[idx].dateAdded || Date.now();
+                Object.assign(shows[idx], newShowData);
+            }
+        } else {
+            newShowData.id = 'dh-' + Date.now();
+            newShowData.dateAdded = Date.now();
+            shows.push(newShowData);
+        }
+
+        persistState();
+        closeModal();
+
+        if (!newShowData.poster) {
+            if (newShowData.watchUrl && newShowData.watchUrl.startsWith('https://donghuastream.org/')) {
+                setTimeout(() => fetchShowBanner(newShowData.id, newShowData.watchUrl), 200);
+            } else if (newShowData.countdownUrl && newShowData.countdownUrl.startsWith('https://animecountdown.com/')) {
+                setTimeout(() => fetchShowBanner(newShowData.id, newShowData.countdownUrl), 200);
+            } else {
+                setTimeout(() => fetchPosterFromJikan(newShowData.id, newShowData.title), 200);
+            }
+        }
+    });
 }

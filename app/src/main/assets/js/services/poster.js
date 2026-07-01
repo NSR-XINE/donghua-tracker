@@ -224,3 +224,7 @@ function updateSourceUI(source) {
         if (badgeLucifer) badgeLucifer.style.display = 'none';
     }
 }
+
+function setupPosterFetch() {
+    autoFetchPosters();
+}

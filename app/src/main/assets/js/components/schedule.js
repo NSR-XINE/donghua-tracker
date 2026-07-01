@@ -56,3 +56,14 @@ function renderWeeklySchedule() {
 
     listEl.innerHTML = html;
 }
+
+function setupScheduleTabs() {
+    document.getElementById('schedule-tabs')?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-btn')) {
+            document.querySelectorAll('#schedule-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            scheduleDayFilter = e.target.dataset.day;
+            renderWeeklySchedule();
+        }
+    });
+}
