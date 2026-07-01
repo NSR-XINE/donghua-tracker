@@ -1337,7 +1337,7 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
     }, { passive: true });
 }
 
-// Close whichever modal is open; called from both popstate and Java onBackPressed
+// Close whichever modal is open; called from Java onBackPressed
 function closeTopModal() {
     const modalIds = ['settings-modal', 'donghua-modal', 'import-modal', 'details-modal', 'exit-modal'];
     for (const id of modalIds) {
@@ -1384,27 +1384,6 @@ function handleBackPress() {
 
 window.closeTopModal = closeTopModal;
 window.handleBackPress = handleBackPress;
-
-window.addEventListener('popstate', closeTopModal);
-
-const _origOpenSettings = window.openSettingsModal;
-window.openSettingsModal = function() { _origOpenSettings(); history.pushState({m:1}, ''); };
-
-const _origOpenModal = openModal;
-window.openModal = function(d) { _origOpenModal(d); history.pushState({m:1}, ''); };
-
-// Remove stale modal state when closing normally
-function popModalState() {
-    if (history.state?.m) history.replaceState({}, '');
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Override close functions to clean up history state
-    const _closeModal = closeModal;
-    closeModal = function() { _closeModal(); popModalState(); };
-    const _closeSettings = closeSettingsModal;
-    closeSettingsModal = function() { _closeSettings(); popModalState(); };
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Theme Mode — read from SQLite first, fall back to localStorage
