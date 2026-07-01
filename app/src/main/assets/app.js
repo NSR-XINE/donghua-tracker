@@ -1279,6 +1279,68 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 }
 
+/**
+ * Attaches a horizontal swipe-to-dismiss gesture to a modal's inner content panel.
+ * Swiping left or right by more than the threshold dismisses the modal.
+ * The panel follows the finger and snaps back if the swipe is too short.
+ *
+ * @param {string} modalOverlayId  - ID of the full-screen overlay element
+ * @param {Function} closeFn       - Function to call when swipe threshold is met
+ */
+function addSwipeToDismiss(modalOverlayId, closeFn) {
+    const overlay = document.getElementById(modalOverlayId);
+    if (!overlay) return;
+
+    const panel = overlay.querySelector('.modal-content');
+    if (!panel) return;
+
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    const THRESHOLD = 80; // px needed to dismiss
+
+    panel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        panel.style.transition = 'none';
+    }, { passive: true });
+
+    panel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        // Only track horizontal swipes; ignore if vertical scroll is dominant
+        if (Math.abs(dy) > Math.abs(dx)) return;
+        panel.style.transform = `translateX(${dx}px)`;
+        panel.style.opacity = `${1 - Math.min(Math.abs(dx) / 250, 0.5)}`;
+    }, { passive: true });
+
+    panel.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const dx = e.changedTouches[0].clientX - startX;
+        panel.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+
+        if (Math.abs(dx) >= THRESHOLD) {
+            // Swipe far enough — fly out and close
+            panel.style.transform = `translateX(${dx > 0 ? '110%' : '-110%'})`;
+            panel.style.opacity = '0';
+            setTimeout(() => {
+                closeFn();
+                // Reset after close so it animates in cleanly next time
+                panel.style.transition = 'none';
+                panel.style.transform = '';
+                panel.style.opacity = '';
+            }, 220);
+        } else {
+            // Not far enough — snap back
+            panel.style.transform = '';
+            panel.style.opacity = '';
+        }
+    }, { passive: true });
+}
+
 // Intercept system back gesture to close modals
 window.addEventListener('popstate', () => {
     const settingsEl = document.getElementById('settings-modal');
@@ -1774,6 +1836,29 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => loader.remove(), 600);
         }
     }, 1600);
+
+    // Attach swipe-to-dismiss gesture to all modal panels
+    addSwipeToDismiss('settings-modal', window.closeSettingsModal);
+    addSwipeToDismiss('donghua-modal', closeModal);
+    addSwipeToDismiss('import-modal', () => {
+        const importModal = document.getElementById('import-modal');
+        if (importModal) {
+            importModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const settingsModal = document.getElementById('settings-modal');
+            if (settingsModal && settingsModal.style.display === 'flex') {
+                document.body.classList.add('modal-open');
+            }
+        }
+    });
+    addSwipeToDismiss('details-modal', () => {
+        const detailsModal = document.getElementById('details-modal');
+        if (detailsModal) {
+            detailsModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    });
+    addSwipeToDismiss('exit-modal', closeExitModal);
 });
 
 // Mobile Navigation View Controller
