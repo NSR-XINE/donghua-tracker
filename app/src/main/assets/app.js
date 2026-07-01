@@ -1327,7 +1327,11 @@ function addSwipeToDismiss(modalOverlayId, closeFn) {
         const dy = e.touches[0].clientY - startY;
         if (Math.abs(dy) > Math.abs(dx)) return;
 
-        if (isEdgeSwipe && dx < 0) return;
+        if (isEdgeSwipe) {
+            const onLeftEdge = startX < EDGE_THRESHOLD;
+            if (onLeftEdge && dx < 0) return;
+            if (!onLeftEdge && dx > 0) return;
+        }
 
         panel.style.transform = `translateX(${dx}px)`;
         panel.style.opacity = `${1 - Math.min(Math.abs(dx) / 250, 0.5)}`;
